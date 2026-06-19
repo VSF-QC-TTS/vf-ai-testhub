@@ -13,7 +13,7 @@ import vn.vinfast.aitesthub.auth.request.ForgotPasswordRequest;
 import vn.vinfast.aitesthub.auth.request.LoginRequest;
 import vn.vinfast.aitesthub.auth.service.EmailVerificationService;
 import vn.vinfast.aitesthub.auth.service.PasswordResetService;
-import vn.vinfast.aitesthub.auth.token.JwtTokenService;
+import vn.vinfast.aitesthub.auth.token.TokenService;
 import vn.vinfast.aitesthub.exception.ErrorCode;
 import vn.vinfast.aitesthub.exception.ResourceException;
 import vn.vinfast.aitesthub.mail.model.MailRequest;
@@ -176,12 +176,12 @@ class AuthServiceImplTest {
     return user -> response;
   }
 
-  private JwtTokenService tokenService() {
+  private TokenService tokenService() {
     return tokenService("qc.demo@example.com");
   }
 
-  private JwtTokenService tokenService(String refreshTokenSubject) {
-    return new JwtTokenService() {
+  private TokenService tokenService(String refreshTokenSubject) {
+    return new TokenService() {
       @Override
       public String createAccessToken(User user) {
         return "access-token";
@@ -209,8 +209,8 @@ class AuthServiceImplTest {
     };
   }
 
-  private JwtTokenService expiredRefreshTokenService() {
-    return new JwtTokenService() {
+  private TokenService expiredRefreshTokenService() {
+    return new TokenService() {
       @Override
       public String createAccessToken(User user) {
         throw new AssertionError("Access token should not be created");

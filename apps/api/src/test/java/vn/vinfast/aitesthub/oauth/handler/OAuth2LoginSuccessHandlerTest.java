@@ -16,7 +16,7 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
-import vn.vinfast.aitesthub.auth.token.JwtTokenService;
+import vn.vinfast.aitesthub.auth.token.TokenService;
 import vn.vinfast.aitesthub.oauth.AuthProvider;
 import vn.vinfast.aitesthub.oauth.profile.OAuth2UserProfile;
 import vn.vinfast.aitesthub.oauth.profile.OAuth2UserProfileService;
@@ -206,7 +206,7 @@ class OAuth2LoginSuccessHandlerTest {
   /** Builds handler with a real (mock) UserRepository for fine-grained control. */
   private OAuth2LoginSuccessHandler buildHandler(
       OAuth2UserProfile profile, UserRepository userRepo) {
-    var jwtTokenService = mock(JwtTokenService.class);
+    var jwtTokenService = mock(TokenService.class);
     when(jwtTokenService.createAccessToken(any())).thenReturn(ACCESS_TOKEN);
     when(jwtTokenService.createRefreshToken(any())).thenReturn(REFRESH_TOKEN);
 

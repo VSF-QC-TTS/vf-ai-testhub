@@ -19,7 +19,7 @@ import vn.vinfast.aitesthub.auth.response.LoginResult;
 import vn.vinfast.aitesthub.auth.service.AuthService;
 import vn.vinfast.aitesthub.auth.service.EmailVerificationService;
 import vn.vinfast.aitesthub.auth.service.PasswordResetService;
-import vn.vinfast.aitesthub.auth.token.JwtTokenService;
+import vn.vinfast.aitesthub.auth.token.TokenService;
 import vn.vinfast.aitesthub.exception.ErrorCode;
 import vn.vinfast.aitesthub.exception.ResourceException;
 import vn.vinfast.aitesthub.mail.model.MailRequest;
@@ -45,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
   private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;
   private final UserMapper userMapper;
-  private final JwtTokenService jwtTokenService;
+  private final TokenService jwtTokenService;
   private final EmailVerificationService emailVerificationService;
   private final PasswordResetService passwordResetService;
   private final MailService mailService;

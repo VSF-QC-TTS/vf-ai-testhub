@@ -6,7 +6,7 @@ import vn.vinfast.aitesthub.user.entity.User;
  * @author nghlong3004 (Long Nguyen Hoang)
  * @since 6/9/2026
  */
-public interface JwtTokenService {
+public interface TokenService {
 
   /**
    * Creates a short-lived access JWT for API authentication by a {@link User}.

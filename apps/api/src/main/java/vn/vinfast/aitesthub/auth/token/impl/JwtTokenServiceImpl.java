@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
-import vn.vinfast.aitesthub.auth.token.JwtTokenService;
+import vn.vinfast.aitesthub.auth.token.TokenService;
 import vn.vinfast.aitesthub.user.entity.User;
 
 /**
@@ -19,7 +19,7 @@ import vn.vinfast.aitesthub.user.entity.User;
  * @since 6/9/2026
  */
 @Service
-public class JwtTokenServiceImpl implements JwtTokenService {
+public class JwtTokenServiceImpl implements TokenService {
 
   private static final String ISSUER = "vat-api";
   private static final String ACCESS_TOKEN_TYPE = "access";

@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import vn.vinfast.aitesthub.auth.token.JwtTokenService;
+import vn.vinfast.aitesthub.auth.token.TokenService;
 import vn.vinfast.aitesthub.oauth.profile.OAuth2UserProfile;
 import vn.vinfast.aitesthub.oauth.profile.OAuth2UserProfileService;
 import vn.vinfast.aitesthub.user.entity.User;
@@ -52,7 +52,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private final OAuth2UserProfileService oAuth2UserProfileService;
   private final UserRepository userRepository;
-  private final JwtTokenService jwtTokenService;
+  private final TokenService jwtTokenService;
   private final PasswordEncoder passwordEncoder;
 
   @Override
