@@ -1,39 +1,50 @@
 # Agent Workflow & Delegation Guidelines
 
-This document serves as the **Source of Truth** for coordinating autonomous Subagents (Coder & Reviewer) in the project. Any main agent or orchestrator must read and follow this guide when assigning tasks.
+This document serves as the **Source of Truth** for coordinating autonomous Subagents in the project. The Orchestrator (Main Agent) must read and enforce this guide when delegating tasks. All content here is written in English to ensure compatibility with all AI agents.
 
-## 1. Context Reading (Hiểu Context)
-Trước khi giao việc hoặc code, các agent **phải** đọc các file sau:
-- `apps/api/CONTEXT.md`: Chứa rules bắt buộc (JavaDoc header, `publicId` UUID, DTO `record`, explicit validation messages, v.v.). Đây là tài liệu sống (living document).
-- `docs/tasks/TASKS_Backend.md`: Chứa task breakdown và checklist. Chỉ làm đúng scope được giao.
+## 1. Context and Knowledge Management
+Before executing any tasks, all agents must understand the domain rules:
+- `apps/api/CONTEXT.md`: The living document for architectural rules (e.g., JavaDoc headers, `publicId` UUIDs, DTO `record` usage, explicit validation messages).
+- `docs/tasks/TASKS_Backend.md`: The single source of truth for the project roadmap, task breakdown, and acceptance criteria.
+- **MCP Tools**: Agents (if `enable_mcp_tools` is true) should use tools from `agent-skills-standard`:
+  - Use `load_skills_for_keywords` (e.g., `["java 21", "jpa"]`) during planning.
+  - Use `load_skills_for_files` (e.g., `*Repository.java`) to fetch specific coding practices before modifying files.
 
-## 2. MCP Tools (Kỹ năng AI)
-Các subagents (nếu được bật `enable_mcp_tools: true`) NÊN sử dụng các MCP từ `agent-skills-standard` để lấy thông tin:
-- **Planning**: Dùng `load_skills_for_keywords` (VD: `["java 21", "jpa", "spring"]`) để load guidelines chung trước khi code.
-- **Coding**: Dùng `load_skills_for_files` dựa trên tên file chuẩn bị sửa (VD: `*Repository.java`) để lấy practices và anti-patterns cụ thể.
-- **Reviewing**: Dùng `audit_session_compliance` (nếu cần) hoặc đối chiếu thủ công với file `CONTEXT.md`.
+## 2. Agent Roles and Separation of Concerns
+To prevent agents from hallucinating or taking unauthorized actions (like committing unreviewed code), we separate concerns into three distinct roles. **Do not mix these responsibilities.**
 
-## 3. Workflow "Ping-Pong" Luân Phiên (BẮT BUỘC)
-Để tránh tình trạng Coder ôm hết việc và tự commit phá vỡ quy trình, quá trình phát triển **phải tuân thủ** luồng sau:
+### A. The Coder Agent (`java_backend_coder`)
+- **Responsibility**: Write code and tests strictly for the assigned micro-task.
+- **Restrictions**: 
+  - **NEVER** run `git commit`. 
+  - **NEVER** update `CONTEXT.md` or system architecture files.
+- **Prompt Directive**: *"Implement task [X]. Read CONTEXT.md for rules. Leave all changes in the working directory (unstaged or staged). Do NOT commit. Report back when all tests pass."*
 
-### Bước 1: Giao việc cho Coder (Micro-tasking)
-- **Scope**: Giao **TỪNG TASK NHỎ** (Ví dụ: Chỉ giao `E3.1` thay vì toàn bộ `Epic E3`).
-- **Prompt bắt buộc**:
-  > "Triển khai task X. Tuân thủ `CONTEXT.md`. **TUYỆT ĐỐI KHÔNG DÙNG LỆNH `git commit`**. Sau khi code xong và test pass (chạy `mvn test`), hãy giữ nguyên trạng thái Unstaged/Staged và báo cáo lại để tôi chuyển cho Reviewer."
+### B. The Reviewer Agent (`java_backend_reviewer`)
+- **Responsibility**: Audit the Coder's changes against the strict checklist. Provide feedback or approval.
+- **Checklist**:
+  1. **JavaDoc**: Every new `.java` file MUST have the standard class-level header (`@author` and `@since`).
+  2. **Security**: Internal DB `id` (BIGINT) must NOT be exposed. API must use `publicId` (UUID).
+  3. **DTOs**: Must use Java `record` and include OpenAPI `@Schema` annotations.
+  4. **Validation**: All validation annotations must have explicit `message` attributes.
+- **Restrictions**:
+  - **NEVER** run `git commit`.
+- **Prompt Directive**: *"Review the unstaged/staged changes. Use the checklist in AGENT_WORKFLOW.md. If there are violations, reject and detail the errors. If it passes 100%, output 'APPROVED'."*
 
-### Bước 2: Reviewer kiểm tra
-- **Scope**: Review các file bị thay đổi đang ở trạng thái unstaged/staged thông qua git diff.
-- **Checklist Reviewer**:
-  1. Kiểm tra Javadoc header (`@author`, `@since`) trên TẤT CẢ các file `.java` mới.
-  2. Kiểm tra expose `publicId` (UUID) và sử dụng Java `record` cho DTO.
-  3. Kiểm tra các validation annotation phải có explicit `message`.
-  4. Nếu Coder code sai: Trả về feedback rõ ràng và ép Coder sửa.
-  5. Nếu pass: Chuyển sang Bước 3.
+### C. The Documenter & Committer Agent (`java_backend_committer`)
+- **Responsibility**: Update living documentation and persist changes to version control.
+- **Workflow**: Only triggered AFTER the Reviewer outputs 'APPROVED'.
+- **Actions**:
+  1. Inspect the approved diff.
+  2. Update `apps/api/CONTEXT.md` if new domains, entities, or API endpoints were introduced.
+  3. Run `git add .` and `git commit -m "feat(scope): description"`.
+- **Prompt Directive**: *"The code is approved. Please update CONTEXT.md with any new endpoints/domains discovered in the diff. Then, commit the changes using Conventional Commits."*
 
-### Bước 3: Cập nhật tài liệu & Commit (Chỉ do Reviewer thực hiện)
-- Khi code đã đạt chuẩn, Reviewer phải **tự động cập nhật** `apps/api/CONTEXT.md` (Ghi nhận thêm API/Domain mới nếu có).
-- Reviewer tự thực hiện lệnh gom code:
-  `git add .`
-  `git commit -m "feat(scope): mô tả"`
-
-Lặp lại quy trình 3 bước này cho các task tiếp theo (E3.2, E3.3...). Đảm bảo tính kiểm soát tuyệt đối sau mỗi nhịp (Ping - Pong).
+## 3. The Strict "Ping-Pong" Workflow
+The Orchestrator must orchestrate tasks sequentially:
+1. **Assign** a micro-task (e.g., "E3.1 only") to the **Coder**.
+2. **Wait** for the Coder to finish.
+3. **Assign** the **Reviewer** to audit the working directory.
+4. If rejected, send feedback back to the **Coder**.
+5. If approved, **Assign** the **Committer** to finalize the task.
+6. Move to the next micro-task (e.g., E3.2).
