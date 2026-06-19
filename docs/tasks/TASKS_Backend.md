@@ -165,14 +165,14 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Cấu hình `spring-data-redis` kết nối Redis từ `docker-compose.yml` | ⬜ |
-| 2 | Tạo `RedisStreamConfig` bean (StringRedisTemplate, StreamOperations) | ⬜ |
-| 3 | Viết hàm util `publishToStream(streamKey, payload)` dùng `XADD` | ⬜ |
-| 4 | Test: Gọi hàm publish, kiểm tra message xuất hiện trong Redis | ⬜ |
+| 1 | Cấu hình `spring-data-redis` kết nối Redis từ `docker-compose.yml` | ✅ |
+| 2 | Tạo `RedisStreamConfig` bean (StringRedisTemplate, StreamOperations) | ✅ |
+| 3 | Viết hàm util `publishToStream(streamKey, payload)` dùng `XADD` | ✅ |
+| 4 | Test: Gọi hàm publish, kiểm tra message xuất hiện trong Redis | ✅ |
 
 - **Commit:** `feat(api): configure redis streams connection and publisher util`
 - **Scope:** S
-- **Review:** ⬜ | **Note:**
+- **Review:** ✅ | **Note:**
 
 ---
 
