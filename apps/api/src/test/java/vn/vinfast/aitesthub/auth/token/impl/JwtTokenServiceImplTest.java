@@ -24,9 +24,8 @@ class JwtTokenServiceImplTest {
     ReflectionTestUtils.setField(
         config, "secret", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
     SecretKey secretKey = config.secretKey();
-    JwtTokenServiceImpl tokenService =
-        new JwtTokenServiceImpl(
-            config.jwtEncoder(secretKey), config.refreshTokenJwtDecoder(secretKey));
+    JwtTokenService tokenService =
+        new JwtTokenService(config.jwtEncoder(secretKey), config.refreshTokenJwtDecoder(secretKey));
     ReflectionTestUtils.setField(tokenService, "accessExpirationMinutes", 15L);
     ReflectionTestUtils.setField(tokenService, "refreshExpirationMinutes", 10080L);
     User user = new User();

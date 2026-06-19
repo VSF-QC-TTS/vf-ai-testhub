@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Import;
       "GITHUB_CLIENT_SECRET=test-github-client-secret",
       "GEMINI_API_KEY=test-gemini-api-key"
     })
-class AiTesthubApplicationTests {
+class ApplicationTests {
 
   @Test
   void contextLoads() {}

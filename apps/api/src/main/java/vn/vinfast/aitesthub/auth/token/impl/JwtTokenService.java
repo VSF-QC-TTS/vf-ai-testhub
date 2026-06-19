@@ -1,7 +1,7 @@
 package vn.vinfast.aitesthub.auth.token.impl;
 
 import java.time.Instant;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.BadJwtException;
@@ -19,7 +19,8 @@ import vn.vinfast.aitesthub.user.entity.User;
  * @since 6/9/2026
  */
 @Service
-public class JwtTokenServiceImpl implements TokenService {
+@RequiredArgsConstructor
+public class JwtTokenService implements TokenService {
 
   private static final String ISSUER = "vat-api";
   private static final String ACCESS_TOKEN_TYPE = "access";
@@ -33,13 +34,6 @@ public class JwtTokenServiceImpl implements TokenService {
 
   private final JwtEncoder jwtEncoder;
   private final JwtDecoder refreshTokenJwtDecoder;
-
-  public JwtTokenServiceImpl(
-      JwtEncoder jwtEncoder,
-      @Qualifier("refreshTokenJwtDecoder") JwtDecoder refreshTokenJwtDecoder) {
-    this.jwtEncoder = jwtEncoder;
-    this.refreshTokenJwtDecoder = refreshTokenJwtDecoder;
-  }
 
   @Override
   public String createAccessToken(User user) {
