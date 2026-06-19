@@ -77,6 +77,8 @@ public enum ErrorCode {
       HttpStatus.CONFLICT.value(), "USERNAME_ALREADY_EXISTS", "Username is already in use."),
 
   // ── Projects ──
+  PROJECT_ALREADY_EXISTS(
+      HttpStatus.CONFLICT.value(), "PROJECT_ALREADY_EXISTS", "Project name is already in use."),
   PROJECT_NOT_FOUND(
       HttpStatus.NOT_FOUND.value(), "PROJECT_NOT_FOUND", "No project found with the provided ID."),
   TARGET_CONNECTOR_NOT_FOUND(

@@ -180,10 +180,10 @@ apps/api/
 
 | # | Kiểm tra | Status |
 |---|----------|--------|
-| 1 | `mvn compile` thành công, không lỗi | ⬜ |
-| 2 | `mvn test` pass (nếu có test) | ⬜ |
-| 3 | App khởi động được, kết nối PostgreSQL + Redis thành công | ⬜ |
-| 4 | Review với team trước khi tiếp tục | ⬜ |
+| 1 | `mvn compile` thành công, không lỗi | ✅ |
+| 2 | `mvn test` pass (nếu có test) | ✅ |
+| 3 | App khởi động được, kết nối PostgreSQL + Redis thành công | ✅ |
+| 4 | Review với team trước khi tiếp tục | ✅ |
 
 ---
 
@@ -195,15 +195,15 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `Project` entity với Lombok (`@Entity`, `@Data`, `@Builder`) theo Database_Design | ⬜ |
-| 2 | Tạo `ProjectRequest` DTO (với `@Valid` annotations) | ⬜ |
-| 3 | Tạo `ProjectResponse` DTO | ⬜ |
-| 4 | Tạo `ProjectMapper` interface (MapStruct) | ⬜ |
-| 5 | Tạo Flyway migration cho bảng `projects` | ⬜ |
+| 1 | Tạo `Project` entity với Lombok (`@Entity`, `@Data`, `@Builder`) theo Database_Design | ✅ |
+| 2 | Tạo `ProjectRequest` DTO (với `@Valid` annotations) | ✅ |
+| 3 | Tạo `ProjectResponse` DTO | ✅ |
+| 4 | Tạo `ProjectMapper` interface (MapStruct) | ✅ |
+| 5 | Tạo Flyway migration cho bảng `projects` | ✅ |
 
 - **Commit:** `feat(project): add entity, dto, mapper and migration`
 - **Scope:** M
-- **Review:** ⬜ | **Note:**
+- **Review:** ✅ | **Note:**
 
 ---
 
@@ -211,14 +211,14 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `ProjectRepository` (Spring Data JPA interface) | ⬜ |
-| 2 | Tạo `ProjectService` với CRUD: create, findById, findAll, update, archive | ⬜ |
-| 3 | Xử lý `ResourceNotFoundException` khi findById không tìm thấy | ⬜ |
-| 4 | Unit test `ProjectService` bằng Mockito (mock Repository) | ⬜ |
+| 1 | Tạo `ProjectRepository` (Spring Data JPA interface) | ✅ |
+| 2 | Tạo `ProjectService` với CRUD: create, findById, findAll, update, archive | ✅ |
+| 3 | Xử lý `ResourceNotFoundException` khi findById không tìm thấy | ✅ |
+| 4 | Unit test `ProjectService` bằng Mockito (mock Repository) | ✅ |
 
 - **Commit:** `feat(project): add repository, service and unit tests`
 - **Scope:** M
-- **Review:** ⬜ | **Note:**
+- **Review:** ✅ | **Note:**
 
 ---
 
@@ -226,15 +226,15 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `ProjectController` (`@RestController`, `/api/projects`) | ⬜ |
-| 2 | Implement endpoints: POST, GET /{id}, GET (list), PUT /{id}, PATCH /{id}/archive | ⬜ |
-| 3 | MockMvc integration test: Tạo project → 201 Created | ⬜ |
-| 4 | MockMvc integration test: Get project không tồn tại → 404 | ⬜ |
-| 5 | MockMvc integration test: Validation lỗi (thiếu name) → 400 | ⬜ |
+| 1 | Tạo `ProjectController` (`@RestController`, `/api/projects`) | ✅ |
+| 2 | Implement endpoints: POST, GET /{id}, GET (list), PUT /{id}, PATCH /{id}/archive | ✅ |
+| 3 | MockMvc integration test: Tạo project → 201 Created | ✅ |
+| 4 | MockMvc integration test: Get project không tồn tại → 404 | ✅ |
+| 5 | MockMvc integration test: Validation lỗi (thiếu name) → 400 | ✅ |
 
 - **Commit:** `feat(project): add controller and integration tests`
 - **Scope:** M
-- **Review:** ⬜ | **Note:**
+- **Review:** ✅ | **Note:**
 
 ---
 

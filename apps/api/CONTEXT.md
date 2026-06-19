@@ -101,6 +101,8 @@ Domain choices in current code:
   in its JSON payload. When `avatarUrl` is `null`, the frontend falls back to initials-based avatar rendering.
 - Default avatar URL template is configurable via `vat.user.default-avatar-url` (env: `DEFAULT_AVATAR_URL`).
 
+- `Project` entity is `vn.vinfast.aitesthub.project.entity.Project`. Uses internal `BIGINT id` and exposes `UUID publicId`. Tracks ownership and creator via relationships to `User`.
+
 ## [CURRENT_STATE] Persistence
 
 Persistence now vs target:
@@ -116,6 +118,11 @@ Persistence now vs target:
 Implemented API slices after auth:
 
 - `GET /api/v1/users/me`: returns the current authenticated user by principal username/email.
+- `POST /api/v1/projects`: Create a new project.
+- `GET /api/v1/projects/{id}`: Get a project by `publicId`.
+- `GET /api/v1/projects`: Get paginated active projects.
+- `PUT /api/v1/projects/{id}`: Update a project by `publicId`.
+- `PATCH /api/v1/projects/{id}/archive`: Archive a project by `publicId`.
 
 ## [MAIL] Mail
 
