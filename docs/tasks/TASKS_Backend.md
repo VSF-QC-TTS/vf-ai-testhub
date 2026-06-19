@@ -256,11 +256,11 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `Target` entity (FK tới Project) theo Database_Design (Hỗ trợ cả HTTP và LLM config) | ⬜ |
-| 2 | Tạo `ResponseMapping` entity (FK tới Target, 1-1) | ⬜ |
-| 3 | Tạo DTO: `TargetRequest`, `TargetResponse`, `ResponseMappingRequest`, `ResponseMappingResponse` | ⬜ |
-| 4 | Tạo `TargetMapper`, `ResponseMappingMapper` (MapStruct) | ⬜ |
-| 5 | Tạo Flyway migration cho bảng `targets` và `response_mappings` | ⬜ |
+| 1 | Tạo `Target` entity (FK tới Project) theo Database_Design (Hỗ trợ cả HTTP và LLM config) | ✅ |
+| 2 | Tạo `ResponseMapping` entity (FK tới Target, 1-1) | ✅ |
+| 3 | Tạo DTO: `TargetRequest`, `TargetResponse`, `ResponseMappingRequest`, `ResponseMappingResponse` | ✅ |
+| 4 | Tạo `TargetMapper`, `ResponseMappingMapper` (MapStruct) | ✅ |
+| 5 | Tạo Flyway migration cho bảng `targets` và `response_mappings` | ✅ |
 
 - **Commit:** `feat(target): add target and response mapping entities, dto, mapper`
 - **Review:** ⬜ | **Note:**

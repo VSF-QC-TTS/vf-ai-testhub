@@ -103,6 +103,9 @@ Domain choices in current code:
 
 - `Project` entity is `vn.vinfast.aitesthub.project.entity.Project`. Uses internal `BIGINT id` and exposes `UUID publicId`. Tracks ownership and creator via relationships to `User`.
 
+- `Target` entity is `vn.vinfast.aitesthub.target.entity.Target`. Configures external execution environments (HTTP APIs or LLM providers) for a `Project`. Exposes `UUID publicId`.
+- `ResponseMapping` entity is `vn.vinfast.aitesthub.target.entity.ResponseMapping`. Associated `OneToOne` with `Target` to map dynamic JSON response paths (e.g., answer, suggestions, intent) into structured evaluation data.
+
 ## [CURRENT_STATE] Persistence
 
 Persistence now vs target:
