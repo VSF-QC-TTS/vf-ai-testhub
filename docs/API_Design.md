@@ -3768,6 +3768,71 @@ curl -X POST https://host/api/runs/run_efg012/review \
 
 ---
 
+### 11.5 So sánh kết quả Runs — `GET /api/runs/compare`
+
+Lấy chi tiết sự khác biệt giữa 2 lần chạy trên cùng một Dataset (thường là để đối chiếu Regression test hoặc so sánh version LLM).
+
+**Query Parameters:**
+
+| Name | Type | Req | Mô tả |
+|------|------|-----|--------|
+| `baseRunId` | `string` | ✅ | ID của Run gốc (VD: v3.1) |
+| `compareRunId` | `string` | ✅ | ID của Run dùng để so sánh (VD: v3.2) |
+
+**Response Format (`200 OK`):**
+
+```json
+{
+  "code": "SUCCESS",
+  "data": {
+    "baseRun": {
+      "id": "run_base_1",
+      "name": "v3.1",
+      "targetName": "GPT-4"
+    },
+    "compareRun": {
+      "id": "run_comp_2",
+      "name": "v3.2",
+      "targetName": "GPT-4o"
+    },
+    "summary": {
+      "totalCases": 120,
+      "regressions": 3,
+      "fixed": 5,
+      "unchanged": 112
+    },
+    "diffs": [
+      {
+        "testCaseId": "tc_123",
+        "input": "Phí ship về Đà Nẵng bao nhiêu?",
+        "statusShift": "PASS_TO_FAIL",
+        "latencyShift": "+120ms",
+        "baseResult": {
+          "latencyMs": 380,
+          "autoStatus": "PASSED"
+        },
+        "compareResult": {
+          "latencyMs": 500,
+          "autoStatus": "FAILED"
+        },
+        "assertionDiffs": [
+          {
+            "assertionId": "as_789",
+            "field": "$.intent",
+            "baseStatus": "PASSED",
+            "baseOutput": "shipping_fee",
+            "compareStatus": "FAILED",
+            "compareOutput": "faq"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
 ## 12. Phụ lục — Enum Values & Domain Types
 
 ### 12.1 Assertion Scopes

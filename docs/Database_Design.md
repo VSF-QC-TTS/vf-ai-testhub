@@ -161,8 +161,7 @@ erDiagram
 
     test_cases {
         UUID id PK
-        VARCHAR external_id
-        UUID dataset_id FK
+        VARCHAR external_id            BIGINT dataset_id FK
         VARCHAR section_name
         VARCHAR name
         TEXT description
@@ -408,6 +407,9 @@ Sử dụng PostgreSQL custom ENUM types để đảm bảo type-safety tại da
 -- User roles
 CREATE TYPE user_role AS ENUM ('ADMIN', 'QC_LEAD', 'QC', 'VIEWER');
 
+-- Target Types
+CREATE TYPE target_type AS ENUM ('HTTP', 'LLM');
+
 -- HTTP methods cho Target
 CREATE TYPE http_method AS ENUM ('GET', 'POST', 'PUT', 'PATCH', 'DELETE');
 
@@ -424,7 +426,7 @@ CREATE TYPE assertion_type AS ENUM (
     'is_true', 'is_false',
     'field_exists', 'field_not_exists',
     'array_length_greater_than', 'array_contains',
-    'llm_rubric'
+    'llm_rubric', 'range', 'schema'
 );
 
 -- Severity levels
@@ -523,7 +525,7 @@ Bảng quản lý người dùng cho JWT authentication và authorization. PRD k
 
 ```sql
 CREATE TABLE users (
-    id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username        VARCHAR(100)    NOT NULL,
     email           VARCHAR(255)    NOT NULL,
     password_hash   VARCHAR(255)    NOT NULL,
@@ -573,11 +575,12 @@ CREATE INDEX idx_users_role ON users (role);
 
 ```sql
 CREATE TABLE projects (
-    id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    public_id       VARCHAR(32)     UNIQUE NOT NULL,
     name            VARCHAR(255)    NOT NULL,
     description     TEXT,
-    owner_id        UUID            NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-    created_by      UUID            NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    owner_id            BIGINT            NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    created_by      BIGINT            NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     archived        BOOLEAN         NOT NULL DEFAULT FALSE,
     created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
@@ -623,16 +626,28 @@ Target lưu request template đã parse từ cURL, bao gồm input binding và v
 
 ```sql
 CREATE TABLE targets (
-    id                      UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id              UUID            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    public_id               VARCHAR(32)     UNIQUE NOT NULL,
+    project_id            BIGINT            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     name                    VARCHAR(255)    NOT NULL,
     environment             VARCHAR(50),
-    method                  http_method     NOT NULL DEFAULT 'POST',
-    url                     TEXT            NOT NULL,
+    target_type             target_type     NOT NULL DEFAULT 'HTTP',
+    
+    -- Config cho HTTP Target
+    method                  http_method     DEFAULT 'POST',
+    url                     TEXT,
     query_params_template   JSONB           DEFAULT '{}',
     headers_template        JSONB           DEFAULT '{}',
     body_template           JSONB           DEFAULT '{}',
     auth_config             JSONB,
+    
+    -- Config cho LLM Target
+    llm_provider            VARCHAR(100),
+    llm_model               VARCHAR(100),
+    llm_base_url            TEXT,
+    llm_key_ref             VARCHAR(255),
+    
+    -- Binding chung
     input_binding           JSONB,
     variable_bindings       JSONB           DEFAULT '{}',
     timeout_ms              INTEGER         NOT NULL DEFAULT 30000,
@@ -641,7 +656,10 @@ CREATE TABLE targets (
     updated_at              TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
 
     CONSTRAINT uq_targets_project_name UNIQUE (project_id, name),
-    CONSTRAINT ck_targets_url_not_empty CHECK (char_length(TRIM(url)) > 0),
+    CONSTRAINT ck_targets_http_or_llm CHECK (
+        (target_type = 'HTTP' AND url IS NOT NULL AND char_length(TRIM(url)) > 0) OR 
+        (target_type = 'LLM' AND llm_provider IS NOT NULL AND llm_model IS NOT NULL)
+    ),
     CONSTRAINT ck_targets_timeout_positive CHECK (timeout_ms > 0 AND timeout_ms <= 300000)
 );
 ```
@@ -690,8 +708,8 @@ Response mapping chứa JSON path cho từng standard component (answer, suggest
 
 ```sql
 CREATE TABLE response_mappings (
-    id                      UUID                    PRIMARY KEY DEFAULT gen_random_uuid(),
-    target_id               UUID                    NOT NULL REFERENCES targets(id) ON DELETE CASCADE,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    target_id            BIGINT                    NOT NULL REFERENCES targets(id) ON DELETE CASCADE,
     answer_path             VARCHAR(500),
     suggestions_path        VARCHAR(500),
     intent_path             VARCHAR(500),
@@ -757,15 +775,16 @@ Một bộ test cases thuộc project (PRD §9.6). Ví dụ: "Smoke Test", "Full
 
 ```sql
 CREATE TABLE datasets (
-    id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id          UUID            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    public_id           VARCHAR(32)     UNIQUE NOT NULL,
+    project_id            BIGINT            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     name                VARCHAR(255)    NOT NULL,
     description         TEXT,
     category            VARCHAR(100),
     tags                JSONB           DEFAULT '[]',
     default_assertions  JSONB           DEFAULT '[]',
     default_rubrics     JSONB           DEFAULT '[]',
-    created_by          UUID            REFERENCES users(id) ON DELETE SET NULL,
+    created_by      BIGINT            REFERENCES users(id) ON DELETE SET NULL,
     enabled             BOOLEAN         NOT NULL DEFAULT TRUE,
     archived            BOOLEAN         NOT NULL DEFAULT FALSE,
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
@@ -816,9 +835,10 @@ Mapping legacy CSV: `id → external_id`, `section_name → section_name`, `cust
 
 ```sql
 CREATE TABLE test_cases (
-    id                  UUID                PRIMARY KEY DEFAULT gen_random_uuid(),
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    public_id           VARCHAR(32)         UNIQUE NOT NULL,
     external_id         VARCHAR(255),
-    dataset_id          UUID                NOT NULL REFERENCES datasets(id) ON DELETE CASCADE,
+    dataset_id            BIGINT                NOT NULL REFERENCES datasets(id) ON DELETE CASCADE,
     section_name        VARCHAR(500),
     name                VARCHAR(500),
     description         TEXT,
@@ -894,15 +914,15 @@ CREATE INDEX idx_test_cases_variables ON test_cases USING GIN (variables jsonb_p
 
 ```sql
 CREATE TABLE assertions (
-    id                  UUID                PRIMARY KEY DEFAULT gen_random_uuid(),
-    test_case_id        UUID                NOT NULL REFERENCES test_cases(id) ON DELETE CASCADE,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    test_case_id            BIGINT                NOT NULL REFERENCES test_cases(id) ON DELETE CASCADE,
     scope               assertion_scope     NOT NULL,
     type                assertion_type      NOT NULL,
     target_component    VARCHAR(100),
     field_path          VARCHAR(500),
     field_paths         JSONB,
     expected_value      JSONB,
-    rubric_id           UUID                REFERENCES rubrics(id) ON DELETE SET NULL,
+    rubric_id            BIGINT                REFERENCES rubrics(id) ON DELETE SET NULL,
     rubric_override     TEXT,
     threshold           NUMERIC(5,4)        DEFAULT 0.8000,
     weight              NUMERIC(5,4)        DEFAULT 1.0000,
@@ -973,8 +993,8 @@ Kỳ vọng về tool call/agent/action của chatbot (PRD §12). Object riêng,
 
 ```sql
 CREATE TABLE tool_expectations (
-    id                      UUID                    PRIMARY KEY DEFAULT gen_random_uuid(),
-    test_case_id            UUID                    NOT NULL REFERENCES test_cases(id) ON DELETE CASCADE,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    test_case_id            BIGINT                    NOT NULL REFERENCES test_cases(id) ON DELETE CASCADE,
     expectation_type        tool_expectation_type   NOT NULL,
     target_source           target_source_type      NOT NULL DEFAULT 'normalized_tool_calls',
     tool_name               VARCHAR(255),
@@ -983,7 +1003,7 @@ CREATE TABLE tool_expectations (
     sequence                JSONB,
     min_calls               INTEGER,
     max_calls               INTEGER,
-    rubric_id               UUID                    REFERENCES rubrics(id) ON DELETE SET NULL,
+    rubric_id            BIGINT                    REFERENCES rubrics(id) ON DELETE SET NULL,
     rubric_override         TEXT,
     threshold               NUMERIC(5,4)            DEFAULT 0.8000,
     required                BOOLEAN                 NOT NULL DEFAULT TRUE,
@@ -1054,17 +1074,17 @@ Rubric library cho LLM judge (PRD §11.2). Cho phép QC tái sử dụng rubric 
 
 ```sql
 CREATE TABLE rubrics (
-    id                  UUID                PRIMARY KEY DEFAULT gen_random_uuid(),
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     scope               rubric_scope        NOT NULL DEFAULT 'PROJECT',
-    project_id          UUID                REFERENCES projects(id) ON DELETE CASCADE,
-    dataset_id          UUID                REFERENCES datasets(id) ON DELETE CASCADE,
+    project_id            BIGINT                REFERENCES projects(id) ON DELETE CASCADE,
+    dataset_id            BIGINT                REFERENCES datasets(id) ON DELETE CASCADE,
     name                VARCHAR(255)        NOT NULL,
     description         TEXT,
     category            rubric_category     DEFAULT 'ANSWER_QUALITY',
     language            VARCHAR(10)         NOT NULL DEFAULT 'vi',
     content             TEXT                NOT NULL,
     default_threshold   NUMERIC(5,4)        NOT NULL DEFAULT 0.8000,
-    created_by          UUID                REFERENCES users(id) ON DELETE SET NULL,
+    created_by      BIGINT                REFERENCES users(id) ON DELETE SET NULL,
     archived            BOOLEAN             NOT NULL DEFAULT FALSE,
     created_at          TIMESTAMPTZ         NOT NULL DEFAULT NOW(),
     updated_at          TIMESTAMPTZ         NOT NULL DEFAULT NOW(),
@@ -1128,10 +1148,11 @@ Một lần thực thi dataset (PRD §15.1). Run chạy async qua Redis queue, l
 
 ```sql
 CREATE TABLE runs (
-    id                          UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id                  UUID            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    dataset_id                  UUID            NOT NULL REFERENCES datasets(id) ON DELETE RESTRICT,
-    target_id                   UUID            NOT NULL REFERENCES targets(id) ON DELETE RESTRICT,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    public_id                   VARCHAR(32)     UNIQUE NOT NULL,
+    project_id            BIGINT            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    dataset_id            BIGINT            NOT NULL REFERENCES datasets(id) ON DELETE RESTRICT,
+    target_id            BIGINT            NOT NULL REFERENCES targets(id) ON DELETE RESTRICT,
     status                      run_status      NOT NULL DEFAULT 'PENDING',
     run_mode                    run_mode        NOT NULL DEFAULT 'FULL_DATASET',
     include_llm_judge           BOOLEAN         NOT NULL DEFAULT TRUE,
@@ -1139,8 +1160,8 @@ CREATE TABLE runs (
     max_concurrency             INTEGER         NOT NULL DEFAULT 3,
     timeout_ms                  INTEGER         NOT NULL DEFAULT 30000,
     retry_count                 INTEGER         NOT NULL DEFAULT 0,
-    triggered_by                UUID            REFERENCES users(id) ON DELETE SET NULL,
-    previous_run_id             UUID            REFERENCES runs(id) ON DELETE SET NULL,  -- Lineage: dùng cho rerun-failed, trỏ về run gốc để track chuỗi retry
+    triggered_by    BIGINT            REFERENCES users(id) ON DELETE SET NULL,
+    previous_run_id            BIGINT            REFERENCES runs(id) ON DELETE SET NULL,  -- Lineage: dùng cho rerun-failed, trỏ về run gốc để track chuỗi retry
     selected_case_ids           JSONB,
     selected_section            VARCHAR(500),
     started_at                  TIMESTAMPTZ,
@@ -1240,9 +1261,9 @@ Output sau khi chạy một test case trong một run (PRD §16.1). Chứa raw r
 
 ```sql
 CREATE TABLE test_results (
-    id                          UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
-    run_id                      UUID            NOT NULL REFERENCES runs(id) ON DELETE CASCADE,
-    test_case_id                UUID            NOT NULL REFERENCES test_cases(id) ON DELETE RESTRICT,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    run_id            BIGINT            NOT NULL REFERENCES runs(id) ON DELETE CASCADE,
+    test_case_id            BIGINT            NOT NULL REFERENCES test_cases(id) ON DELETE RESTRICT,
     status                      review_status   NOT NULL DEFAULT 'SKIPPED',
     score                       NUMERIC(5,4),
     request_snapshot            JSONB,
@@ -1301,9 +1322,9 @@ Kết quả evaluate từng assertion của test case (PRD §16.2). Cho phép re
 
 ```sql
 CREATE TABLE assertion_results (
-    id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
-    test_result_id      UUID            NOT NULL REFERENCES test_results(id) ON DELETE CASCADE,
-    assertion_id        UUID            NOT NULL REFERENCES assertions(id) ON DELETE RESTRICT,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    test_result_id            BIGINT            NOT NULL REFERENCES test_results(id) ON DELETE CASCADE,
+    assertion_id            BIGINT            NOT NULL REFERENCES assertions(id) ON DELETE RESTRICT,
     status              review_status   NOT NULL,
     actual_value        JSONB,
     expected_value      JSONB,
@@ -1368,9 +1389,9 @@ Kết quả evaluate từng tool expectation (PRD §16.3). Cho phép report **to
 
 ```sql
 CREATE TABLE tool_expectation_results (
-    id                      UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
-    test_result_id          UUID            NOT NULL REFERENCES test_results(id) ON DELETE CASCADE,
-    tool_expectation_id     UUID            NOT NULL REFERENCES tool_expectations(id) ON DELETE RESTRICT,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    test_result_id            BIGINT            NOT NULL REFERENCES test_results(id) ON DELETE CASCADE,
+    tool_expectation_id            BIGINT            NOT NULL REFERENCES tool_expectations(id) ON DELETE RESTRICT,
     status                  review_status   NOT NULL,
     expected_tool_name      VARCHAR(255),
     actual_tool_calls       JSONB,
@@ -1419,13 +1440,13 @@ Tách auto evaluation và QC final review (PRD §16.4). QC có thể override au
 
 ```sql
 CREATE TABLE manual_reviews (
-    id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
-    test_result_id      UUID            NOT NULL REFERENCES test_results(id) ON DELETE CASCADE,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    test_result_id            BIGINT            NOT NULL REFERENCES test_results(id) ON DELETE CASCADE,
     auto_status         review_status   NOT NULL,
     auto_reason         TEXT,
     reviewed_status     review_status,
     reviewer_note       TEXT,
-    reviewed_by         UUID            REFERENCES users(id) ON DELETE SET NULL,
+    reviewed_by     BIGINT            REFERENCES users(id) ON DELETE SET NULL,
     reviewed_at         TIMESTAMPTZ,
     final_status        review_status   NOT NULL,
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
@@ -1483,16 +1504,16 @@ Lưu metadata cho file artifacts: promptfoo config, output, run report, import/e
 
 ```sql
 CREATE TABLE artifacts (
-    id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
-    run_id              UUID            REFERENCES runs(id) ON DELETE CASCADE,
-    project_id          UUID            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    run_id            BIGINT            REFERENCES runs(id) ON DELETE CASCADE,
+    project_id            BIGINT            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     artifact_type       artifact_type   NOT NULL,
     file_name           VARCHAR(500)    NOT NULL,
     file_path           VARCHAR(1000)   NOT NULL,
     mime_type           VARCHAR(100)    DEFAULT 'application/json',
     file_size_bytes     BIGINT,
     metadata            JSONB           DEFAULT '{}',
-    created_by          UUID            REFERENCES users(id) ON DELETE SET NULL,
+    created_by      BIGINT            REFERENCES users(id) ON DELETE SET NULL,
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
 
     CONSTRAINT ck_artifacts_file_size_positive CHECK (file_size_bytes IS NULL OR file_size_bytes >= 0),
@@ -1538,13 +1559,13 @@ Quản lý API keys, tokens, credentials cho targets (PRD §20.1). Secret phải
 
 ```sql
 CREATE TABLE secrets (
-    id                  UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
-    project_id          UUID            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    id              BIGINT          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    project_id            BIGINT            NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     key_name            VARCHAR(255)    NOT NULL,
     encrypted_value     TEXT            NOT NULL,
     secret_type         secret_type     NOT NULL DEFAULT 'API_KEY',
     description         TEXT,
-    created_by          UUID            REFERENCES users(id) ON DELETE SET NULL,
+    created_by      BIGINT            REFERENCES users(id) ON DELETE SET NULL,
     last_rotated_at     TIMESTAMPTZ,
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
     updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
@@ -1692,8 +1713,8 @@ Theo thứ tự ưu tiên:
 -- Khi cần partition, drop bảng cũ và tạo lại:
 CREATE TABLE test_results (
     id                          UUID            NOT NULL DEFAULT gen_random_uuid(),
-    run_id                      UUID            NOT NULL,
-    test_case_id                UUID            NOT NULL,
+    run_id            BIGINT            NOT NULL,
+    test_case_id            BIGINT            NOT NULL,
     status                      review_status   NOT NULL DEFAULT 'SKIPPED',
     score                       NUMERIC(5,4),
     request_snapshot            JSONB,
@@ -1734,26 +1755,26 @@ Sử dụng **Flyway** (Java ecosystem, phù hợp với Spring Boot backend) ho
 
 ```text
 db/migration/
-├── V001__create_enum_types.sql
-├── V002__create_users_table.sql
-├── V003__create_projects_table.sql
-├── V004__create_targets_table.sql
-├── V005__create_response_mappings_table.sql
-├── V006__create_datasets_table.sql
-├── V007__create_test_cases_table.sql
-├── V008__create_rubrics_table.sql
-├── V009__create_assertions_table.sql
-├── V010__create_tool_expectations_table.sql
-├── V011__create_runs_table.sql
-├── V012__create_test_results_table.sql
-├── V013__create_assertion_results_table.sql
-├── V014__create_tool_expectation_results_table.sql
-├── V015__create_manual_reviews_table.sql
-├── V016__create_artifacts_table.sql
-├── V017__create_secrets_table.sql
-├── V018__create_indexes.sql
-├── V019__create_triggers.sql
-├── V020__seed_data.sql
+├── V1__create_enum_types.sql
+├── V2__create_users_table.sql
+├── V3__create_projects_table.sql
+├── V4__create_targets_table.sql
+├── V5__create_response_mappings_table.sql
+├── V6__create_datasets_table.sql
+├── V7__create_test_cases_table.sql
+├── V8__create_rubrics_table.sql
+├── V9__create_assertions_table.sql
+├── V10__create_tool_expectations_table.sql
+├── V11__create_runs_table.sql
+├── V12__create_test_results_table.sql
+├── V13__create_assertion_results_table.sql
+├── V14__create_tool_expectation_results_table.sql
+├── V15__create_manual_reviews_table.sql
+├── V16__create_artifacts_table.sql
+├── V17__create_secrets_table.sql
+├── V18__create_indexes.sql
+├── V19__create_triggers.sql
+├── V20__seed_data.sql
 ```
 
 ### Quy tắc migration
@@ -1883,9 +1904,9 @@ VALUES (
 
 DO $$
 DECLARE
-    v_admin_id UUID;
-    v_project_id UUID;
-    v_target_id UUID;
+    v_admin_id            BIGINT;
+    v_project_id            BIGINT;
+    v_target_id            BIGINT;
 BEGIN
     -- Lấy admin user
     SELECT id INTO v_admin_id FROM users WHERE username = 'admin' LIMIT 1;

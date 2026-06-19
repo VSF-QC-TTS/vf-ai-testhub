@@ -256,7 +256,7 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `Target` entity (FK tới Project) theo Database_Design | ⬜ |
+| 1 | Tạo `Target` entity (FK tới Project) theo Database_Design (Hỗ trợ cả HTTP và LLM config) | ⬜ |
 | 2 | Tạo `ResponseMapping` entity (FK tới Target, 1-1) | ⬜ |
 | 3 | Tạo DTO: `TargetRequest`, `TargetResponse`, `ResponseMappingRequest`, `ResponseMappingResponse` | ⬜ |
 | 4 | Tạo `TargetMapper`, `ResponseMappingMapper` (MapStruct) | ⬜ |
@@ -427,7 +427,7 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `Assertion` entity (FK tới TestCase) theo Database_Design — scope, type, targetComponent, fieldPath... | ⬜ |
+| 1 | Tạo `Assertion` entity (FK tới TestCase) theo Database_Design — scope, type (kể cả RANGE, SCHEMA), targetComponent, fieldPath... | ⬜ |
 | 2 | Tạo `AssertionRequest`, `AssertionResponse` DTO | ⬜ |
 | 3 | Tạo `AssertionMapper` (MapStruct) | ⬜ |
 | 4 | Tạo Flyway migration cho bảng `assertions` | ⬜ |
@@ -671,10 +671,11 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `ResultController` (`/api/runs/{runId}/results`) | ⬜ |
+| 1 | Tạo `ResultController` (`/api/runs/{runId}/results`) và endpoint Compare (`/api/runs/compare`) | ⬜ |
 | 2 | Tạo `ManualReviewController` (`/api/results/{resultId}/review`) | ⬜ |
-| 3 | MockMvc test: Get report → 200 + đúng cấu trúc JSON | ⬜ |
-| 4 | MockMvc test: Submit manual review → 200 | ⬜ |
+| 3 | MockMvc test: Get report \u2192 200 + đúng cấu trúc JSON | ⬜ |
+| 4 | MockMvc test: Get compare \u2192 200 | ⬜ |
+| 5 | MockMvc test: Submit manual review \u2192 200 | ⬜ |
 
 - **Commit:** `feat(result): add controllers and integration tests`
 - **Review:** ⬜ | **Note:**
