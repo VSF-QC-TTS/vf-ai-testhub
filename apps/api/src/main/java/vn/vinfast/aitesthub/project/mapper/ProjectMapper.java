@@ -1,5 +1,11 @@
 package vn.vinfast.aitesthub.project.mapper;
 
+/**
+ * @author nghlong3004 (Long Nguyen Hoang)
+ * @since 6/19/2026
+ */
+
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import vn.vinfast.aitesthub.project.entity.Project;

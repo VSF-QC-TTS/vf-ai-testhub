@@ -1,5 +1,11 @@
 package vn.vinfast.aitesthub.project.entity;
 
+/**
+ * @author nghlong3004 (Long Nguyen Hoang)
+ * @since 6/19/2026
+ */
+
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

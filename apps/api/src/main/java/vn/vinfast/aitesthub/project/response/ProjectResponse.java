@@ -1,5 +1,11 @@
 package vn.vinfast.aitesthub.project.response;
 
+/**
+ * @author nghlong3004 (Long Nguyen Hoang)
+ * @since 6/19/2026
+ */
+
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import java.util.UUID;
