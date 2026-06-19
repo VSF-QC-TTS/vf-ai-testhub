@@ -1,0 +1,48 @@
+package vn.vinfast.aitesthub.auth.token;
+
+import vn.vinfast.aitesthub.user.entity.User;
+
+/**
+ * @author nghlong3004 (Long Nguyen Hoang)
+ * @since 6/9/2026
+ */
+public interface JwtTokenService {
+
+  /**
+   * Creates a short-lived access JWT for API authentication by a {@link User}.
+   *
+   * @param user authenticated {@link User}
+   * @return signed access token
+   */
+  String createAccessToken(User user);
+
+  /**
+   * Creates a refresh JWT for session renewal by a {@link User}.
+   *
+   * @param user authenticated {@link User}
+   * @return signed refresh token
+   */
+  String createRefreshToken(User user);
+
+  /**
+   * Validates a refresh JWT and returns its subject.
+   *
+   * @param refreshToken refresh JWT from the HttpOnly cookie
+   * @return normalized email stored as the token subject
+   */
+  String readRefreshTokenSubject(String refreshToken);
+
+  /**
+   * Returns access token TTL.
+   *
+   * @return access token lifetime in seconds
+   */
+  long accessTokenExpiresInSeconds();
+
+  /**
+   * Returns refresh token TTL.
+   *
+   * @return refresh token lifetime in seconds
+   */
+  long refreshTokenExpiresInSeconds();
+}

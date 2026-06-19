@@ -1,0 +1,88 @@
+package vn.vinfast.aitesthub.auth.token.impl;
+
+import java.time.Instant;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.BadJwtException;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Service;
+import vn.vinfast.aitesthub.auth.token.JwtTokenService;
+import vn.vinfast.aitesthub.user.entity.User;
+
+/**
+ * @author nghlong3004 (Long Nguyen Hoang)
+ * @since 6/9/2026
+ */
+@Service
+public class JwtTokenServiceImpl implements JwtTokenService {
+
+  private static final String ISSUER = "vat-api";
+  private static final String ACCESS_TOKEN_TYPE = "access";
+  private static final String REFRESH_TOKEN_TYPE = "refresh";
+
+  @Value("${vat.security.access-expiration}")
+  private long accessExpirationMinutes;
+
+  @Value("${vat.security.refresh-expiration}")
+  private long refreshExpirationMinutes;
+
+  private final JwtEncoder jwtEncoder;
+  private final JwtDecoder refreshTokenJwtDecoder;
+
+  public JwtTokenServiceImpl(
+      JwtEncoder jwtEncoder,
+      @Qualifier("refreshTokenJwtDecoder") JwtDecoder refreshTokenJwtDecoder) {
+    this.jwtEncoder = jwtEncoder;
+    this.refreshTokenJwtDecoder = refreshTokenJwtDecoder;
+  }
+
+  @Override
+  public String createAccessToken(User user) {
+    return createToken(user, ACCESS_TOKEN_TYPE, accessTokenExpiresInSeconds());
+  }
+
+  @Override
+  public String createRefreshToken(User user) {
+    return createToken(user, REFRESH_TOKEN_TYPE, refreshTokenExpiresInSeconds());
+  }
+
+  @Override
+  public String readRefreshTokenSubject(String refreshToken) {
+    String subject = refreshTokenJwtDecoder.decode(refreshToken).getSubject();
+    if (subject == null || subject.isBlank()) {
+      throw new BadJwtException("Refresh token subject is missing");
+    }
+    return subject;
+  }
+
+  @Override
+  public long accessTokenExpiresInSeconds() {
+    return accessExpirationMinutes * 60;
+  }
+
+  @Override
+  public long refreshTokenExpiresInSeconds() {
+    return refreshExpirationMinutes * 60;
+  }
+
+  private String createToken(User user, String tokenType, long expiresInSeconds) {
+    Instant now = Instant.now();
+    JwtClaimsSet claims =
+        JwtClaimsSet.builder()
+            .issuer(ISSUER)
+            .issuedAt(now)
+            .expiresAt(now.plusSeconds(expiresInSeconds))
+            .subject(user.getUsername())
+            .claim("scope", user.getRole().getAuthority())
+            .claim("token_type", tokenType)
+            .claim("user_public_id", user.getPublicId().toString())
+            .build();
+    JwsHeader headers = JwsHeader.with(MacAlgorithm.HS256).build();
+    return jwtEncoder.encode(JwtEncoderParameters.from(headers, claims)).getTokenValue();
+  }
+}
