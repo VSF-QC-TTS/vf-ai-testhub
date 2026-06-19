@@ -118,15 +118,15 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Khởi tạo Spring Boot 4.1.0 project từ template của team | ⬜ |
-| 2 | Thêm dependencies: Lombok, MapStruct, Spring Data JPA, Spring Data Redis, Validation, Web | ⬜ |
-| 3 | Cấu hình `application.yml` (datasource, redis, server port) | ⬜ |
-| 4 | Cấu hình Lombok annotation processor + MapStruct trong build tool | ⬜ |
-| 5 | Verify: `mvn compile` hoặc `gradle build` thành công, không lỗi | ⬜ |
+| 1 | Khởi tạo Spring Boot 4.1.0 project từ template của team | ✅ |
+| 2 | Thêm dependencies: Lombok, MapStruct, Spring Data JPA, Spring Data Redis, Validation, Web | ✅ |
+| 3 | Cấu hình `application.yml` (datasource, redis, server port) | ✅ |
+| 4 | Cấu hình Lombok annotation processor + MapStruct trong build tool | ✅ |
+| 5 | Verify: `mvn compile` hoặc `gradle build` thành công, không lỗi | ✅ |
 
 - **Commit:** `chore(api): init spring boot project with core dependencies`
 - **Scope:** S
-- **Review:** ⬜ | **Note:**
+- **Review:** `DONE` | **Note:** Đã được khởi tạo sẵn trong codebase.
 
 ---
 
@@ -134,15 +134,15 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `GlobalExceptionHandler` (`@ControllerAdvice`) trả JSON chuẩn `{error, message, timestamp}` | ⬜ |
-| 2 | Tạo custom exception classes: `ResourceNotFoundException`, `BusinessException` | ⬜ |
-| 3 | Cấu hình CORS cho phép `localhost:5173` (Vite dev server) | ⬜ |
-| 4 | Cấu hình `MessageSource` cho validation messages (nếu cần i18n) | ⬜ |
-| 5 | Test: Gọi API không tồn tại → trả đúng format JSON lỗi | ⬜ |
+| 1 | Tạo `GlobalExceptionHandler` (`@ControllerAdvice`) trả JSON chuẩn `{error, message, timestamp}` | ✅ |
+| 2 | Tạo custom exception classes: `ResourceNotFoundException`, `BusinessException` | ✅ |
+| 3 | Cấu hình CORS cho phép `localhost:5173` (Vite dev server) | ✅ |
+| 4 | Cấu hình `MessageSource` cho validation messages (nếu cần i18n) | ✅ |
+| 5 | Test: Gọi API không tồn tại → trả đúng format JSON lỗi | ✅ |
 
 - **Commit:** `feat(api): add global exception handler and CORS config`
 - **Scope:** S
-- **Review:** ⬜ | **Note:**
+- **Review:** `DONE` | **Note:** Đã được code sẵn (xem package exception, config).
 
 ---
 
@@ -150,14 +150,14 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Cấu hình `application.yml` kết nối PostgreSQL từ `docker-compose.yml` | ⬜ |
-| 2 | Chọn và cài migration tool (Flyway hoặc Liquibase) | ⬜ |
-| 3 | Tạo migration script V1 (schema ban đầu — có thể rỗng hoặc chứa bảng `projects`) | ⬜ |
-| 4 | Verify: App khởi động thành công, migration chạy đúng, bảng được tạo | ⬜ |
+| 1 | Cấu hình `application.yml` kết nối PostgreSQL từ `docker-compose.yml` | ✅ |
+| 2 | Chọn và cài migration tool (Flyway hoặc Liquibase) | ✅ |
+| 3 | Tạo migration script V1 (schema ban đầu — có thể rỗng hoặc chứa bảng `projects`) | ✅ |
+| 4 | Verify: App khởi động thành công, migration chạy đúng, bảng được tạo | ✅ |
 
 - **Commit:** `feat(api): configure postgresql and flyway migration`
 - **Scope:** S
-- **Review:** ⬜ | **Note:**
+- **Review:** `DONE` | **Note:** Đã cấu hình Flyway, V1__init_schema.sql (Auth) đã tồn tại.
 
 ---
 
@@ -735,12 +735,12 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `JwtAuthFilter` extends `OncePerRequestFilter` | ⬜ |
-| 2 | Tạo `SecurityConfig` (`@EnableWebSecurity`) — whitelist public endpoints, protect `/api/**` | ⬜ |
-| 3 | Inject `userId` vào SecurityContext sau khi verify token | ⬜ |
+| 1 | Tạo `JwtAuthFilter` extends `OncePerRequestFilter` | ✅ |
+| 2 | Tạo `SecurityConfig` (`@EnableWebSecurity`) — whitelist public endpoints, protect `/api/**` | ✅ |
+| 3 | Inject `userId` vào SecurityContext sau khi verify token | ✅ |
 
 - **Commit:** `feat(security): add jwt authentication filter`
-- **Review:** ⬜ | **Note:**
+- **Review:** `DONE` | **Note:** Đã được team triển khai sẵn đầy đủ.
 
 ---
 
