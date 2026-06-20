@@ -1,10 +1,10 @@
 package vn.vinfast.aitesthub.target.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.OffsetDateTime;
@@ -150,15 +150,11 @@ class TargetControllerTest {
     }
   }
 
-  static class MockTargetService extends TargetService {
+  static class MockTargetService implements TargetService {
     static TargetResponse createTargetResponse;
     static TargetRequest capturedCreateRequest;
     static Page<TargetResponse> getTargetsResponse;
     static boolean throwOnCreate;
-
-    public MockTargetService() {
-      super(null, null, null);
-    }
 
     @Override
     public TargetResponse createTarget(TargetRequest request) {
@@ -196,14 +192,10 @@ class TargetControllerTest {
     }
   }
 
-  static class MockCurlParserService extends CurlParserService {
+  static class MockCurlParserService implements CurlParserService {
     static CurlParserService.ParsedCurl parseCurlResponse;
     static String capturedCurlCommand;
     static boolean throwOnParse;
-
-    public MockCurlParserService() {
-      super(null);
-    }
 
     @Override
     public CurlParserService.ParsedCurl parseCurl(String curlCommand) {

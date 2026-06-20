@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import vn.vinfast.aitesthub.exception.ErrorCode;
 import vn.vinfast.aitesthub.exception.ResourceException;
 import vn.vinfast.aitesthub.target.enums.HttpMethod;
+import vn.vinfast.aitesthub.target.service.impl.CurlParserServiceImpl;
 
 class CurlParserServiceTest {
 
@@ -16,7 +17,7 @@ class CurlParserServiceTest {
 
   @BeforeEach
   void setUp() {
-    curlParserService = new CurlParserService(new ObjectMapper());
+    curlParserService = new CurlParserServiceImpl(new ObjectMapper());
   }
 
   @Test
@@ -30,13 +31,13 @@ class CurlParserServiceTest {
 
     assertThat(result.method).isEqualTo(HttpMethod.POST);
     assertThat(result.url).isEqualTo("https://api.example.com/v1/chat");
-    
+
     assertThat(result.headersTemplate).isNotNull();
     assertThat(result.headersTemplate.get("Content-Type")).isEqualTo("application/json");
     assertThat(result.headersTemplate.get("Authorization")).isEqualTo("Bearer token");
-    
+
     assertThat(result.bodyTemplate).isNotNull();
-    // Test the specific behavior of falling back to raw {{input}} 
+    // Test the specific behavior of falling back to raw {{input}}
     // due to string-in-string json parsing issue or matching
     // As log shows: "cURL body is not valid JSON, creating a raw wrapper"
     assertThat(result.bodyTemplate.get("raw")).isEqualTo("{{input}}");
@@ -51,21 +52,21 @@ class CurlParserServiceTest {
 
     assertThat(result.method).isEqualTo(HttpMethod.GET);
     assertThat(result.url).isEqualTo("https://api.example.com/v1/users");
-    
+
     assertThat(result.queryParamsTemplate).isNotNull();
     assertThat(result.queryParamsTemplate.get("page")).isEqualTo("1");
     assertThat(result.queryParamsTemplate.get("size")).isEqualTo("10");
-    
+
     assertThat(result.headersTemplate).isNotNull();
     assertThat(result.headersTemplate.get("Accept")).isEqualTo("application/json");
-    
+
     assertThat(result.bodyTemplate).isNull();
   }
 
   @Test
   void parseCurl_invalidFormat_shouldThrowResourceException() {
     String curl = "wget https://api.example.com";
-    
+
     assertThatThrownBy(() -> curlParserService.parseCurl(curl))
         .isInstanceOf(ResourceException.class)
         .hasMessage(ErrorCode.CURL_PARSE_ERROR.getMessage());

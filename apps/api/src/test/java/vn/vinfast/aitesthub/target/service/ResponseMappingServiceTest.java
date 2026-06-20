@@ -24,6 +24,7 @@ import vn.vinfast.aitesthub.target.repository.ResponseMappingRepository;
 import vn.vinfast.aitesthub.target.repository.TargetRepository;
 import vn.vinfast.aitesthub.target.request.ResponseMappingRequest;
 import vn.vinfast.aitesthub.target.response.ResponseMappingResponse;
+import vn.vinfast.aitesthub.target.service.impl.ResponseMappingServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class ResponseMappingServiceTest {
@@ -38,7 +39,7 @@ class ResponseMappingServiceTest {
   private ResponseMappingMapper responseMappingMapper;
 
   @InjectMocks
-  private ResponseMappingService responseMappingService;
+  private ResponseMappingServiceImpl responseMappingService;
 
   private UUID targetId;
   private Target target;

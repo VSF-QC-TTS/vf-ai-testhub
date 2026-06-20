@@ -104,16 +104,12 @@ class ResponseMappingControllerTest {
     }
   }
 
-  static class MockResponseMappingService extends ResponseMappingService {
+  static class MockResponseMappingService implements ResponseMappingService {
     static ResponseMappingResponse saveResponseMappingResponse;
     static ResponseMappingResponse getResponseMappingResponse;
     static ResponseMappingRequest capturedRequest;
     static UUID capturedTargetId;
     static boolean throwOnSave;
-
-    public MockResponseMappingService() {
-      super(null, null, null);
-    }
 
     @Override
     public ResponseMappingResponse getResponseMapping(UUID targetId) {

@@ -30,6 +30,8 @@ import vn.vinfast.aitesthub.target.enums.TargetType;
 import vn.vinfast.aitesthub.target.request.TargetRequest;
 import vn.vinfast.aitesthub.target.response.TargetResponse;
 import vn.vinfast.aitesthub.target.service.TargetService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @WebMvcTest(
     controllers = GlobalTargetController.class,
@@ -124,17 +126,13 @@ class GlobalTargetControllerTest {
     }
   }
 
-  static class MockTargetService extends TargetService {
+  static class MockTargetService implements TargetService {
     static TargetResponse getTargetResponse;
     static TargetResponse updateTargetResponse;
     static UUID capturedTargetId;
     static UUID capturedDeleteTargetId;
     static TargetRequest capturedUpdateRequest;
     static boolean throwOnAction;
-
-    public MockTargetService() {
-      super(null, null, null);
-    }
 
     @Override
     public TargetResponse getTarget(UUID targetId) {
@@ -162,6 +160,12 @@ class GlobalTargetControllerTest {
         throw new ResourceException(ErrorCode.TARGET_CONNECTOR_NOT_FOUND);
       }
     }
+
+    @Override
+    public Page<TargetResponse> getTargets(UUID projectId, Pageable pageable) { return null; }
+
+    @Override
+    public TargetResponse createTarget(TargetRequest request) { return null; }
 
     static void reset() {
       getTargetResponse = null;
