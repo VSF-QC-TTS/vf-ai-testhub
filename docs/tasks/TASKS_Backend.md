@@ -263,7 +263,7 @@ apps/api/
 | 5 | Tạo Flyway migration cho bảng `targets` và `response_mappings` | ✅ |
 
 - **Commit:** `feat(target): add target and response mapping entities, dto, mapper`
-- **Review:** ⬜ | **Note:**
+- **Review:** ✅ | **Note:**
 
 ---
 
@@ -271,15 +271,15 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `CurlParserService` nhận chuỗi cURL string | ⬜ |
-| 2 | Parse ra: method, url, headers, body | ⬜ |
-| 3 | Sinh `bodyTemplate` với placeholder `{{input}}` | ⬜ |
-| 4 | Unit test: Parse cURL POST có JSON body → đúng method, url, headers | ⬜ |
-| 5 | Unit test: Parse cURL GET có query params → đúng url + query | ⬜ |
-| 6 | Unit test: cURL không hợp lệ → throw BusinessException | ⬜ |
+| 1 | Tạo `CurlParserService` nhận chuỗi cURL string | ✅ |
+| 2 | Parse ra: method, url, headers, body | ✅ |
+| 3 | Sinh `bodyTemplate` với placeholder `{{input}}` | ✅ |
+| 4 | Unit test: Parse cURL POST có JSON body → đúng method, url, headers | ✅ |
+| 5 | Unit test: Parse cURL GET có query params → đúng url + query | ✅ |
+| 6 | Unit test: cURL không hợp lệ → throw BusinessException | ✅ |
 
 - **Commit:** `feat(target): add curl parser service with unit tests`
-- **Review:** ⬜ | **Note:**
+- **Review:** ✅ | **Note:**
 
 ---
 
@@ -287,13 +287,13 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `TargetService` CRUD (liên kết ProjectId) | ⬜ |
-| 2 | Tạo `ResponseMappingService` CRUD (liên kết TargetId) | ⬜ |
-| 3 | Logic: Khi tạo Target từ cURL, tự động gọi `CurlParserService` | ⬜ |
-| 4 | Unit test cho cả 2 service bằng Mockito | ⬜ |
+| 1 | Tạo `TargetService` CRUD (liên kết ProjectId) | ✅ |
+| 2 | Tạo `ResponseMappingService` CRUD (liên kết TargetId) | ✅ |
+| 3 | Logic: Khi tạo Target từ cURL, tự động gọi `CurlParserService` | ✅ |
+| 4 | Unit test cho cả 2 service bằng Mockito | ✅ |
 
 - **Commit:** `feat(target): add target and response mapping services`
-- **Review:** ⬜ | **Note:**
+- **Review:** ✅ | **Note:**
 
 ---
 
@@ -301,14 +301,14 @@ apps/api/
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `TargetController` (`/api/projects/{projectId}/targets`) | ⬜ |
-| 2 | Endpoint đặc biệt: `POST /parse-curl` nhận raw cURL → trả Target preview | ⬜ |
-| 3 | Tạo `ResponseMappingController` (`/api/targets/{targetId}/response-mapping`) | ⬜ |
-| 4 | MockMvc test: Tạo target từ cURL → 201 | ⬜ |
-| 5 | MockMvc test: Cập nhật ResponseMapping → 200 | ⬜ |
+| 1 | Tạo `TargetController` (`/api/projects/{projectId}/targets`) | ✅ |
+| 2 | Endpoint đặc biệt: `POST /parse-curl` nhận raw cURL → trả Target preview | ✅ |
+| 3 | Tạo `ResponseMappingController` (`/api/targets/{targetId}/response-mapping`) | ✅ |
+| 4 | MockMvc test: Tạo target từ cURL → 201 | ✅ |
+| 5 | MockMvc test: Cập nhật ResponseMapping → 200 | ✅ |
 
 - **Commit:** `feat(target): add controllers and integration tests`
-- **Review:** ⬜ | **Note:**
+- **Review:** ✅ | **Note:**
 
 ---
 
@@ -673,9 +673,9 @@ apps/api/
 |---|-----------|--------|
 | 1 | Tạo `ResultController` (`/api/runs/{runId}/results`) và endpoint Compare (`/api/runs/compare`) | ⬜ |
 | 2 | Tạo `ManualReviewController` (`/api/results/{resultId}/review`) | ⬜ |
-| 3 | MockMvc test: Get report \u2192 200 + đúng cấu trúc JSON | ⬜ |
-| 4 | MockMvc test: Get compare \u2192 200 | ⬜ |
-| 5 | MockMvc test: Submit manual review \u2192 200 | ⬜ |
+| 3 | MockMvc test: Get report → 200 + đúng cấu trúc JSON | ⬜ |
+| 4 | MockMvc test: Get compare → 200 | ⬜ |
+| 5 | MockMvc test: Submit manual review → 200 | ⬜ |
 
 - **Commit:** `feat(result): add controllers and integration tests`
 - **Review:** ⬜ | **Note:**
