@@ -2,7 +2,7 @@
 
 > **Version:** 1.0
 > **Ngày tạo:** 2026-06-18
-> **Tham chiếu:** [PRD v1.0](file:///home/nghlong3004/projects/vf-ai-testhub/docs/PRD_Draw.md)
+> **Tham chiếu:** [PRD v1.0](../product/PRD.md)
 > **Tác giả:** Architecture Team
 
 ---
@@ -383,7 +383,7 @@ graph TB
             REPO["JPA Repositories<br/><i>Spring Data JPA,<br/>custom queries</i>"]
             RSP["Redis Stream Publisher<br/><i>Job serialization,<br/>XADD to stream</i>"]
             ASC["Artifact Storage Client<br/><i>Read/Write files,<br/>path management</i>"]
-            JWT_F["JWT Auth Filter<br/><i>Token validation,<br/>SecurityContext</i>"]
+            JWT_RS["JWT Resource Server<br/><i>JwtDecoder,<br/>SecurityContext</i>"]
             SM["Secret Manager<br/><i>Encryption, masking,<br/>reference resolution</i>"]
         end
 
@@ -438,7 +438,7 @@ graph TB
     style REPO fill:#E67E22,stroke:#D35400,color:#FFF
     style RSP fill:#9B59B6,stroke:#7D3C98,color:#FFF
     style ASC fill:#E67E22,stroke:#D35400,color:#FFF
-    style JWT_F fill:#E74C3C,stroke:#C0392B,color:#FFF
+    style JWT_RS fill:#E74C3C,stroke:#C0392B,color:#FFF
     style SM fill:#E74C3C,stroke:#C0392B,color:#FFF
     style PCA fill:#F39C12,stroke:#E67E22,color:#FFF
     style DB_EXT fill:#E67E22,stroke:#D35400,color:#FFF
@@ -478,7 +478,7 @@ graph TB
 | **Infrastructure** | `JPA Repositories` | Spring Data JPA repositories cho tất cả entities, custom queries cho reporting |
 | | `Redis Stream Publisher` | Serialize job message (JSON), XADD vào Redis Stream |
 | | `Artifact Storage Client` | Abstract file I/O: read/write config snapshots, reports, promptfoo output |
-| | `JWT Auth Filter` | Validate JWT token, set SecurityContext, handle expired tokens |
+| | `JWT Resource Server` | Validate access JWTs with `JwtDecoder`, set `SecurityContext`, reject wrong token type or expired tokens |
 | | `Secret Manager` | Encrypt/decrypt secrets, mask trong UI/logs, resolve secret references |
 | **Adapters** | `PromptfooConfigGenerator` | Convert domain objects → promptfoo YAML config. **Đây là one-way adapter**: domain là source of truth, promptfoo config là generated artifact |
 
@@ -556,8 +556,8 @@ graph TB
     evaluators --> RR_C
     evaluators --> PR
 
-    RR_C -- "POST /api/internal/runs/{runId}/results<br/>[Service Token Auth]" --> BE_EXT
-    PR -- "POST /api/internal/runs/{runId}/progress<br/>[Service Token Auth]" --> BE_EXT
+    RR_C -- "POST /api/v1/internal/runs/{runId}/results<br/>[Service Token Auth]" --> BE_EXT
+    PR -- "POST /api/v1/internal/runs/{runId}/progress<br/>[Service Token Auth]" --> BE_EXT
     AW -- "File I/O" --> STORE_EXT
 
     style QL fill:#27AE60,stroke:#1E8449,color:#FFF
@@ -626,7 +626,7 @@ sequenceDiagram
     participant LLM as 🧠 LLM Provider
 
     QC->>FE: Trigger Run (datasetId, targetId, config)
-    FE->>BE: POST /api/runs
+    FE->>BE: POST /api/v1/runs
     
     Note over BE: Tạo Run record (PENDING)
     BE->>DB: INSERT Run
@@ -659,16 +659,16 @@ sequenceDiagram
         
         Note over RN: Chạy tool expectations
         
-        RN->>BE: POST /api/internal/runs/{runId}/progress<br/>{ completed: N, total: M, currentTestCase }
+        RN->>BE: POST /api/v1/internal/runs/{runId}/progress<br/>{ completed: N, total: M, currentTestCase }
     end
 
-    RN->>BE: POST /api/internal/runs/{runId}/results<br/>{ testResults[], assertionResults[],<br/>  toolExpectationResults[] }
+    RN->>BE: POST /api/v1/internal/runs/{runId}/results<br/>{ testResults[], assertionResults[],<br/>  toolExpectationResults[] }
 
     BE->>DB: INSERT TestResults, AssertionResults,<br/>ToolExpectationResults
     BE->>DB: UPDATE Run status = COMPLETED, summary
 
     Note over FE: Polling hoặc notification
-    FE->>BE: GET /api/runs/{runId}
+    FE->>BE: GET /api/v1/runs/{runId}
     BE-->>FE: Run { status: COMPLETED, summary }
     FE-->>QC: Hiển thị Report
 ```
@@ -681,7 +681,7 @@ sequenceDiagram
   "runSnapshot": {
     "target": {
       "method": "POST",
-      "url": "https://chatbot.internal/api/chat",
+      "url": "https://chatbot.internal/api/v1/chat",
       "headersTemplate": { "Authorization": "{{secret:chatbot_token}}" },
       "bodyTemplate": { "message": "{{input}}" },
       "inputBinding": { "source": "testcase.input", "targetPath": "body.message" },
@@ -722,9 +722,9 @@ sequenceDiagram
 
 | Endpoint | Method | Mô tả | Auth |
 |----------|--------|--------|------|
-| `/api/internal/runs/{runId}/results` | POST | Runner gửi toàn bộ kết quả evaluation | Service-to-service token |
-| `/api/internal/runs/{runId}/progress` | POST | Runner gửi progress update (completed/total) | Service-to-service token |
-| `/api/internal/runs/{runId}/error` | POST | Runner báo lỗi fatal, mark run FAILED | Service-to-service token |
+| `/api/v1/internal/runs/{runId}/results` | POST | Runner gửi toàn bộ kết quả evaluation | Service-to-service token |
+| `/api/v1/internal/runs/{runId}/progress` | POST | Runner gửi progress update (completed/total) | Service-to-service token |
+| `/api/v1/internal/runs/{runId}/error` | POST | Runner báo lỗi fatal, mark run FAILED | Service-to-service token |
 
 > [!IMPORTANT]
 > Internal API endpoints dùng **service-to-service token** (pre-shared hoặc mTLS), **không** dùng user JWT. Điều này đảm bảo Runner có thể authenticate độc lập mà không cần forward user credentials.
@@ -806,12 +806,12 @@ sequenceDiagram
     participant CB as 🤖 Chatbot API
 
     QC->>FE: Tạo Project (name, description)
-    FE->>BE: POST /api/projects
+    FE->>BE: POST /api/v1/projects
     BE->>DB: INSERT Project
     BE-->>FE: Project created
 
     QC->>FE: Paste cURL command
-    FE->>BE: POST /api/projects/{id}/targets/import-curl<br/>{ curlString }
+    FE->>BE: POST /api/v1/projects/{id}/targets/parse-curl<br/>{ curlString }
     
     Note over BE: cURL Parser:<br/>Extract method, URL,<br/>headers, body, query params
     Note over BE: Secret detection:<br/>Identify Authorization, API keys
@@ -822,11 +822,11 @@ sequenceDiagram
 
     QC->>FE: Review parsed request
     QC->>FE: Chọn Input Binding<br/>(body.message ← testcase.input)
-    FE->>BE: PUT /api/targets/{id}/bindings
+    FE->>BE: PUT /api/v1/targets/{id}/bindings<br/>(roadmap)
     BE->>DB: UPDATE Target
 
     QC->>FE: Run Sample Request
-    FE->>BE: POST /api/targets/{id}/sample-run<br/>{ sampleInput: "Xin chào" }
+    FE->>BE: POST /api/v1/targets/{id}/sample-run<br/>{ sampleInput: "Xin chao" }<br/>(roadmap)
     BE->>CB: HTTP Request (sample)
     CB-->>BE: JSON Response
     BE-->>FE: Raw response JSON
@@ -836,7 +836,7 @@ sequenceDiagram
     QC->>FE: Map response components<br/>(click node → assign component)
     Note over FE: answer → data.response.text<br/>intent → data.response.intent<br/>toolCalls → data.response.tool_calls
 
-    FE->>BE: PUT /api/targets/{id}/mappings<br/>{ answerPath, intentPath, toolCallsPath, ... }
+    FE->>BE: PUT /api/v1/targets/{id}/response-mapping<br/>{ answerPath, intentPath, toolCallsPath, ... }
     BE->>DB: INSERT ResponseMapping
     BE-->>FE: Mapping saved ✅
 ```
@@ -852,12 +852,12 @@ sequenceDiagram
     participant LLM as 🧠 LLM Provider
 
     QC->>FE: Tạo Dataset (name, category)
-    FE->>BE: POST /api/projects/{id}/datasets
+    FE->>BE: POST /api/v1/projects/{id}/datasets
     BE->>DB: INSERT Dataset
     BE-->>FE: Dataset created
 
     QC->>FE: Upload CSV file
-    FE->>BE: POST /api/datasets/{id}/testcases/import<br/>{ file: legacy.csv }
+    FE->>BE: POST /api/v1/datasets/{id}/testcases/import<br/>{ file: legacy.csv }
     
     Note over BE: ImportService:<br/>Parse CSV, detect columns
     BE-->>FE: Preview: 4 columns detected<br/>id, section_name,<br/>custom_nlp_sample,<br/>custom_nlp_expected_dialog
@@ -871,7 +871,7 @@ sequenceDiagram
     BE-->>FE: 150 testcases imported ✅
 
     QC->>FE: Select testcases → AI Suggest Assertions
-    FE->>BE: POST /api/datasets/{id}/testcases/ai-suggest-assertions<br/>{ testCaseIds: [...] }
+    FE->>BE: POST /api/v1/datasets/{id}/testcases/ai-suggest-assertions<br/>{ testCaseIds: [...] }
     
     BE->>LLM: Prompt: "Đọc expectedBehavior,<br/>suggest structured assertions"
     LLM-->>BE: Suggested assertions[]
@@ -879,13 +879,13 @@ sequenceDiagram
     BE-->>FE: Suggested assertions per testcase
 
     QC->>FE: Review suggestions, edit, approve
-    FE->>BE: POST /api/testcases/{id}/assertions<br/>(cho từng testcase)
+    FE->>BE: POST /api/v1/testcases/{id}/assertions<br/>(cho từng testcase)
     BE->>DB: INSERT Assertion[]
     BE-->>FE: Assertions created ✅
 
     QC->>FE: Tạo thêm assertions thủ công
     Note over FE: AssertionBuilder:<br/>scope: COMPONENT<br/>target: answer<br/>type: contains<br/>expected: "VF 8"
-    FE->>BE: POST /api/testcases/{id}/assertions
+    FE->>BE: POST /api/v1/testcases/{id}/assertions
     BE->>DB: INSERT Assertion
 ```
 
@@ -904,7 +904,7 @@ sequenceDiagram
     participant FS as 📁 Storage
 
     QC->>FE: Click "Run Dataset"<br/>Config: concurrency=5, LLM judge=ON
-    FE->>BE: POST /api/runs<br/>{ datasetId, targetId, config }
+    FE->>BE: POST /api/v1/runs<br/>{ datasetId, targetId, config }
 
     Note over BE: 1. Create Run (PENDING)
     BE->>DB: INSERT Run
@@ -944,17 +944,17 @@ sequenceDiagram
     end
 
     RN->>FS: Write detailed artifacts
-    RN->>BE: POST /api/internal/runs/{runId}/results<br/>{ testResults, assertionResults, toolExpResults }
+    RN->>BE: POST /api/v1/internal/runs/{runId}/results<br/>{ testResults, assertionResults, toolExpResults }
 
     BE->>DB: Bulk INSERT results
     BE->>DB: UPDATE Run → COMPLETED + summary
 
     loop FE Polling (mỗi 3s)
-        FE->>BE: GET /api/runs/{runId}
+        FE->>BE: GET /api/v1/runs/{runId}
         BE-->>FE: { status, progress }
     end
 
-    FE->>BE: GET /api/runs/{runId}/results
+    FE->>BE: GET /api/v1/runs/{runId}/results
     BE-->>FE: Full results + breakdown
 
     FE-->>QC: 📊 Run Report:<br/>Pass: 120/150 (80%)<br/>Fail: 25, Error: 5
@@ -970,7 +970,7 @@ sequenceDiagram
     participant DB as 🗄️ PostgreSQL
 
     QC->>FE: Mở Run Report
-    FE->>BE: GET /api/runs/{runId}/results
+    FE->>BE: GET /api/v1/runs/{runId}/results
     BE->>DB: SELECT TestResults + ManualReviews
     BE-->>FE: Results with auto/review status
 
@@ -986,10 +986,10 @@ sequenceDiagram
 
     alt QC đồng ý với auto result
         QC->>FE: Confirm FAILED + note
-        FE->>BE: POST /api/runs/{runId}/review<br/>{ testResultId, reviewedStatus: FAILED,<br/>  note: "Bot trả sai policy" }
+        FE->>BE: POST /api/v1/runs/{runId}/review<br/>{ testResultId, reviewedStatus: FAILED,<br/>  note: "Bot trả sai policy" }
     else QC override auto result
         QC->>FE: Override → PASSED + note
-        FE->>BE: POST /api/runs/{runId}/review<br/>{ testResultId, reviewedStatus: PASSED,<br/>  note: "Response đúng ý, assertion<br/>  contains quá strict" }
+        FE->>BE: POST /api/v1/runs/{runId}/review<br/>{ testResultId, reviewedStatus: PASSED,<br/>  note: "Response đúng ý, assertion<br/>  contains quá strict" }
     end
 
     BE->>DB: INSERT/UPDATE ManualReview
@@ -1003,7 +1003,7 @@ sequenceDiagram
     Note over QC: Lặp lại cho các cases còn lại
 
     QC->>FE: Xem summary sau review
-    FE->>BE: GET /api/runs/{runId}
+    FE->>BE: GET /api/v1/runs/{runId}
     BE-->>FE: Updated summary:<br/>Final Pass: 135/150 (90%)<br/>(Auto: 120, Override: 15)
 ```
 
@@ -1185,19 +1185,19 @@ sequenceDiagram
     participant RN as 🏃 Runner
 
     Note over QC,BE: User Authentication (JWT)
-    QC->>FE: Login (username, password)
-    FE->>BE: POST /api/auth/login
-    BE-->>FE: { accessToken, refreshToken }
-    FE->>FE: Store tokens
+    QC->>FE: Login (email, password)
+    FE->>BE: POST /api/v1/auth/login
+    BE-->>FE: LoginResponse + HttpOnly refresh_token cookie
+    FE->>FE: Store access token in app state
 
     Note over FE,BE: Authenticated Request
-    FE->>BE: GET /api/projects<br/>Header: Authorization: Bearer {accessToken}
-    Note over BE: JWT Auth Filter:<br/>Validate token → SecurityContext
-    BE-->>FE: 200 OK { projects[] }
+    FE->>BE: GET /api/v1/projects<br/>Header: Authorization: Bearer {accessToken}
+    Note over BE: Spring Resource Server:<br/>JwtDecoder validates access token
+    BE-->>FE: 200 OK { items, page, size, totalItems, totalPages }
 
     Note over RN,BE: Service-to-Service Auth
-    RN->>BE: POST /api/internal/runs/{id}/results<br/>Header: X-Service-Token: {serviceToken}
-    Note over BE: Service Token Filter:<br/>Validate pre-shared token
+    RN->>BE: POST /internal/runs/{id}/results<br/>Header: service credential
+    Note over BE: Planned internal auth:<br/>Do not use user JWT
     BE-->>RN: 200 OK
 ```
 
@@ -1205,12 +1205,12 @@ sequenceDiagram
 
 | Aspect | Implementation |
 |--------|---------------|
-| **User Auth** | JWT (JSON Web Tokens) — stateless, Frontend gửi Bearer token trong mỗi request |
-| **Token Refresh** | Access token short-lived (15m), refresh token long-lived (7d) |
+| **User Auth** | Local email/password and Google/GitHub OAuth2 login issue local JWTs. Frontend sends the access token as a Bearer token. |
+| **Token Refresh** | Access token is short-lived. Refresh token is a long-lived JWT stored only in the HttpOnly `refresh_token` cookie and rotated by `/api/v1/auth/refresh-token`. |
 | **Password Storage** | BCrypt hash |
-| **Service Auth** | Pre-shared token cho Runner → Backend internal API |
+| **Service Auth** | Planned service credential for Runner -> Backend internal API. Do not forward user JWTs. |
 | **Authorization MVP** | Đơn giản: QC Engineer (full access), QC Leader (+ admin features). Advanced RBAC ở Phase 3 |
-| **JWT Filter** | Spring Security filter chain, validate signature + expiry, set `SecurityContext` |
+| **JWT Validation** | Spring Security OAuth2 Resource Server + `JwtDecoder`, token type validation, and `JwtAuthenticationConverter`. No separate handwritten JWT request filter is required. |
 
 ### 9.2 Logging
 
@@ -1296,4 +1296,4 @@ graph LR
 ---
 
 > [!TIP]
-> Tài liệu này nên được cập nhật mỗi khi có thay đổi kiến trúc lớn. Tham khảo [PRD v1.0](file:///home/nghlong3004/projects/vf-ai-testhub/docs/PRD_Draw.md) cho business context đầy đủ.
+> Tài liệu này nên được cập nhật mỗi khi có thay đổi kiến trúc lớn. Tham khảo [PRD v1.0](../product/PRD.md) cho business context đầy đủ.

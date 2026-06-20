@@ -147,7 +147,7 @@ MVP chưa cần làm:
 multi-turn conversation phức tạp
 streaming/SSE/WebSocket
 file upload/multipart request
-OAuth refresh flow phức tạp
+third-party OAuth provider token refresh
 CI/CD pull request gating
 scheduled run
 distributed runner nhiều node
@@ -462,7 +462,7 @@ multipart
 binary
 streaming
 complex cookie jar
-OAuth refresh
+third-party OAuth provider token refresh
 WebSocket
 ```
 
@@ -1911,23 +1911,25 @@ QC đã override chưa?
 POST /api/projects
 GET /api/projects
 GET /api/projects/{projectId}
-PUT /api/projects/{projectId}
-DELETE /api/projects/{projectId}
+PUT /api/v1/projects/{projectId}
+PATCH /api/v1/projects/{projectId}/archive
 ```
 
 ## 18.2 Target APIs
 
 ```http
-POST /api/projects/{projectId}/targets/import-curl
-GET /api/projects/{projectId}/targets
-GET /api/targets/{targetId}
-PUT /api/targets/{targetId}
-DELETE /api/targets/{targetId}
+POST /api/v1/projects/{projectId}/targets/parse-curl
+POST /api/v1/projects/{projectId}/targets
+GET /api/v1/projects/{projectId}/targets
+GET /api/v1/targets/{targetId}
+PUT /api/v1/targets/{targetId}
+DELETE /api/v1/targets/{targetId}
+GET /api/v1/targets/{targetId}/response-mapping
+PUT /api/v1/targets/{targetId}/response-mapping
 
-POST /api/targets/{targetId}/sample-run
-PUT /api/targets/{targetId}/bindings
-PUT /api/targets/{targetId}/mappings
-# tool-trace mapping is handled within the mappings endpoint
+# Roadmap, not current implementation:
+# POST /api/v1/targets/{targetId}/sample-run
+# PUT /api/v1/targets/{targetId}/bindings
 ```
 
 ## 18.3 Dataset APIs
@@ -2403,4 +2405,3 @@ Dataset trong hệ thống
 ```
 
 MVP cần đủ mạnh để QC thay thế phần lớn luồng Excel hiện tại, nhưng kiến trúc vẫn mở để sau này thêm multi-turn, CI/CD, scheduled run, distributed runner, trace integration và advanced red-team testing.
-

@@ -1,61 +1,57 @@
-## E2: Target & ResponseMapping Module
+# E2: Target & ResponseMapping Module
 
-> Dependency: E1 (Project phải tồn tại trước khi tạo Target)
+Dependency: E1.
 
-### E2.1: Entity + DTO + Mapper
+This epic is implemented. Future work should add security hardening and sampling behavior without redesigning the slice.
 
-| # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `Target` entity (FK tới Project) theo Database_Design (Hỗ trợ cả HTTP và LLM config) | ✅ |
-| 2 | Tạo `ResponseMapping` entity (FK tới Target, 1-1) | ✅ |
-| 3 | Tạo DTO: `TargetRequest`, `TargetResponse`, `ResponseMappingRequest`, `ResponseMappingResponse` | ✅ |
-| 4 | Tạo `TargetMapper`, `ResponseMappingMapper` (MapStruct) | ✅ |
-| 5 | Tạo Flyway migration cho bảng `targets` và `response_mappings` | ✅ |
-
-- **Commit:** `feat(target): add target and response mapping entities, dto, mapper`
-- **Review:** ✅ | **Note:**
-
----
-
-### E2.2: cURL Parser Service
+## E2.1: Entity + DTO + Mapper
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `CurlParserService` nhận chuỗi cURL string | ✅ |
-| 2 | Parse ra: method, url, headers, body | ✅ |
-| 3 | Sinh `bodyTemplate` với placeholder `{{input}}` | ✅ |
-| 4 | Unit test: Parse cURL POST có JSON body → đúng method, url, headers | ✅ |
-| 5 | Unit test: Parse cURL GET có query params → đúng url + query | ✅ |
-| 6 | Unit test: cURL không hợp lệ → throw BusinessException | ✅ |
+|---|---|---|
+| 1 | Add `Target` entity linked to `Project` | DONE |
+| 2 | Support HTTP and LLM target configuration fields | DONE |
+| 3 | Add `ResponseMapping` entity linked one-to-one with `Target` | DONE |
+| 4 | Add request/response DTOs and MapStruct mappers | DONE |
+| 5 | Add Flyway migration for `targets` and `response_mappings` | DONE |
 
-- **Commit:** `feat(target): add curl parser service with unit tests`
-- **Review:** ✅ | **Note:**
+- Commit: `feat(target): add target and response mapping entities, dto, mapper`
+- Review: `DONE`
 
----
-
-### E2.3: TargetService + ResponseMappingService
+## E2.2: cURL Parser Service
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `TargetService` CRUD (liên kết ProjectId) | ✅ |
-| 2 | Tạo `ResponseMappingService` CRUD (liên kết TargetId) | ✅ |
-| 3 | Logic: Khi tạo Target từ cURL, tự động gọi `CurlParserService` | ✅ |
-| 4 | Unit test cho cả 2 service bằng Mockito | ✅ |
+|---|---|---|
+| 1 | Add `CurlParserService` for raw cURL input | DONE |
+| 2 | Parse method, URL, headers, and body | DONE |
+| 3 | Generate a target preview with `{{input}}` binding support | DONE |
+| 4 | Test JSON POST parsing | DONE |
+| 5 | Test GET/query parsing | DONE |
+| 6 | Reject invalid cURL with `BusinessException` | DONE |
 
-- **Commit:** `feat(target): add target and response mapping services`
-- **Review:** ✅ | **Note:**
+- Commit: `feat(target): add curl parser service with unit tests`
+- Review: `DONE`
 
----
-
-### E2.4: Controller + Tests
+## E2.3: Services
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `TargetController` (`/api/projects/{projectId}/targets`) | ✅ |
-| 2 | Endpoint đặc biệt: `POST /parse-curl` nhận raw cURL → trả Target preview | ✅ |
-| 3 | Tạo `ResponseMappingController` (`/api/targets/{targetId}/response-mapping`) | ✅ |
-| 4 | MockMvc test: Tạo target từ cURL → 201 | ✅ |
-| 5 | MockMvc test: Cập nhật ResponseMapping → 200 | ✅ |
+|---|---|---|
+| 1 | Add `TargetService` CRUD scoped by project | DONE |
+| 2 | Add `ResponseMappingService` get/save behavior scoped by target | DONE |
+| 3 | Use cURL parser for parse-preview endpoint | DONE |
+| 4 | Add focused service tests | DONE |
 
-- **Commit:** `feat(target): add controllers and integration tests`
-- **Review:** ✅ | **Note:**
+- Commit: `feat(target): add target and response mapping services`
+- Review: `DONE`
+
+## E2.4: Controllers + Tests
+
+| # | Checklist | Status |
+|---|---|---|
+| 1 | Add `TargetController` at `/api/v1/projects/{projectId}/targets` | DONE |
+| 2 | Add `POST /parse-curl` preview endpoint | DONE |
+| 3 | Add global target endpoints under `/api/v1/targets/{targetId}` | DONE |
+| 4 | Add `ResponseMappingController` at `/api/v1/targets/{targetId}/response-mapping` | DONE |
+| 5 | Add MockMvc coverage for create and mapping save | DONE |
+
+- Commit: `feat(target): add controllers and integration tests`
+- Review: `DONE`

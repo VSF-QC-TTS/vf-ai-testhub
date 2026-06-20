@@ -64,6 +64,6 @@ Chúng ta dùng **promptfoo Node API** (`evaluate()`) với **Custom Function Pr
 - Source of truth là domain model riêng (Assertion, ToolExpectation), không phải promptfoo config. Nếu cần thay thế promptfoo, chỉ cần viết lại module `ConfigGenerator` và `ResultNormalizer` (Adapter Pattern).
 
 ## Tham chiếu
-- `docs/promptfoo_yaml_nodejs_llm_spec.md` — Mục 5.4 Approach B (Custom Function Provider)
-- `docs/LLD_FullStack.md` — Mục 3.1 (Luồng Runner)
-- `docs/PRD.md` — Mục 9.4 (ResponseMapping)
+- `docs/integrations/promptfoo_yaml_nodejs_llm_spec.md` — Mục 5.4 Approach B (Custom Function Provider)
+- `docs/architecture/LLD_FullStack.md` — Mục 3.1 (Luồng Runner)
+- `docs/product/PRD.md` — Mục 9.4 (ResponseMapping)

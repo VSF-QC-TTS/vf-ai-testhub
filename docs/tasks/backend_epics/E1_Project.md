@@ -1,58 +1,55 @@
-## E1: Project Module
+# E1: Project Module
 
-> Dependency: E0 (Foundation)
+Dependency: E0.
 
-### E1.1: Entity + DTO + Mapper
+This epic is implemented. New tasks should extend it instead of replacing it.
 
-| # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `Project` entity với Lombok (`@Entity`, `@Data`, `@Builder`) theo Database_Design | ✅ |
-| 2 | Tạo `ProjectRequest` DTO (với `@Valid` annotations) | ✅ |
-| 3 | Tạo `ProjectResponse` DTO | ✅ |
-| 4 | Tạo `ProjectMapper` interface (MapStruct) | ✅ |
-| 5 | Tạo Flyway migration cho bảng `projects` | ✅ |
-
-- **Commit:** `feat(project): add entity, dto, mapper and migration`
-- **Scope:** M
-- **Review:** ✅ | **Note:**
-
----
-
-### E1.2: Repository + Service
+## E1.1: Entity + DTO + Mapper
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `ProjectRepository` (Spring Data JPA interface) | ✅ |
-| 2 | Tạo `ProjectService` với CRUD: create, findById, findAll, update, archive | ✅ |
-| 3 | Xử lý `ResourceNotFoundException` khi findById không tìm thấy | ✅ |
-| 4 | Unit test `ProjectService` bằng Mockito (mock Repository) | ✅ |
+|---|---|---|
+| 1 | Add `Project` entity with internal `BIGINT id` and public UUID `publicId` | DONE |
+| 2 | Add request/response DTOs using current API conventions | DONE |
+| 3 | Add `ProjectMapper` | DONE |
+| 4 | Add Flyway migration for `projects` | DONE |
+| 5 | Link project owner/creator to `User` | DONE |
 
-- **Commit:** `feat(project): add repository, service and unit tests`
-- **Scope:** M
-- **Review:** ✅ | **Note:**
+- Commit: `feat(project): add entity, dto, mapper and migration`
+- Scope: `M`
+- Review: `DONE`
 
----
-
-### E1.3: Controller + Integration Tests
+## E1.2: Repository + Service
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `ProjectController` (`@RestController`, `/api/projects`) | ✅ |
-| 2 | Implement endpoints: POST, GET /{id}, GET (list), PUT /{id}, PATCH /{id}/archive | ✅ |
-| 3 | MockMvc integration test: Tạo project → 201 Created | ✅ |
-| 4 | MockMvc integration test: Get project không tồn tại → 404 | ✅ |
-| 5 | MockMvc integration test: Validation lỗi (thiếu name) → 400 | ✅ |
+|---|---|---|
+| 1 | Add `ProjectRepository` | DONE |
+| 2 | Add `ProjectService` interface and implementation | DONE |
+| 3 | Support create, find by `publicId`, paginated list, update, archive | DONE |
+| 4 | Handle missing projects with shared error handling | DONE |
+| 5 | Add focused service tests | DONE |
 
-- **Commit:** `feat(project): add controller and integration tests`
-- **Scope:** M
-- **Review:** ✅ | **Note:**
+- Commit: `feat(project): add repository, service and unit tests`
+- Scope: `M`
+- Review: `DONE`
 
----
+## E1.3: Controller + Tests
 
-### 🚩 Checkpoint: Phase 2 (CRUD cơ bản)
+| # | Checklist | Status |
+|---|---|---|
+| 1 | Add `ProjectController` at `/api/v1/projects` | DONE |
+| 2 | Implement create/get/list/update/archive endpoints | DONE |
+| 3 | Add MockMvc tests for create success | DONE |
+| 4 | Add MockMvc tests for not found | DONE |
+| 5 | Add MockMvc tests for validation errors | DONE |
 
-| # | Kiểm tra | Status |
-|---|----------|--------|
-| 1 | `mvn test` — All tests pass | ✅ |
-| 2 | API Project CRUD hoạt động đúng qua Postman/curl | ✅ |
-| 3 | Flyway migration chạy đúng, schema được tạo | ✅ |
+- Commit: `feat(project): add controller and integration tests`
+- Scope: `M`
+- Review: `DONE`
+
+## Checkpoint: Project CRUD
+
+| # | Check | Status |
+|---|---|---|
+| 1 | Project API uses `publicId`, not internal DB `id` | DONE |
+| 2 | Project list hides archived records | DONE |
+| 3 | Flyway migration creates expected schema | DONE |

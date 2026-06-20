@@ -61,7 +61,7 @@ Tổng cộng **16 bảng** được thiết kế.
 
 | Nguyên tắc | Chi tiết |
 |---|---|
-| **Primary Key** | UUID v4 (`gen_random_uuid()`), tránh sequential leak và hỗ trợ distributed ID |
+| **Primary Key** | Current backend standard: internal `BIGINT id` identity primary key plus public UUID `public_id` generated with `gen_random_uuid()`. API responses expose `publicId`, never internal `id`. |
 | **Timestamps** | `TIMESTAMPTZ`, default `NOW()`, lưu timezone-aware |
 | **Soft Delete** | Dùng `archived BOOLEAN DEFAULT FALSE` hoặc `deleted_at TIMESTAMPTZ` tùy bảng |
 | **JSONB** | Cho dữ liệu flexible/nested: variables, tags, custom components, argument assertions, snapshots |
@@ -76,10 +76,13 @@ Tổng cộng **16 bảng** được thiết kế.
 
 ## 3. ERD Diagram
 
+> Current implementation note: the high-level ERD below is conceptual. The implemented schema and future migrations should follow the current backend convention of internal `BIGINT id` plus public UUID `public_id`. For `users`, the persisted `username` column currently stores the user's email address.
+
 ```mermaid
 erDiagram
     users {
-        UUID id PK
+        BIGINT id PK
+        UUID public_id UK
         VARCHAR username
         VARCHAR email
         VARCHAR password_hash
@@ -92,19 +95,21 @@ erDiagram
     }
 
     projects {
-        UUID id PK
+        BIGINT id PK
+        UUID public_id UK
         VARCHAR name
         TEXT description
-        UUID owner_id FK
-        UUID created_by FK
+        BIGINT owner_id FK
+        BIGINT created_by FK
         BOOLEAN archived
         TIMESTAMPTZ created_at
         TIMESTAMPTZ updated_at
     }
 
     targets {
-        UUID id PK
-        UUID project_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT project_id FK
         VARCHAR name
         VARCHAR environment
         VARCHAR method
@@ -122,8 +127,9 @@ erDiagram
     }
 
     response_mappings {
-        UUID id PK
-        UUID target_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT target_id FK
         VARCHAR answer_path
         VARCHAR suggestions_path
         VARCHAR intent_path
@@ -144,15 +150,16 @@ erDiagram
     }
 
     datasets {
-        UUID id PK
-        UUID project_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT project_id FK
         VARCHAR name
         TEXT description
         VARCHAR category
         JSONB tags
         JSONB default_assertions
         JSONB default_rubrics
-        UUID created_by FK
+        BIGINT created_by FK
         BOOLEAN enabled
         BOOLEAN archived
         TIMESTAMPTZ created_at
@@ -160,7 +167,8 @@ erDiagram
     }
 
     test_cases {
-        UUID id PK
+        BIGINT id PK
+        UUID public_id UK
         VARCHAR external_id            BIGINT dataset_id FK
         VARCHAR section_name
         VARCHAR name
@@ -182,15 +190,16 @@ erDiagram
     }
 
     assertions {
-        UUID id PK
-        UUID test_case_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT test_case_id FK
         VARCHAR scope
         VARCHAR type
         VARCHAR target_component
         VARCHAR field_path
         JSONB field_paths
         JSONB expected_value
-        UUID rubric_id FK
+        BIGINT rubric_id FK
         TEXT rubric_override
         NUMERIC threshold
         NUMERIC weight
@@ -202,8 +211,9 @@ erDiagram
     }
 
     tool_expectations {
-        UUID id PK
-        UUID test_case_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT test_case_id FK
         VARCHAR expectation_type
         VARCHAR target_source
         VARCHAR tool_name
@@ -212,7 +222,7 @@ erDiagram
         JSONB sequence
         INTEGER min_calls
         INTEGER max_calls
-        UUID rubric_id FK
+        BIGINT rubric_id FK
         TEXT rubric_override
         NUMERIC threshold
         BOOLEAN required
@@ -224,27 +234,29 @@ erDiagram
     }
 
     rubrics {
-        UUID id PK
+        BIGINT id PK
+        UUID public_id UK
         VARCHAR scope
-        UUID project_id FK
-        UUID dataset_id FK
+        BIGINT project_id FK
+        BIGINT dataset_id FK
         VARCHAR name
         TEXT description
         VARCHAR category
         VARCHAR language
         TEXT content
         NUMERIC default_threshold
-        UUID created_by FK
+        BIGINT created_by FK
         BOOLEAN archived
         TIMESTAMPTZ created_at
         TIMESTAMPTZ updated_at
     }
 
     runs {
-        UUID id PK
-        UUID project_id FK
-        UUID dataset_id FK
-        UUID target_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT project_id FK
+        BIGINT dataset_id FK
+        BIGINT target_id FK
         VARCHAR status
         VARCHAR run_mode
         BOOLEAN include_llm_judge
@@ -253,7 +265,7 @@ erDiagram
         INTEGER timeout_ms
         INTEGER retry_count
         UUID triggered_by FK
-        UUID previous_run_id FK
+        BIGINT previous_run_id FK
         JSONB selected_case_ids
         VARCHAR selected_section
         TIMESTAMPTZ started_at
@@ -265,9 +277,10 @@ erDiagram
     }
 
     test_results {
-        UUID id PK
-        UUID run_id FK
-        UUID test_case_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT run_id FK
+        BIGINT test_case_id FK
         VARCHAR status
         NUMERIC score
         JSONB request_snapshot
@@ -281,9 +294,10 @@ erDiagram
     }
 
     assertion_results {
-        UUID id PK
-        UUID test_result_id FK
-        UUID assertion_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT test_result_id FK
+        BIGINT assertion_id FK
         VARCHAR status
         JSONB actual_value
         JSONB expected_value
@@ -295,9 +309,10 @@ erDiagram
     }
 
     tool_expectation_results {
-        UUID id PK
-        UUID test_result_id FK
-        UUID tool_expectation_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT test_result_id FK
+        BIGINT tool_expectation_id FK
         VARCHAR status
         VARCHAR expected_tool_name
         JSONB actual_tool_calls
@@ -310,13 +325,14 @@ erDiagram
     }
 
     manual_reviews {
-        UUID id PK
-        UUID test_result_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT test_result_id FK
         VARCHAR auto_status
         TEXT auto_reason
         VARCHAR reviewed_status
         TEXT reviewer_note
-        UUID reviewed_by FK
+        BIGINT reviewed_by FK
         TIMESTAMPTZ reviewed_at
         VARCHAR final_status
         TIMESTAMPTZ created_at
@@ -324,27 +340,29 @@ erDiagram
     }
 
     artifacts {
-        UUID id PK
-        UUID run_id FK
-        UUID project_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT run_id FK
+        BIGINT project_id FK
         VARCHAR artifact_type
         VARCHAR file_name
         VARCHAR file_path
         VARCHAR mime_type
         BIGINT file_size_bytes
         JSONB metadata
-        UUID created_by FK
+        BIGINT created_by FK
         TIMESTAMPTZ created_at
     }
 
     secrets {
-        UUID id PK
-        UUID project_id FK
+        BIGINT id PK
+        UUID public_id UK
+        BIGINT project_id FK
         VARCHAR key_name
         TEXT encrypted_value
         VARCHAR secret_type
         TEXT description
-        UUID created_by FK
+        BIGINT created_by FK
         TIMESTAMPTZ last_rotated_at
         TIMESTAMPTZ created_at
         TIMESTAMPTZ updated_at

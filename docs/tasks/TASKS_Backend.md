@@ -1,130 +1,96 @@
-# Task Breakdown: Backend (`apps/api/`)
+# Backend Task Breakdown (`apps/api`)
 
-> **Tham chiếu:** PRD.md, LLD_FullStack.md, Database_Design.md, API_Design.md
+> References: `apps/api/CONTEXT.md`, `docs/product/PRD.md`, `docs/architecture/LLD_FullStack.md`, `docs/architecture/Database_Design.md`, `docs/architecture/API_Design.md`.
 >
-> **Quy tắc Gate-Check:** Mỗi task con khi hoàn thành phải được review. Chỉ được tiếp tục task tiếp theo khi review **KHÔNG phải `FALSE`**.
+> Source-of-truth rule: current code and `apps/api/CONTEXT.md` win when older product docs disagree.
 
-## Chú thích
+## Current Backend Baseline
 
-| Ký hiệu | Ý nghĩa |
-|----------|---------|
-| ⬜ | Chưa làm |
-| 🔄 | Đang làm |
-| ✅ | Đã xong, chờ review |
-| Review: `DONE` | ✅ Approved, tiếp tục |
-| Review: `WARNING` | ⚠️ Có vấn đề nhỏ, được phép tiếp tục nhưng phải fix sau |
-| Review: `FALSE` | 🚫 Blocked — KHÔNG được code tiếp cho tới khi fix xong |
+These choices are already implemented. Do not rebuild them unless the task explicitly says to migrate.
 
-## Verification Commands (chạy sau MỖI task con)
+| Area | Current state |
+|---|---|
+| Framework | Spring Boot 4.0.7, Java 21, Maven |
+| Persistence | PostgreSQL + Flyway. Current migrations: `V1__init_schema.sql`, `V2__project_schema.sql`, `V3__target_schema.sql` |
+| Identity model | Internal `BIGINT id`; public APIs expose UUID `publicId` |
+| Auth | Local email/password auth, Google/GitHub OAuth2 login, custom JWT issuing |
+| JWT validation | Spring Security OAuth2 Resource Server with `JwtDecoder`; no separate handwritten JWT request filter is needed |
+| Refresh flow | HttpOnly `refresh_token` cookie, rotated by `POST /api/v1/auth/refresh-token` |
+| Implemented APIs | Auth, OAuth2, `GET /api/v1/users/me`, Project CRUD/archive, Target CRUD/parse-curl, ResponseMapping get/save |
+
+## Status Legend
+
+| Status | Meaning |
+|---|---|
+| `TODO` | Not implemented |
+| `IN_PROGRESS` | Being implemented |
+| `DONE` | Implemented and reviewed |
+| `WARNING` | Accepted with known follow-up |
+| `BLOCKED` | Do not continue until fixed |
+
+## Verification Commands
+
+Run after each code-changing backend subtask.
 
 ```bash
-# Build check (bắt buộc)
-mvn compile -pl apps/api
-
-# Test check (bắt buộc)
-mvn test -pl apps/api
-
-# Lint/Format check (khuyến nghị)
-mvn checkstyle:check -pl apps/api
+rtk bash mvnw compile
+rtk bash mvnw test
 ```
 
-> ⚠️ Theo skill `incremental-implementation`: Chỉ chạy lại khi code đã thay đổi. Không chạy lại cùng lệnh trên code chưa sửa.
+Use focused tests when possible. Avoid rerunning expensive full suites when code has not changed.
 
 ## Scope Sizing
 
-| Size | Files | Ý nghĩa |
-|------|-------|---------|
-| **S** | 1-2 | Entity + Migration hoặc Service đơn giản |
-| **M** | 3-5 | CRUD hoàn chỉnh 1 module (Entity + Service + Controller) |
-| **L** | 5-8 | Logic phức tạp (ImportService, RunSnapshot assembly) |
+| Size | Expected change |
+|---|---|
+| `S` | 1-2 files, entity/migration or simple service |
+| `M` | 3-5 files, one complete CRUD slice |
+| `L` | 5-8 files, complex flow such as import or run snapshot assembly |
 
----
+## Backend Roadmap
 
-## Task Tree tổng quan
-
-```
+```text
 apps/api/
-├── E0: Foundation & Infrastructure
-│   ├── E0.1: Project scaffold + dependencies
-│   ├── E0.2: Global config (Exception, Validation, CORS)
-│   ├── E0.3: Database connection + migration tool
-│   └── E0.4: Redis Streams connection
-│
-├── E1: Project Module
-│   ├── E1.1: Entity + DTO + Mapper
-│   ├── E1.2: Repository + Service
-│   └── E1.3: Controller + Tests
-│
-├── E2: Target & ResponseMapping Module
-│   ├── E2.1: Entity + DTO + Mapper
-│   ├── E2.2: cURL Parser Service
-│   ├── E2.3: TargetService + ResponseMappingService
-│   └── E2.4: Controller + Tests
-│
-├── E3: Dataset Module
-│   ├── E3.1: Entity + DTO + Mapper
-│   ├── E3.2: Service + Controller
-│   └── E3.3: Tests
-│
-├── E4: TestCase Module
-│   ├── E4.1: Entity + DTO + Mapper
-│   ├── E4.2: TestCaseService (CRUD)
-│   ├── E4.3: ImportService (CSV/Excel — Strategy Pattern)
-│   └── E4.4: Controller + Tests
-│
-├── E5: Assertion & ToolExpectation Module
-│   ├── E5.1: Assertion Entity + DTO + Mapper
-│   ├── E5.2: ToolExpectation Entity + DTO + Mapper
-│   ├── E5.3: Services
-│   └── E5.4: Controller + Tests
-│
-├── E6: Rubric Module
-│   ├── E6.1: Entity + DTO + Mapper
-│   ├── E6.2: Service + Controller
-│   └── E6.3: Tests
-│
-├── E7: Run Module (Complex — Facade Pattern)
-│   ├── E7.1: Run Entity + DTO
-│   ├── E7.2: RunSnapshot assembly (Batch Fetching — 5 SQL)
-│   ├── E7.3: Redis Streams publisher (XADD)
-│   ├── E7.4: RunService (Facade)
-│   └── E7.5: Controller + Tests
-│
-├── E8: Result & ManualReview Module
-│   ├── E8.1: TestResult + AssertionResult + ToolExpectationResult Entities
-│   ├── E8.2: Result ingestion API (POST from Runner)
-│   ├── E8.3: ManualReview Entity + Service
-│   ├── E8.4: Report aggregation Service
-│   └── E8.5: Controller + Tests
-│
-├── E9: AI Integration Module
-│   ├── E9.1: AIGeneratorService (Testcase generation)
-│   ├── E9.2: AI Assertion suggestion
-│   └── E9.3: Tests (WireMock)
-│
-└── E10: Security Module
-    ├── E10.1: JWT Filter + AuthConfig
-    ├── E10.2: SSRF Protection (InetAddressFilter)
-    └── E10.3: SecurityFilterTest (MockMvc)
+|-- E0: Foundation & Infrastructure
+|   |-- E0.1: Project scaffold + dependencies
+|   |-- E0.2: Global config
+|   |-- E0.3: PostgreSQL + Flyway
+|   `-- E0.4: Redis Streams
+|
+|-- E1: Project Module
+|   |-- E1.1: Entity + DTO + Mapper
+|   |-- E1.2: Repository + Service
+|   `-- E1.3: Controller + Tests
+|
+|-- E2: Target & ResponseMapping Module
+|   |-- E2.1: Entity + DTO + Mapper
+|   |-- E2.2: cURL Parser Service
+|   |-- E2.3: Services
+|   `-- E2.4: Controllers + Tests
+|
+|-- E3: Dataset Module
+|-- E4: TestCase Module
+|-- E5: Assertion & ToolExpectation Module
+|-- E6: Rubric Module
+|-- E7: Run Module
+|-- E8: Result & ManualReview Module
+|-- E9: AI Integration Module
+`-- E10: Security Hardening
 ```
 
----
+## Epic Details
 
-## Epics Details
-
-* [E0: Foundation & Infrastructure](./backend_epics/E0_Foundation.md)
-* [E1: Project Module](./backend_epics/E1_Project.md)
-* [E2: Target & ResponseMapping Module](./backend_epics/E2_Target_ResponseMapping.md)
-* [E3: Dataset Module](./backend_epics/E3_Dataset.md)
-* [E4: TestCase Module](./backend_epics/E4_TestCase.md)
-* [E5: Assertion & ToolExpectation Module](./backend_epics/E5_Assertion_ToolExpectation.md)
-* [E6: Rubric Module](./backend_epics/E6_Rubric.md)
-* [E7: Run Module](./backend_epics/E7_Run.md)
-* [E8: Result & ManualReview Module](./backend_epics/E8_Result_ManualReview.md)
-* [E9: AI Integration Module](./backend_epics/E9_AI_Integration.md)
-* [E10: Security Module](./backend_epics/E10_Security.md)
-
----
+- [E0: Foundation & Infrastructure](./backend_epics/E0_Foundation.md)
+- [E1: Project Module](./backend_epics/E1_Project.md)
+- [E2: Target & ResponseMapping Module](./backend_epics/E2_Target_ResponseMapping.md)
+- [E3: Dataset Module](./backend_epics/E3_Dataset.md)
+- [E4: TestCase Module](./backend_epics/E4_TestCase.md)
+- [E5: Assertion & ToolExpectation Module](./backend_epics/E5_Assertion_ToolExpectation.md)
+- [E6: Rubric Module](./backend_epics/E6_Rubric.md)
+- [E7: Run Module](./backend_epics/E7_Run.md)
+- [E8: Result & ManualReview Module](./backend_epics/E8_Result_ManualReview.md)
+- [E9: AI Integration Module](./backend_epics/E9_AI_Integration.md)
+- [E10: Security Hardening](./backend_epics/E10_Security.md)
 
 ## Dependency Graph
 
@@ -146,14 +112,29 @@ graph TD
     E5 --> E9
 ```
 
----
+## Product Prototype Note
 
-## Risks & Open Questions
+`docs/product/EvalDeskQAPlatform.html` is an AI-generated UI prototype and should be treated as product aspiration, not a literal backend contract. It implies these backend capabilities:
 
-| # | Risk / Câu hỏi | Impact | Giảm thiểu |
-|---|---------------|--------|----------|
-| 1 | **Flyway vs Liquibase**: Chưa chốt dùng migration tool nào. Cần quyết định trước E0.3. | Medium | Team chọn và viết ADR nếu cần. |
-| 2 | **JWT Provider**: Chưa rõ dùng Keycloak, Auth0 hay tự code JWT. Ảnh hưởng E10. | High | Chốt trước khi làm E10. |
-| 3 | **AI LLM Provider**: Chưa rõ dùng OpenAI, Gemini hay Azure. Ảnh hưởng E9. | Medium | Abstract qua interface, chọn provider sau. |
-| 4 | **Large CSV Import**: File CSV > 100k dòng có thể timeout HTTP request. | Medium | Chuyển sang async import (background job) nếu cần. |
-| 5 | **Redis Streams message size**: RunSnapshot chứa 10k testcases có thể vượt giới hạn message size. | High | Chunk RunSnapshot thành nhiều message nhỏ hoặc lưu snapshot vào DB rồi chỉ gửi ID qua Redis. |
+- Dashboard: aggregate recent runs, pass rate, and dataset counts.
+- Config: target API setup, LLM judge settings, verification rules, dataset column metadata.
+- Dataset: import/preview/manage test cases and columns.
+- Test Run: trigger asynchronous evaluation and stream status.
+- Results: field-level pass/fail breakdown, comparison, and manual review.
+
+## Resolved Decisions
+
+| Decision | Current answer |
+|---|---|
+| Migration tool | Flyway is selected and configured. |
+| JWT provider | Custom local JWT issuing is implemented with Spring Security JWT validation. |
+| API auth base path | Current implemented path is `/api/v1/auth`; older unversioned auth paths and session-style paths are legacy only. |
+
+## Remaining Risks
+
+| # | Risk | Impact | Mitigation |
+|---|---|---|---|
+| 1 | AI LLM provider may change | Medium | Keep AI generation behind an interface; current dependency includes Google GenAI via Spring AI. |
+| 2 | Large CSV import can timeout HTTP | Medium | Add streaming parser and chunked persistence; move to async import if needed. |
+| 3 | Large RunSnapshot can exceed Redis payload limits | High | Chunk snapshots or persist snapshot in DB/object storage and send only a reference through Redis. |
+| 4 | User-supplied target URLs can hit private networks | High | Implement SSRF validation before saving or sampling targets. |

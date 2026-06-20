@@ -1,85 +1,80 @@
-## E7: Run Module (Complex — Facade Pattern)
+# E7: Run Module
 
-> Dependency: E2 (Target), E4 (TestCase), E5 (Assertion), E6 (Rubric), E0.4 (Redis)
->
-> ⚠️ Đây là Epic phức tạp nhất. Tham chiếu LLD mục 2.2 (Batch Fetching 5 SQL).
+Dependencies: E2, E4, E5, E6, E0.4.
 
-### E7.1: Run Entity + DTO
+This is the highest-risk backend epic. Keep it small and preserve async execution through Redis Streams.
 
-| # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `Run` entity (FK tới Dataset + Target) — status, startedAt, completedAt... | ⬜ |
-| 2 | Tạo `RunRequest`, `RunResponse`, `RunSnapshotDto` | ⬜ |
-| 3 | Flyway migration cho bảng `runs` | ⬜ |
-
-- **Commit:** `feat(run): add run entity, dto and migration`
-- **Review:** ⬜ | **Note:**
-
----
-
-### E7.2: RunSnapshot assembly (Batch Fetching)
+## E7.1: Run Entity + DTO
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Implement logic lấy dữ liệu bằng chính xác 5 câu SQL (theo LLD 2.2) | ⬜ |
-| 2 | Dùng `Collectors.groupingBy` gắn Assertion/ToolExpectation vào đúng TestCase | ⬜ |
-| 3 | Serialize thành `RunSnapshotDto` JSON | ⬜ |
-| 4 | Unit test: Mock 5 repositories, verify output RunSnapshotDto chứa đúng số lượng TestCase và mỗi TestCase có đúng Assertions gắn vào (test state/output, không test số lần gọi) | ⬜ |
-| 5 | Unit test: Dataset rỗng (0 testcase) → trả về snapshot rỗng, không crash | ⬜ |
+|---|---|---|
+| 1 | Add `Run` entity linked to project, dataset, target, trigger user, and optional previous run | TODO |
+| 2 | Add status, timestamps, counters, and failure reason fields | TODO |
+| 3 | Add `RunRequest`, `RunResponse`, and `RunSnapshotDto` | TODO |
+| 4 | Add Flyway migration for `runs` | TODO |
 
-- **Commit:** `feat(run): implement run snapshot assembly with batch fetching`
-- **Scope:** L
-- **Review:** ⬜ | **Note:**
+- Commit: `feat(run): add run entity, dto and migration`
+- Scope: `M`
+- Review: `TODO`
 
----
-
-### E7.3: Redis Streams publisher (XADD)
+## E7.2: RunSnapshot Assembly
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `RunStreamPublisher` sử dụng `StreamOperations.add()` | ⬜ |
-| 2 | Serialize RunSnapshot → JSON string → XADD vào stream key `run:jobs` | ⬜ |
-| 3 | Integration test: Publish message → verify message tồn tại trong Redis stream | ⬜ |
+|---|---|---|
+| 1 | Fetch target, test cases, assertions, tool expectations, and rubrics with bounded query count | TODO |
+| 2 | Group assertions and tool expectations by test case in memory | TODO |
+| 3 | Serialize an immutable `RunSnapshotDto` for the runner | TODO |
+| 4 | Unit test snapshot shape and grouping behavior by state/output | TODO |
+| 5 | Unit test empty dataset behavior | TODO |
 
-- **Commit:** `feat(run): add redis streams publisher`
-- **Review:** ⬜ | **Note:**
+- Commit: `feat(run): implement run snapshot assembly with batch fetching`
+- Scope: `L`
+- Review: `TODO`
 
----
-
-### E7.4: RunService (Facade)
-
-| # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `RunService.triggerRun(datasetId, targetId)` — Facade che giấu logic bên dưới | ⬜ |
-| 2 | Logic: Tạo Run record (status=PENDING) → Assembly snapshot → Publish to Redis → Update status=RUNNING | ⬜ |
-| 3 | Xử lý edge case: Target không tồn tại, Dataset rỗng → throw BusinessException | ⬜ |
-| 4 | Unit test: Mock dependencies, verify Run.status chuyển từ PENDING → RUNNING và RunSnapshot được publish (test state, không test thứ tự gọi) | ⬜ |
-
-- **Commit:** `feat(run): add run service facade`
-- **Review:** ⬜ | **Note:**
-
----
-
-### E7.5: Controller + Integration Tests
+## E7.3: Redis Streams Publisher
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `RunController` (`/api/datasets/{datasetId}/runs`) | ⬜ |
-| 2 | Endpoint: `POST /trigger` kích hoạt run | ⬜ |
-| 3 | Endpoint: `GET /{runId}` xem status | ⬜ |
-| 4 | Endpoint: `GET /` liệt kê run history | ⬜ |
-| 5 | MockMvc test: Trigger run → 202 Accepted | ⬜ |
+|---|---|---|
+| 1 | Add `RunStreamPublisher` over the existing Redis stream infrastructure | TODO |
+| 2 | Publish serialized snapshot/reference to stream key `run:jobs` | TODO |
+| 3 | Include run ID and correlation metadata for observability | TODO |
+| 4 | Add integration or focused component test for stream publish | TODO |
 
-- **Commit:** `feat(run): add controller and integration tests`
-- **Scope:** M
-- **Review:** ⬜ | **Note:**
+- Commit: `feat(run): add redis streams publisher`
+- Scope: `M`
+- Review: `TODO`
 
----
+## E7.4: RunService Facade
 
-### 🚩 Checkpoint: Phase 3 (Core Business Logic)
+| # | Checklist | Status |
+|---|---|---|
+| 1 | Add `RunService.triggerRun(datasetId, targetId)` | TODO |
+| 2 | Create run with `PENDING`, assemble snapshot, publish job, then mark `RUNNING` | TODO |
+| 3 | Reject missing target/dataset and invalid empty-dataset runs with business errors | TODO |
+| 4 | Unit test status changes and publish outcome by state/output | TODO |
 
-| # | Kiểm tra | Status |
-|---|----------|--------|
-| 1 | `mvn test` — All tests pass (bao gồm cả E1–E7) | ⬜ |
-| 2 | Luồng end-to-end: Tạo Project → Tạo Target → Tạo Dataset → Import TestCase → Tạo Assertion → Trigger Run → Verify message xuất hiện trong Redis Stream | ⬜ |
-| 3 | Review với team trước khi tiếp tục sang E8–E10 | ⬜ |
+- Commit: `feat(run): add run service facade`
+- Scope: `L`
+- Review: `TODO`
+
+## E7.5: Controller + Tests
+
+| # | Checklist | Status |
+|---|---|---|
+| 1 | Add `RunController` at `/api/v1/datasets/{datasetId}/runs` | TODO |
+| 2 | Add trigger endpoint returning `202 Accepted` | TODO |
+| 3 | Add get status endpoint by run `publicId` | TODO |
+| 4 | Add paginated run history endpoint | TODO |
+| 5 | MockMvc test trigger and status retrieval | TODO |
+
+- Commit: `feat(run): add controller and integration tests`
+- Scope: `M`
+- Review: `TODO`
+
+## Checkpoint: Core Evaluation Flow
+
+| # | Check | Status |
+|---|---|---|
+| 1 | Project -> Target -> Dataset -> TestCase -> Assertion -> Trigger Run flow works | TODO |
+| 2 | Redis Stream receives a job with the expected run reference or snapshot | TODO |
+| 3 | Large snapshot payload risk is explicitly handled before production use | TODO |

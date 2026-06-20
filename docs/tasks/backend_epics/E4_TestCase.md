@@ -1,64 +1,62 @@
-## E4: TestCase Module
+# E4: TestCase Module
 
-> Dependency: E3 (Dataset)
+Dependency: E3.
 
-### E4.1: Entity + DTO + Mapper
+Test cases are QC-authored inputs and expected behavior. Results produced after execution belong to E8, not this module.
 
-| # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `TestCase` entity (FK tới Dataset) | ⬜ |
-| 2 | Thêm các trường dữ liệu theo UI Spec: `inputMessage` (text), `expectedIntent` (varchar), mảng `tags` (Text Array/JSONB lưu "Happy Path", "Edge Case") | ⬜ |
-| 3 | Tạo `TestCaseRequest`, `TestCaseResponse` DTO (cập nhật mapping cho tags) | ⬜ |
-| 4 | Tạo `TestCaseMapper` (MapStruct) | ⬜ |
-| 5 | Tạo Flyway migration cho bảng `test_cases` (hỗ trợ các cột JSONB/Array) | ⬜ |
-
-- **Commit:** `feat(testcase): add entity, dto, mapper and migration`
-- **Review:** ⬜ | **Note:**
-
----
-
-### E4.2: TestCaseService (CRUD & Filtering)
+## E4.1: Entity + DTO + Mapper
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo interface `TestCaseService` và class `TestCaseServiceImpl` | ⬜ |
-| 2 | Tạo `TestCaseRepository` (implement `JpaSpecificationExecutor` để hỗ trợ dynamic filtering) | ⬜ |
-| 3 | Thêm method CRUD cơ bản (liên kết DatasetId) | ⬜ |
-| 4 | Thêm method search/filter (hỗ trợ phân trang, lọc theo array `tags`, search `keyword` trên `inputMessage`) | ⬜ |
-| 5 | Unit test bằng Mockito cho CRUD và Filter logic | ⬜ |
+|---|---|---|
+| 1 | Add `TestCase` entity linked to `Dataset` | TODO |
+| 2 | Include legacy import fields: `externalId`, `sectionName`, `input`, `expectedBehavior` | TODO |
+| 3 | Include roadmap fields: reference answer, variables/context, tags, priority, enabled, source, sort order | TODO |
+| 4 | Add request/response DTOs and mapper | TODO |
+| 5 | Add Flyway migration for `test_cases` with JSONB where appropriate | TODO |
 
-- **Commit:** `feat(testcase): add repository, service with filtering and unit tests`
-- **Review:** ⬜ | **Note:**
+- Commit: `feat(testcase): add entity, dto, mapper and migration`
+- Scope: `M`
+- Review: `TODO`
 
----
-
-### E4.3: ImportService (CSV/Excel — Strategy Pattern)
-
-| # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo interface `ImportStrategy` | ⬜ |
-| 2 | Implement `CsvImportStrategy` (hỗ trợ parse map cột mới như `tags`, `expectedIntent`) | ⬜ |
-| 3 | Implement `ExcelImportStrategy` (Apache POI) | ⬜ |
-| 4 | Tạo `ImportService` với Batch Processing (chunk 500, batch check duplicate, saveAll) theo LLD 2.1 | ⬜ |
-| 5 | Unit test: Import tags hợp lệ và lưu thành công | ⬜ |
-| 6 | Unit test: Import CSV có dòng trùng lặp → bỏ qua | ⬜ |
-| 7 | Unit test: File rỗng → trả về 0 records, không throw | ⬜ |
-| 8 | Unit test: File sai format (thiếu cột) → throw BusinessException | ⬜ |
-
-- **Commit:** `feat(testcase): add import service supporting tags and batch processing`
-- **Review:** ⬜ | **Note:**
-
----
-
-### E4.4: Controller + Integration Tests
+## E4.2: CRUD + Filtering Service
 
 | # | Checklist | Status |
-|---|-----------|--------|
-| 1 | Tạo `TestCaseController` (`/api/datasets/{datasetId}/testcases`) | ⬜ |
-| 2 | Endpoint: `GET /` với Pagination và Request Params cho Filter (`?tags=Happy Path,Edge Case&keyword=...`) | ⬜ |
-| 3 | Endpoint: `POST /import` nhận multipart file (CSV/Excel) | ⬜ |
-| 4 | MockMvc test: GET endpoint với các query parameters filtering | ⬜ |
-| 5 | MockMvc test: Import file CSV → 200 + count imported | ⬜ |
+|---|---|---|
+| 1 | Add `TestCaseRepository` with filtering support | TODO |
+| 2 | Add `TestCaseService` interface and implementation | TODO |
+| 3 | Support CRUD scoped by dataset | TODO |
+| 4 | Support pagination, keyword search, enabled filter, and tag filter | TODO |
+| 5 | Add focused unit tests for CRUD and filtering behavior | TODO |
 
-- **Commit:** `feat(testcase): add controller with filter, import endpoint and tests`
-- **Review:** ⬜ | **Note:**
+- Commit: `feat(testcase): add repository, service with filtering and unit tests`
+- Scope: `M`
+- Review: `TODO`
+
+## E4.3: Import Service
+
+| # | Checklist | Status |
+|---|---|---|
+| 1 | Add `ImportStrategy` interface | TODO |
+| 2 | Implement CSV import for the legacy four testcase definition columns | TODO |
+| 3 | Implement Excel import only if product scope confirms it is still needed | TODO |
+| 4 | Process rows in chunks and batch-check duplicates by dataset/external ID | TODO |
+| 5 | Return import summary: imported, skipped, failed, and row-level errors | TODO |
+| 6 | Unit test valid import, duplicates, empty file, and missing required columns | TODO |
+
+- Commit: `feat(testcase): add import service with batch processing`
+- Scope: `L`
+- Review: `TODO`
+
+## E4.4: Controller + Tests
+
+| # | Checklist | Status |
+|---|---|---|
+| 1 | Add `TestCaseController` at `/api/v1/datasets/{datasetId}/test-cases` | TODO |
+| 2 | Add list endpoint with pagination/filter query params | TODO |
+| 3 | Add multipart import endpoint | TODO |
+| 4 | MockMvc test list filtering | TODO |
+| 5 | MockMvc test CSV import success and validation failure | TODO |
+
+- Commit: `feat(testcase): add controller with filter, import endpoint and tests`
+- Scope: `M`
+- Review: `TODO`

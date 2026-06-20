@@ -4,7 +4,9 @@ This document serves as the **Source of Truth** for coordinating autonomous Suba
 
 ## 1. Context and Knowledge Management
 Before executing any tasks, all agents must understand the domain rules:
-- `apps/api/CONTEXT.md`: The living document for architectural rules (e.g., JavaDoc headers, `publicId` UUIDs, DTO `record` usage, explicit validation messages).
+- `apps/api/AGENTS.md`: Backend coding rules and conventions (e.g., JavaDoc headers, `publicId` UUIDs, DTO `record` usage, explicit validation messages).
+- `apps/api/CONTEXT.md`: Current backend implementation state, implemented endpoints, auth behavior, persistence notes, and focused test guidance.
+- `docs/INDEX.md`: Documentation map and recommended reading sets.
 - `docs/tasks/TASKS_Backend.md`: The single source of truth for the project roadmap, task breakdown, and acceptance criteria.
 - **MCP Tools**: Agents (if `enable_mcp_tools` is true) should use tools from `agent-skills-standard`:
   - Use `load_skills_for_keywords` (e.g., `["java 21", "jpa"]`) during planning.
@@ -17,8 +19,8 @@ To prevent agents from hallucinating or taking unauthorized actions (like commit
 - **Responsibility**: Write code and tests strictly for the assigned micro-task.
 - **Restrictions**: 
   - **NEVER** run `git commit`. 
-  - **NEVER** update `CONTEXT.md` or system architecture files.
-- **Prompt Directive**: *"Implement task [X]. Read CONTEXT.md for rules. Leave all changes in the working directory (unstaged or staged). Do NOT commit. Report back when all tests pass."*
+  - **NEVER** update `CONTEXT.md`, `AGENTS.md`, or system architecture files.
+- **Prompt Directive**: *"Implement task [X]. Read apps/api/AGENTS.md for rules and apps/api/CONTEXT.md for current backend state. Leave all changes in the working directory (unstaged or staged). Do NOT commit. Report back when all tests pass."*
 
 ### B. The Reviewer Agent (`java_backend_reviewer`)
 - **Responsibility**: Audit the Coder's changes against the strict checklist. Provide feedback or approval.
@@ -29,7 +31,7 @@ To prevent agents from hallucinating or taking unauthorized actions (like commit
   4. **Validation**: All validation annotations must have explicit `message` attributes.
 - **Restrictions**:
   - **NEVER** run `git commit`.
-- **Prompt Directive**: *"Review the unstaged/staged changes. Use the checklist in AGENT_WORKFLOW.md. If there are violations, reject and detail the errors. If it passes 100%, output 'APPROVED'."*
+- **Prompt Directive**: *"Review the unstaged/staged changes. Use the checklist in docs/agent/AGENT_WORKFLOW.md. If there are violations, reject and detail the errors. If it passes 100%, output 'APPROVED'."*
 
 ### C. The Documenter & Committer Agent (`java_backend_committer`)
 - **Responsibility**: Update living documentation and persist changes to version control.
@@ -37,8 +39,9 @@ To prevent agents from hallucinating or taking unauthorized actions (like commit
 - **Actions**:
   1. Inspect the approved diff.
   2. Update `apps/api/CONTEXT.md` if new domains, entities, or API endpoints were introduced.
-  3. Run `git add .` and `git commit -m "feat(scope): description"`.
-- **Prompt Directive**: *"The code is approved. Please update CONTEXT.md with any new endpoints/domains discovered in the diff. Then, commit the changes using Conventional Commits."*
+  3. Update `apps/api/AGENTS.md` only if backend rules or conventions changed.
+  4. Run `git add .` and `git commit -m "feat(scope): description"`.
+- **Prompt Directive**: *"The code is approved. Please update apps/api/CONTEXT.md with any new endpoints/domains discovered in the diff. Update apps/api/AGENTS.md only if backend rules changed. Then, commit the changes using Conventional Commits."*
 
 ## 3. The Strict "Ping-Pong" Workflow
 The Orchestrator must orchestrate tasks sequentially:

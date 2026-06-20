@@ -78,5 +78,5 @@ vf-ai-testhub/
 - Repo size lớn dần theo thời gian.
 
 ## Tham chiếu
-- `docs/PRD.md` — Mục 6 (Tech Stack)
-- `docs/C4_Architecture.md` — Kiến trúc tổng quan
+- `docs/product/PRD.md` — Mục 6 (Tech Stack)
+- `docs/architecture/C4_Architecture.md` — Kiến trúc tổng quan
