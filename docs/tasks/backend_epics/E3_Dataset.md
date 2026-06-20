@@ -6,7 +6,7 @@
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `Dataset` entity (FK tới Project) theo Database_Design | ⬜ |
+| 1 | Tạo `Dataset` entity (FK tới Project, thêm trường `description` hoặc metadata làm context context để hỗ trợ E9 AI Generator) | ⬜ |
 | 2 | Tạo `DatasetRequest`, `DatasetResponse` DTO | ⬜ |
 | 3 | Tạo `DatasetMapper` (MapStruct) | ⬜ |
 | 4 | Tạo Flyway migration cho bảng `datasets` | ⬜ |
@@ -20,9 +20,12 @@
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Tạo `DatasetRepository` | ⬜ |
-| 2 | Tạo `DatasetService` CRUD (liên kết ProjectId) | ⬜ |
-| 3 | Tạo `DatasetController` (`/api/projects/{projectId}/datasets`) | ⬜ |
+| 1 | Tạo interface `DatasetService` và class `DatasetServiceImpl` | ⬜ |
+| 2 | Tạo `DatasetRepository` | ⬜ |
+| 3 | Thêm method CRUD (liên kết ProjectId) | ⬜ |
+| 4 | Thêm phương thức placeholder cho AI Generator (gọi sang service của E9) | ⬜ |
+| 5 | Tạo `DatasetController` (`/api/projects/{projectId}/datasets`) | ⬜ |
+| 6 | Thêm endpoint AI Generator: `POST /api/datasets/{datasetId}/generate-test-cases` (nhận requirement input text) | ⬜ |
 
 - **Commit:** `feat(dataset): add service and controller`
 - **Review:** ⬜ | **Note:**
@@ -33,7 +36,7 @@
 
 | # | Checklist | Status |
 |---|-----------|--------|
-| 1 | Unit test `DatasetService` (Mockito) | ⬜ |
+| 1 | Unit test `DatasetServiceImpl` (Mockito) | ⬜ |
 | 2 | MockMvc test: CRUD endpoints | ⬜ |
 | 3 | MockMvc test: Tạo dataset cho project không tồn tại → 404 | ⬜ |
 
