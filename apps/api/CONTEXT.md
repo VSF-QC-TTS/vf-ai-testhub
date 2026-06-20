@@ -1,6 +1,6 @@
 # Context
 
-Date: 2026-06-19
+Date: 2026-06-20
 
 Repo area: `apps/api`
 
@@ -36,7 +36,7 @@ Rules:
 
 Docs map:
 
-- `seapps/apirver/CONTEXT.md`: read first; this file routes the rest of the backend context.
+- `apps/api/CONTEXT.md`: read first; this file routes the rest of the backend context.
 
 ## [START_HERE] Agent Startup Order
 
@@ -126,6 +126,14 @@ Implemented API slices after auth:
 - `GET /api/v1/projects`: Get paginated active projects.
 - `PUT /api/v1/projects/{id}`: Update a project by `publicId`.
 - `PATCH /api/v1/projects/{id}/archive`: Archive a project by `publicId`.
+- `POST /api/v1/projects/{projectId}/targets/parse-curl`: Parse a raw cURL command into a Target configuration preview without persisting.
+- `POST /api/v1/projects/{projectId}/targets`: Create a new target inside a project.
+- `GET /api/v1/projects/{projectId}/targets`: Get paginated targets for a project.
+- `GET /api/v1/targets/{targetId}`: Get a target by its `publicId`.
+- `PUT /api/v1/targets/{targetId}`: Update a target by its `publicId`.
+- `DELETE /api/v1/targets/{targetId}`: Delete a target by its `publicId`.
+- `GET /api/v1/targets/{targetId}/response-mapping`: Get response mapping configuration for a given target.
+- `PUT /api/v1/targets/{targetId}/response-mapping`: Save or update response mapping configuration for a target.
 
 ## [MAIL] Mail
 
@@ -151,8 +159,7 @@ Development workflow:
 - Never move to the next step until current step's tests pass and changes are committed.
 - Commit messages follow conventional format: `feat(scope)`, `fix(scope)`, `refactor(scope)`, `docs(scope)`,
   `chore(scope)`.
-- After each backend slice, update `CONTEXT.md`
-  tracked facts change.
+- After each backend slice, update `CONTEXT.md` when their tracked facts change.
 
 ## [CONVENTIONS] API Conventions
 
@@ -182,6 +189,7 @@ Code conventions:
   domain types with `{@link ...}`.
 - Prefer feature-first packages: `<feature>/controller`, `service`, `service/impl`, `repository`, `entity`, `mapper`,
   `request`, `response`.
+- Service classes must be extracted into the Interface/Implementation pattern (e.g., `TargetService` interface in the `service` package, and `TargetServiceImpl` class in the `service.impl` package). Controllers must inject the interface, not the implementation.
 - Prefer Lombok `@Builder` for creating entities/responses/value objects that support it; use setters only for
   JPA/framework requirements, partial updates, or when an existing local pattern already uses setters.
 
