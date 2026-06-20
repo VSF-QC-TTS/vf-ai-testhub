@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vinfast.aitesthub.exception.BusinessException;
 import vn.vinfast.aitesthub.exception.ErrorCode;
 import vn.vinfast.aitesthub.exception.ResourceException;
 import vn.vinfast.aitesthub.project.entity.Project;
@@ -29,7 +30,6 @@ public class TargetService {
   private final TargetRepository targetRepository;
   private final ProjectRepository projectRepository;
   private final TargetMapper targetMapper;
-  private final CurlParserService curlParserService;
 
   @Transactional(readOnly = true)
   public Page<TargetResponse> getTargets(UUID projectId, Pageable pageable) {
@@ -51,6 +51,10 @@ public class TargetService {
     Project project = projectRepository.findByPublicId(request.projectId())
         .orElseThrow(() -> new ResourceException(ErrorCode.PROJECT_NOT_FOUND));
 
+    if (targetRepository.existsByProjectPublicIdAndName(request.projectId(), request.name())) {
+      throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Target name already exists in this project.");
+    }
+
     Target target = targetMapper.toEntity(request);
     target.setProject(project);
 
@@ -62,6 +66,10 @@ public class TargetService {
   public TargetResponse updateTarget(UUID targetId, TargetRequest request) {
     Target target = targetRepository.findByPublicId(targetId)
         .orElseThrow(() -> new ResourceException(ErrorCode.TARGET_CONNECTOR_NOT_FOUND));
+
+    if (targetRepository.existsByProjectPublicIdAndNameAndPublicIdNot(target.getProject().getPublicId(), request.name(), targetId)) {
+      throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Target name already exists in this project.");
+    }
 
     targetMapper.updateEntityFromRequest(request, target);
     Target updated = targetRepository.save(target);
