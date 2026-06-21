@@ -35,14 +35,14 @@ This is the highest-risk backend epic. Keep it small and preserve async executio
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `RunStreamPublisher` over the existing Redis stream infrastructure | TODO |
-| 2 | Publish serialized snapshot/reference to stream key `run:jobs` | TODO |
-| 3 | Include run ID and correlation metadata for observability | TODO |
-| 4 | Add integration or focused component test for stream publish | TODO |
+| 1 | Add `RunStreamPublisher` over the existing Redis stream infrastructure | DONE |
+| 2 | Publish serialized snapshot/reference to stream key `run:jobs` | DONE |
+| 3 | Include run ID and correlation metadata for observability | DONE |
+| 4 | Add integration or focused component test for stream publish | DONE |
 
 - Commit: `feat(run): add redis streams publisher`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E7.4: RunService Facade
 
