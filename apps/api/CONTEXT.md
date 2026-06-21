@@ -112,6 +112,7 @@ Persistence now vs target:
   - `V3__target_schema.sql`: targets and response mappings.
   - `V4__dataset_schema.sql`: datasets.
   - `V5__test_case_schema.sql`: test cases plus `test_priority` and `test_case_source` enum types.
+  - `V6__test_case_import_preview_schema.sql`: persisted CSV/Excel import previews and uploaded file references.
 - Email verification and password reset tokens are opaque raw values; only SHA-256 hashes are stored.
 - `OpaqueTokenService` owns raw token generation and hashing for one-time email tokens.
 - Main tables use internal `BIGINT id` plus public UUID `public_id`; APIs should expose `publicId`, not internal `id`.
@@ -173,5 +174,7 @@ Focused tests:
   `rtk bash mvnw compile` -> success.
 - TestCase service focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=TestCaseServiceImplTest test` -> 6 tests, 0 failures/errors.
+- TestCase import preview persistence compile verification on 2026-06-21:
+  `rtk bash mvnw compile` -> success.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
