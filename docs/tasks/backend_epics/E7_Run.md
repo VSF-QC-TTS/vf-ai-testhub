@@ -8,14 +8,14 @@ This is the highest-risk backend epic. Keep it small and preserve async executio
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `Run` entity linked to project, dataset, target, trigger user, and optional previous run | TODO |
-| 2 | Add status, timestamps, counters, and failure reason fields | TODO |
-| 3 | Add `RunRequest`, `RunResponse`, and `RunSnapshotDto` | TODO |
-| 4 | Add Flyway migration for `runs` | TODO |
+| 1 | Add `Run` entity linked to project, dataset, target, trigger user, and optional previous run | DONE |
+| 2 | Add status, timestamps, counters, and failure reason fields | DONE |
+| 3 | Add `RunRequest`, `RunResponse`, and `RunSnapshotDto` | DONE |
+| 4 | Add Flyway migration for `runs` | DONE |
 
 - Commit: `feat(run): add run entity, dto and migration`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E7.2: RunSnapshot Assembly
 

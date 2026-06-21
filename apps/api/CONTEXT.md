@@ -214,5 +214,7 @@ Focused tests:
   `rtk bash mvnw -Dtest=AssertionServiceImplTest,ToolExpectationServiceImplTest test` -> 11 tests, 0 failures/errors.
 - Assertion/ToolExpectation controller focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=AssertionControllerTest,ToolExpectationControllerTest test` -> 8 tests, 0 failures/errors.
+- Run entity/DTO/snapshot compile verification on 2026-06-21:
+  `rtk bash mvnw compile` -> success.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.

@@ -11,7 +11,7 @@ These choices are already implemented. Do not rebuild them unless the task expli
 | Area | Current state |
 |---|---|
 | Framework | Spring Boot 4.0.7, Java 21, Maven |
-| Persistence | PostgreSQL + Flyway. Current migrations: `V1__init_schema.sql`, `V2__project_schema.sql`, `V3__target_schema.sql`, `V4__dataset_schema.sql`, `V5__test_case_schema.sql`, `V6__test_case_import_preview_schema.sql`, `V7__rubric_schema.sql`, `V8__assertion_schema.sql`, `V9__tool_expectation_schema.sql` |
+| Persistence | PostgreSQL + Flyway. Current migrations: `V1__init_schema.sql`, `V2__project_schema.sql`, `V3__target_schema.sql`, `V4__dataset_schema.sql`, `V5__test_case_schema.sql`, `V6__test_case_import_preview_schema.sql`, `V7__rubric_schema.sql`, `V8__assertion_schema.sql`, `V9__tool_expectation_schema.sql`, `V10__run_schema.sql` |
 | Identity model | Internal `BIGINT id`; public APIs expose UUID `publicId` |
 | Auth | Local email/password auth, Google/GitHub OAuth2 login, custom JWT issuing |
 | JWT validation | Spring Security OAuth2 Resource Server with `JwtDecoder`; no separate handwritten JWT request filter is needed |
