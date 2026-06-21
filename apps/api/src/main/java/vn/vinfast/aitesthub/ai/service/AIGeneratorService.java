@@ -1,6 +1,8 @@
 package vn.vinfast.aitesthub.ai.service;
 
 import vn.vinfast.aitesthub.ai.request.GenerateTestCasesRequest;
+import vn.vinfast.aitesthub.ai.request.SuggestAssertionsRequest;
+import vn.vinfast.aitesthub.ai.response.AssertionSuggestionResponse;
 import vn.vinfast.aitesthub.ai.response.TestCaseDraftBatchResponse;
 
 /**
@@ -18,4 +20,12 @@ public interface AIGeneratorService {
    * @return generated testcase draft batch for QC review
    */
   TestCaseDraftBatchResponse generateTestCases(GenerateTestCasesRequest request);
+
+  /**
+   * Suggests assertions and optional tool expectations for a testcase draft or existing testcase.
+   *
+   * @param request testcase content and response mapping/tool context
+   * @return draft assertions and tool expectations for QC review
+   */
+  AssertionSuggestionResponse suggestAssertions(SuggestAssertionsRequest request);
 }

@@ -197,6 +197,8 @@ AI generation service state:
 
 - `AIGeneratorService.generateTestCases(...)` calls the configured Spring AI chat provider through `AiChatClient` and
   returns `TestCaseDraft` batches only; it does not persist test cases, assertions, or tool expectations.
+- `AIGeneratorService.suggestAssertions(...)` returns `AssertionDraft` and optional `ToolExpectationDraft` suggestions
+  for QC review; it strips tool expectation suggestions when the request lacks tool/trace context.
 - The production `AiChatClient` implementation is `GeminiAiChatClient`, backed by Spring AI `ChatClient.Builder` and the
   configured Gemini key/model from `spring.ai.google.genai.*`.
 - AI testcase generation uses `AiPromptTemplateBuilder` with an explicit JSON output schema, strips optional Markdown
@@ -280,6 +282,8 @@ Focused tests:
   `rtk bash mvnw -Dtest=ResultControllerTest,ManualReviewControllerTest,ManualReviewServiceImplTest test`
   -> 7 tests, 0 failures/errors.
 - AI testcase generator compile verification on 2026-06-22:
+  `rtk bash mvnw compile` -> success.
+- AI assertion suggestion compile verification on 2026-06-22:
   `rtk bash mvnw compile` -> success.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.

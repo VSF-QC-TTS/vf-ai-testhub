@@ -22,14 +22,14 @@ This module calls external LLM APIs. Tests must mock external calls.
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add method for suggesting assertions from testcase and response mapping context | TODO |
-| 2 | Return `AssertionDraft` objects for QC review before persistence | TODO |
-| 3 | Include tool expectation suggestions only when trace/tool fields are available | TODO |
-| 4 | Validate model output before returning it to controllers | TODO |
+| 1 | Add method for suggesting assertions from testcase and response mapping context | DONE |
+| 2 | Return `AssertionDraft` objects for QC review before persistence | DONE |
+| 3 | Include tool expectation suggestions only when trace/tool fields are available | DONE |
+| 4 | Validate model output before returning it to controllers | DONE |
 
 - Commit: `feat(ai): add ai assertion suggestion`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E9.3: Tests
 

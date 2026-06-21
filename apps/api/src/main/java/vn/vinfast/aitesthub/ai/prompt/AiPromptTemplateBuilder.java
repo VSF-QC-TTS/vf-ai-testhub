@@ -3,6 +3,7 @@ package vn.vinfast.aitesthub.ai.prompt;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import vn.vinfast.aitesthub.ai.request.GenerateTestCasesRequest;
+import vn.vinfast.aitesthub.ai.request.SuggestAssertionsRequest;
 
 /**
  * @author nghlong3004 (Long Nguyen Hoang)
@@ -125,6 +126,81 @@ public class AiPromptTemplateBuilder {
             list(request.defaultRubrics()),
             list(request.existingTestcases()),
             count);
+  }
+
+  public String buildAssertionSuggestionPrompt(SuggestAssertionsRequest request) {
+    String language = request.language() == null || request.language().isBlank() ? "vi" : request.language();
+    return """
+        Suggest assertions for the testcase below. Return draft assertions and, only if tool/trace context is available,
+        draft tool expectations.
+
+        Language: %s
+        Input:
+        %s
+
+        Expected behavior:
+        %s
+
+        Reference answer:
+        %s
+
+        Response mapping context:
+        %s
+
+        Available response components: %s
+        Available tools: %s
+
+        Output JSON schema:
+        {
+          "assertions": [
+            {
+              "scope": "WHOLE_RESPONSE|COMPONENT|FIELD|MULTI_FIELD",
+              "type": "contains|not_contains|equals|not_equals|regex|greater_than|less_than|between|is_true|is_false|field_exists|field_not_exists|array_length_greater_than|array_contains|llm_rubric",
+              "targetComponent": "answer",
+              "fieldPath": "$.answer",
+              "fieldPaths": [],
+              "expectedValue": "expected value when relevant",
+              "rubricId": null,
+              "rubricOverride": null,
+              "threshold": 0.8,
+              "weight": 1.0,
+              "severity": "CRITICAL|MAJOR|MINOR|INFO"
+            }
+          ],
+          "toolExpectations": [
+            {
+              "expectationType": "TOOL_MUST_BE_CALLED|TOOL_MUST_NOT_BE_CALLED|TOOL_ARGS_MATCH|TOOL_SEQUENCE_MATCH|TOOL_CALL_COUNT|TOOL_OUTPUT_USED_IN_ANSWER|AGENT_EQUALS|AGENT_NOT_EQUALS|AGENT_STEP_CONTAINS",
+              "targetSource": "normalized_tool_calls",
+              "toolName": "tool name when relevant",
+              "agentName": null,
+              "argumentAssertions": [],
+              "sequence": [],
+              "minCalls": null,
+              "maxCalls": null,
+              "rubricId": null,
+              "rubricOverride": null,
+              "threshold": 0.8,
+              "required": true,
+              "severity": "CRITICAL|MAJOR|MINOR|INFO"
+            }
+          ]
+        }
+
+        Rules:
+        - Return exactly one JSON object matching the schema.
+        - Return at least one assertion.
+        - Use llm_rubric for semantic expected behavior and field/component assertions for concrete facts.
+        - If no tool/trace context is available, return an empty toolExpectations array.
+        - Do not invent tools that are not listed in available tools.
+        """
+        .formatted(
+            language,
+            request.input(),
+            request.expectedBehavior(),
+            text(request.referenceAnswer()),
+            text(request.responseMappingContext()),
+            list(request.availableComponents()),
+            list(request.availableTools()));
   }
 
   private String text(String value) {

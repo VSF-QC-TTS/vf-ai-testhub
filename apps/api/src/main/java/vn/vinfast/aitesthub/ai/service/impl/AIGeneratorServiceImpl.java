@@ -15,6 +15,9 @@ import vn.vinfast.aitesthub.ai.draft.TestCaseDraft;
 import vn.vinfast.aitesthub.ai.draft.ToolExpectationDraft;
 import vn.vinfast.aitesthub.ai.prompt.AiPromptTemplateBuilder;
 import vn.vinfast.aitesthub.ai.request.GenerateTestCasesRequest;
+import vn.vinfast.aitesthub.ai.request.SuggestAssertionsRequest;
+import vn.vinfast.aitesthub.ai.response.AssertionSuggestionResponse;
+import vn.vinfast.aitesthub.ai.response.GeneratedAssertionSuggestions;
 import vn.vinfast.aitesthub.ai.response.GeneratedTestCaseDrafts;
 import vn.vinfast.aitesthub.ai.response.TestCaseDraftBatchResponse;
 import vn.vinfast.aitesthub.ai.service.AIGeneratorService;
@@ -65,6 +68,37 @@ public class AIGeneratorServiceImpl implements AIGeneratorService {
         "AI could not generate valid testcase drafts",
         422,
         "AI_GENERATION_MALFORMED_RESPONSE");
+  }
+
+  @Override
+  public AssertionSuggestionResponse suggestAssertions(SuggestAssertionsRequest request) {
+    String systemPrompt = promptTemplateBuilder.systemPrompt();
+    String userPrompt = promptTemplateBuilder.buildAssertionSuggestionPrompt(request);
+    for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        String rawResponse = aiChatClient.complete(systemPrompt, userPrompt);
+        GeneratedAssertionSuggestions parsed =
+            objectMapper.readValue(stripJsonFences(rawResponse), GeneratedAssertionSuggestions.class);
+        List<AssertionDraft> assertions = normalizeAndValidateAssertions(parsed);
+        List<ToolExpectationDraft> tools = normalizeAndValidateToolExpectations(parsed, request);
+        return AssertionSuggestionResponse.builder()
+            .testCaseId(request.testCaseId())
+            .assertions(assertions)
+            .toolExpectations(tools)
+            .build();
+      } catch (JsonProcessingException | IllegalArgumentException ex) {
+        userPrompt = userPrompt + "\n\nPrevious response was invalid JSON/schema. Return corrected JSON only.";
+      } catch (RuntimeException ex) {
+        throw new ResourceException(
+            "AI provider request failed",
+            ErrorCode.INTERNAL_SERVER_ERROR.getStatus(),
+            "AI_PROVIDER_REQUEST_FAILED");
+      }
+    }
+    throw new ResourceException(
+        "AI could not generate valid assertion suggestions",
+        422,
+        "AI_SUGGESTION_MALFORMED_RESPONSE");
   }
 
   private List<TestCaseDraft> normalizeAndValidateDrafts(
@@ -118,6 +152,41 @@ public class AIGeneratorServiceImpl implements AIGeneratorService {
     if (draft.expectationType() == null) {
       throw new IllegalArgumentException("Tool expectation drafts must include expectationType.");
     }
+  }
+
+  private List<AssertionDraft> normalizeAndValidateAssertions(GeneratedAssertionSuggestions parsed) {
+    if (parsed == null || parsed.assertions() == null || parsed.assertions().isEmpty()) {
+      throw new IllegalArgumentException("AI response must include at least one assertion.");
+    }
+    parsed.assertions().forEach(this::validateAssertionDraft);
+    return parsed.assertions();
+  }
+
+  private List<ToolExpectationDraft> normalizeAndValidateToolExpectations(
+      GeneratedAssertionSuggestions parsed, SuggestAssertionsRequest request) {
+    List<ToolExpectationDraft> toolDrafts =
+        parsed == null || parsed.toolExpectations() == null ? List.of() : parsed.toolExpectations();
+    if (!hasToolContext(request)) {
+      return List.of();
+    }
+    toolDrafts.forEach(this::validateToolExpectationDraft);
+    return toolDrafts;
+  }
+
+  private boolean hasToolContext(SuggestAssertionsRequest request) {
+    if (request.availableTools() != null && !request.availableTools().isEmpty()) {
+      return true;
+    }
+    if (request.availableComponents() == null) {
+      return false;
+    }
+    return request.availableComponents().stream()
+        .map(String::toLowerCase)
+        .anyMatch(
+            component ->
+                component.contains("tool")
+                    || component.contains("trace")
+                    || component.contains("agent"));
   }
 
   private String stripJsonFences(String rawResponse) {
