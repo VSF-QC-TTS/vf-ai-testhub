@@ -220,5 +220,7 @@ Focused tests:
   `rtk bash mvnw -Dtest=RunSnapshotServiceImplTest test` -> 2 tests, 0 failures/errors.
 - Run stream publisher focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=RunStreamPublisherTest test` -> 1 test, 0 failures/errors.
+- Run service focused verification on 2026-06-21:
+  `rtk bash mvnw -Dtest=RunServiceImplTest test` -> 3 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.

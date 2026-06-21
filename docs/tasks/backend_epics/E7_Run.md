@@ -48,14 +48,14 @@ This is the highest-risk backend epic. Keep it small and preserve async executio
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `RunService.triggerRun(datasetId, targetId)` | TODO |
-| 2 | Create run with `PENDING`, assemble snapshot, publish job, then mark `RUNNING` | TODO |
-| 3 | Reject missing target/dataset and invalid empty-dataset runs with business errors | TODO |
-| 4 | Unit test status changes and publish outcome by state/output | TODO |
+| 1 | Add `RunService.triggerRun(datasetId, targetId)` | DONE |
+| 2 | Create run with `PENDING`, assemble snapshot, publish job, then mark `RUNNING` | DONE |
+| 3 | Reject missing target/dataset and invalid empty-dataset runs with business errors | DONE |
+| 4 | Unit test status changes and publish outcome by state/output | DONE |
 
 - Commit: `feat(run): add run service facade`
 - Scope: `L`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E7.5: Controller + Tests
 
