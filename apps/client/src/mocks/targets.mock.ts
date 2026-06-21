@@ -72,7 +72,7 @@ export const targetHandlers = [
     return HttpResponse.json({ success: true });
   }),
 
-  http.post(`${API_BASE_URL}/targets/parse-curl`, async ({ request }) => {
+  http.post(`${API_BASE_URL}/targets/parse-curl`, async () => {
     await delay(500);
     return HttpResponse.json({
       method: "POST",

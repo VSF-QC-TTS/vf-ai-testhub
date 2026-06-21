@@ -26,12 +26,12 @@ export const getForgotPasswordSchema = (t: TFunction) => z.object({
 
 export type ForgotPasswordFormData = z.infer<ReturnType<typeof getForgotPasswordSchema>>;
 
-export const resetPasswordSchema = z.object({
-  newPassword: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
+export const getResetPasswordSchema = (t: TFunction) => z.object({
+  newPassword: z.string().min(8, t("zod:errors.too_small.string.inclusive", { minimum: 8 })),
+  confirmPassword: z.string().min(8, t("zod:errors.too_small.string.inclusive", { minimum: 8 })),
 }).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords do not match",
+  message: t("auth:register.passwordsDoNotMatch"),
   path: ["confirmPassword"],
 });
 
-export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+export type ResetPasswordFormData = z.infer<ReturnType<typeof getResetPasswordSchema>>;

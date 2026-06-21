@@ -129,7 +129,7 @@ export function TargetConfigurationWorkbench() {
                 <Textarea 
                   placeholder="Paste your cURL command here to auto-fill the configuration below..."
                   value={curlInput}
-                  onChange={(e) => setCurlInput(e.target.value)}
+                  onChange={(e: any) => setCurlInput(e.target.value)}
                   className="font-mono text-sm min-h-[100px]"
                 />
                 <Button 
@@ -206,7 +206,7 @@ export function TargetConfigurationWorkbench() {
                     className="font-mono text-sm min-h-[150px]"
                     {...form.register("headersTemplate")}
                     value={typeof form.watch("headersTemplate") === 'object' ? JSON.stringify(form.watch("headersTemplate"), null, 2) : form.watch("headersTemplate") as any || ""}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       try {
                         const parsed = JSON.parse(e.target.value);
                         form.setValue("headersTemplate", parsed);
@@ -224,7 +224,7 @@ export function TargetConfigurationWorkbench() {
                     className="font-mono text-sm min-h-[200px]"
                     {...form.register("bodyTemplate")}
                     value={typeof form.watch("bodyTemplate") === 'object' ? JSON.stringify(form.watch("bodyTemplate"), null, 2) : form.watch("bodyTemplate") as any || ""}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       try {
                         const parsed = JSON.parse(e.target.value);
                         form.setValue("bodyTemplate", parsed);

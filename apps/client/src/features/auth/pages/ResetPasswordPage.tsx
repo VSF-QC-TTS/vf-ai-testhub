@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
-import { resetPasswordSchema, type ResetPasswordFormData } from "../auth.schemas";
+import { getResetPasswordSchema, type ResetPasswordFormData } from "../auth.schemas";
 import { useResetPassword } from "../auth.queries";
 import { FloatingInput } from "@/components/ui/FloatingInput";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ export function ResetPasswordPage() {
   const { mutate: resetPassword, isPending, error } = useResetPassword();
 
   const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordFormData>({
-    resolver: zodResolver(resetPasswordSchema),
+    resolver: zodResolver(getResetPasswordSchema(t)),
   });
 
   const onSubmit = (data: ResetPasswordFormData) => {

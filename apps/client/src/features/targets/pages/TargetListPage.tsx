@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { useTranslation } from "react-i18next";
 import { Plus, Target, Search, MoreVertical, Trash2, Edit2, Code2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";

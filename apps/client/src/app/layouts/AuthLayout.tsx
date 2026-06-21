@@ -1,10 +1,9 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { BrandLogo } from "../../components/ui/Logo";
 import { AuthDynamicCanvas } from "../../features/auth/components/AuthDynamicCanvas";
 
 export function AuthLayout() {
-  const location = useLocation();
 
   return (
     <div className="min-h-[100dvh] relative flex flex-col items-center bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-8">
