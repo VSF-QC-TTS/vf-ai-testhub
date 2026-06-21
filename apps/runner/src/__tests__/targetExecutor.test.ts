@@ -17,6 +17,29 @@ describe("TargetExecutor", () => {
     expect(requests[0]?.body).toBe(JSON.stringify({ message: "hello", user: "u-1" }));
     expect(result.rawResponse.body).toEqual({ answer: "ok" });
   });
+
+  it("applies query params and redacts auth headers in request snapshots", async () => {
+    const urls: string[] = [];
+    const requests: RequestInit[] = [];
+    const fetchImpl = async (input: string | URL | Request, init?: RequestInit): Promise<Response> => {
+      urls.push(String(input));
+      requests.push(init ?? {});
+      return new Response(JSON.stringify({ answer: "ok" }), { status: 200 });
+    };
+    const ssrfGuard = { assertAllowed: async () => undefined };
+    const executor = new TargetExecutor(ssrfGuard, fetchImpl as typeof fetch);
+    const targetSnapshot = {
+      ...target(),
+      queryParamsTemplate: { q: "{{input}}", user: "{{variables.userId}}" },
+      authConfig: { type: "bearer", token: "secret-token" },
+    };
+
+    const result = await executor.execute(targetSnapshot, testCase(), 1000);
+
+    expect(urls[0]).toBe("https://chatbot.test/api?q=hello&user=u-1");
+    expect(requests[0]?.headers).toMatchObject({ Authorization: "Bearer secret-token" });
+    expect(result.requestSnapshot.headers).toMatchObject({ Authorization: "[REDACTED]" });
+  });
 });
 
 function target(): TargetSnapshot {

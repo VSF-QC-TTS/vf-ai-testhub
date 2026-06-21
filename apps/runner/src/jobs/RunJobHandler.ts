@@ -1,7 +1,7 @@
 import type { TargetExecutionResult } from "../clients/TargetExecutor.js";
 import type { ResponseNormalizer } from "../normalizers/ResponseNormalizer.js";
 import type { ResultReporter } from "../reporting/ResultReporter.js";
-import type { RunJobEnvelope, RunSnapshot, TestCaseSnapshot } from "../types/RunSnapshot.js";
+import type { ReviewStatus, RunJobEnvelope, RunSnapshot, TestCaseSnapshot } from "../types/RunSnapshot.js";
 import type { TestResultIngestionItem } from "../types/ResultPayload.js";
 import { AssertionEvaluator } from "../promptfoo/AssertionEvaluator.js";
 import { ToolExpectationEvaluator } from "../promptfoo/ToolExpectationEvaluator.js";
@@ -58,7 +58,7 @@ export class RunJobHandler {
           )
         : [];
       const childStatuses = [...assertionResults, ...toolExpectationResults].map((item) => item.status);
-      const status = childStatuses.includes("FAILED") ? "FAILED" : "PASSED";
+      const status = aggregateStatus(childStatuses);
       return {
         testCaseId: testCase.id,
         status,
@@ -83,6 +83,22 @@ export class RunJobHandler {
       };
     }
   }
+}
+
+function aggregateStatus(statuses: readonly ReviewStatus[]): ReviewStatus {
+  if (statuses.includes("ERROR")) {
+    return "ERROR";
+  }
+  if (statuses.includes("FAILED")) {
+    return "FAILED";
+  }
+  if (statuses.includes("UNCERTAIN")) {
+    return "UNCERTAIN";
+  }
+  if (statuses.includes("SKIPPED")) {
+    return "SKIPPED";
+  }
+  return "PASSED";
 }
 
 export interface TargetRunner {

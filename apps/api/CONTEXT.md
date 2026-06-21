@@ -204,6 +204,23 @@ AI generation service state:
 - AI testcase generation uses `AiPromptTemplateBuilder` with an explicit JSON output schema, strips optional Markdown
   JSON fences, validates parsed draft shape, and retries malformed model responses with a bounded retry.
 
+Runner integration state:
+
+- `RunSnapshotServiceImpl` assembles the runner snapshot published on Redis stream `run:jobs`; the stream record stores
+  a JSON `payload` envelope containing `runId`, `correlationId`, `snapshot`, and `publishedAt`.
+- `RunSnapshotDto.TargetSnapshot` includes `method`, `url`, `queryParamsTemplate`, `headersTemplate`, `bodyTemplate`,
+  `authConfig`, `inputBinding`, `variableBindings`, and `timeoutMs`. The Node runner currently executes HTTP targets
+  from method/url/query/header/body templates and applies common bearer/basic/API-key `authConfig` shapes.
+- `RunSnapshotDto.responseMapping` uses backend keys ending in `Path` (`answerPath`, `toolCallsPath`, `traceIdPath`,
+  etc.). The runner normalizes these by removing the `Path` suffix and resolving the configured JSON path.
+- Runner result callbacks post to `POST /api/v1/internal/runs/{runId}/results` with `X-Runner-Token`. The payload must
+  include `finalBatch` and `testResults[]`; child assertion/tool result IDs must be public UUIDs from the snapshot.
+- Runner domain evaluators are fail-safe for unsupported semantic checks: `llm_rubric`, deep tool argument matching, and
+  agent trace semantics return `UNCERTAIN` rather than `PASSED` until a real LLM judge/trace evaluator is wired.
+- Promptfoo package/API was verified from the Node runner with `rtk npm run smoke:promptfoo` on 2026-06-22 using
+  `promptfoo@0.121.17`: 1 success, 0 failures, 0 errors. Production runner still keeps promptfoo behind a wrapper and
+  does not enable the placeholder provider in the main worker loop.
+
 ## [MAIL] Mail
 
 Mail state:
@@ -238,6 +255,9 @@ Focused tests:
   -> 6 tests, 0 failures/errors.
 - TestCase controller focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=TestCaseControllerTest,TestCaseImportControllerTest test` -> 9 tests, 0 failures/errors.
+- Runner focused verification on 2026-06-22:
+  `rtk npm run typecheck`, `rtk npm test`, `rtk npm run build`, and `rtk npm run smoke:promptfoo` from `apps/runner`
+  -> typecheck/build success, 30 runner tests passed, promptfoo smoke 1 success/0 failures/0 errors.
 - Rubric entity/DTO/mapper compile verification on 2026-06-21:
   `rtk bash mvnw compile` -> success.
 - Rubric service/controller compile verification on 2026-06-21:

@@ -22,15 +22,15 @@ Make the runner safe to operate beyond the happy path.
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add SSRF guard for target URLs before execution | TODO |
+| 1 | Add SSRF guard for target URLs before execution | DONE |
 | 2 | Add secret resolver for `{{secret.*}}` placeholders | TODO |
-| 3 | Redact secrets from logs/artifacts/errors | TODO |
-| 4 | Prevent runner token from being exposed in logs | TODO |
+| 3 | Redact secrets from logs/artifacts/errors | WARNING |
+| 4 | Prevent runner token from being exposed in logs | DONE |
 | 5 | Unit test blocked private IPs and redaction rules | TODO |
 
 - Commit: `feat(runner): add ssrf guard and secret redaction`
 - Scope: `M`
-- Review: `TODO`
+- Review: `WARNING`
 
 ## R6.3: Observability
 

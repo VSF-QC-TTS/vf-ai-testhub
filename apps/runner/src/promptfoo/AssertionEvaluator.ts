@@ -11,14 +11,14 @@ export class AssertionEvaluator {
     components: Record<string, unknown>,
   ): AssertionResultIngestionItem {
     const actualValue = this.resolveActualValue(assertion, responseBody, components);
-    const passed = evaluateRule(assertion, actualValue);
+    const ruleResult = evaluateRule(assertion, actualValue);
     return {
       assertionId: assertion.id,
-      status: passed ? "PASSED" : "FAILED",
+      status: ruleResult.status,
       actualValue,
       expectedValue: assertion.expectedValue,
-      reason: passed ? "Assertion passed" : `Assertion ${assertion.type} failed`,
-      score: passed ? 1 : 0,
+      reason: ruleResult.reason,
+      score: ruleResult.score,
       severity: assertion.severity,
       metadata: { type: assertion.type, scope: assertion.scope },
     };
@@ -39,8 +39,41 @@ export class AssertionEvaluator {
   }
 }
 
-function evaluateRule(assertion: AssertionSnapshot, actualValue: unknown): boolean {
+interface RuleEvaluation {
+  readonly status: ReviewStatus;
+  readonly reason: string;
+  readonly score: number;
+}
+
+function evaluateRule(assertion: AssertionSnapshot, actualValue: unknown): RuleEvaluation {
   const expected = assertion.expectedValue;
+  if (assertion.type === "llm_rubric") {
+    return {
+      status: "UNCERTAIN",
+      reason: "LLM rubric assertions require an LLM judge and were not evaluated by the domain evaluator",
+      score: 0,
+    };
+  }
+  const passed = evaluateBooleanRule(assertion, actualValue, expected);
+  if (passed === null) {
+    return {
+      status: "UNCERTAIN",
+      reason: `Assertion ${assertion.type} could not be evaluated`,
+      score: 0,
+    };
+  }
+  return {
+    status: passed ? "PASSED" : "FAILED",
+    reason: passed ? "Assertion passed" : `Assertion ${assertion.type} failed`,
+    score: passed ? 1 : 0,
+  };
+}
+
+function evaluateBooleanRule(
+  assertion: AssertionSnapshot,
+  actualValue: unknown,
+  expected: unknown,
+): boolean | null {
   switch (assertion.type) {
     case "contains":
       return String(actualValue ?? "").includes(String(expected ?? ""));
@@ -51,7 +84,11 @@ function evaluateRule(assertion: AssertionSnapshot, actualValue: unknown): boole
     case "not_equals":
       return JSON.stringify(actualValue) !== JSON.stringify(expected);
     case "regex":
-      return new RegExp(String(expected ?? "")).test(String(actualValue ?? ""));
+      try {
+        return new RegExp(String(expected ?? "")).test(String(actualValue ?? ""));
+      } catch {
+        return null;
+      }
     case "greater_than":
       return toNumber(actualValue) > toNumber(expected);
     case "less_than":
@@ -71,7 +108,7 @@ function evaluateRule(assertion: AssertionSnapshot, actualValue: unknown): boole
     case "array_contains":
       return Array.isArray(actualValue) && actualValue.some((item) => JSON.stringify(item) === JSON.stringify(expected));
     case "llm_rubric":
-      return true;
+      return null;
   }
 }
 

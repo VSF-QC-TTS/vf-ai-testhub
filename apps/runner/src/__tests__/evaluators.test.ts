@@ -20,6 +20,25 @@ describe("domain evaluators", () => {
 
     expect(result.status).toBe("PASSED");
   });
+
+  it("does not pass LLM rubric assertions without an LLM judge", () => {
+    const evaluator = new AssertionEvaluator();
+
+    const result = evaluator.evaluate({ ...assertion(), type: "llm_rubric" }, {}, { answer: "ok" });
+
+    expect(result.status).toBe("UNCERTAIN");
+  });
+
+  it("does not pass unsupported tool trace semantics", () => {
+    const evaluator = new ToolExpectationEvaluator();
+
+    const result = evaluator.evaluate(
+      { ...toolExpectation(), expectationType: "TOOL_ARGS_MATCH" },
+      [{ name: "search_product", arguments: { color: "red" } }],
+    );
+
+    expect(result.status).toBe("UNCERTAIN");
+  });
 });
 
 function assertion(): AssertionSnapshot {

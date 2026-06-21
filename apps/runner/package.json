@@ -8,7 +8,8 @@
     "start": "node dist/index.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "smoke:promptfoo": "tsx src/promptfoo/promptfooSmoke.ts"
   },
   "dependencies": {
     "ioredis": "5.11.1",

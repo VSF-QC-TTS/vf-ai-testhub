@@ -8,26 +8,28 @@ Execute target requests safely and normalize raw target responses into component
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Interpolate testcase `input` and `variables` into target body/query/header templates | TODO |
-| 2 | Support current HTTP target method/url/header/body shape | TODO |
-| 3 | Apply timeout and retry count from run options | TODO |
-| 4 | Capture latency and raw response/error details | TODO |
-| 5 | Unit test template interpolation and timeout/error mapping | TODO |
+| 1 | Interpolate testcase `input` and `variables` into target body/query/header templates | DONE |
+| 2 | Support current HTTP target method/url/header/body shape | DONE |
+| 3 | Apply timeout and retry count from run options | WARNING |
+| 4 | Capture latency and raw response/error details | DONE |
+| 5 | Unit test template interpolation, query params, auth redaction, and response parsing | DONE |
 
 - Commit: `feat(runner): execute target request templates`
 - Scope: `L`
-- Review: `TODO`
+- Review: `WARNING`
+
+Current gap: retry count is not implemented yet; timeout is implemented.
 
 ## R3.2: Response Normalizer
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Resolve response mapping paths for answer, suggestions, intent, sources, tool calls, agent, and trace | TODO |
-| 2 | Preserve normalized components and raw response separately | TODO |
+| 1 | Resolve response mapping paths for answer, suggestions, intent, sources, tool calls, agent, and trace | DONE |
+| 2 | Preserve normalized components and raw response separately | DONE |
 | 3 | Support missing-field behavior from backend mapping | TODO |
-| 4 | Extract tool calls into a stable array shape | TODO |
-| 5 | Unit test JSONPath mapping and missing-field behavior | TODO |
+| 4 | Extract tool calls into a stable array shape | DONE |
+| 5 | Unit test JSONPath mapping and missing-field behavior | WARNING |
 
 - Commit: `feat(runner): normalize target responses`
 - Scope: `M`
-- Review: `TODO`
+- Review: `WARNING`
