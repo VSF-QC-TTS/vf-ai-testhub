@@ -23,4 +23,12 @@ public interface TestCaseRepository
   Optional<TestCase> findByDatasetAndExternalId(Dataset dataset, String externalId);
 
   List<TestCase> findByDatasetAndExternalIdIn(Dataset dataset, Collection<String> externalIds);
+
+  List<TestCase> findByDatasetAndEnabledTrueOrderBySortOrderAsc(Dataset dataset);
+
+  List<TestCase> findByDatasetAndSectionNameAndEnabledTrueOrderBySortOrderAsc(
+      Dataset dataset, String sectionName);
+
+  List<TestCase> findByDatasetAndPublicIdInAndEnabledTrueOrderBySortOrderAsc(
+      Dataset dataset, Collection<UUID> publicIds);
 }

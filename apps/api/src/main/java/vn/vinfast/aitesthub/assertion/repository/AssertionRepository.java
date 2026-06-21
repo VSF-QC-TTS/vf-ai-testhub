@@ -1,5 +1,7 @@
 package vn.vinfast.aitesthub.assertion.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -19,4 +21,6 @@ public interface AssertionRepository extends JpaRepository<Assertion, Long> {
   Optional<Assertion> findByPublicId(UUID publicId);
 
   Page<Assertion> findByTestCase(TestCase testCase, Pageable pageable);
+
+  List<Assertion> findByTestCaseInAndEnabledTrue(Collection<TestCase> testCases);
 }

@@ -1,5 +1,7 @@
 package vn.vinfast.aitesthub.toolexpectation.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -19,4 +21,6 @@ public interface ToolExpectationRepository extends JpaRepository<ToolExpectation
   Optional<ToolExpectation> findByPublicId(UUID publicId);
 
   Page<ToolExpectation> findByTestCase(TestCase testCase, Pageable pageable);
+
+  List<ToolExpectation> findByTestCaseInAndEnabledTrue(Collection<TestCase> testCases);
 }

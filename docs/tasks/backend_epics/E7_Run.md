@@ -21,15 +21,15 @@ This is the highest-risk backend epic. Keep it small and preserve async executio
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Fetch target, test cases, assertions, tool expectations, and rubrics with bounded query count | TODO |
-| 2 | Group assertions and tool expectations by test case in memory | TODO |
-| 3 | Serialize an immutable `RunSnapshotDto` for the runner | TODO |
-| 4 | Unit test snapshot shape and grouping behavior by state/output | TODO |
-| 5 | Unit test empty dataset behavior | TODO |
+| 1 | Fetch target, test cases, assertions, tool expectations, and rubrics with bounded query count | DONE |
+| 2 | Group assertions and tool expectations by test case in memory | DONE |
+| 3 | Serialize an immutable `RunSnapshotDto` for the runner | DONE |
+| 4 | Unit test snapshot shape and grouping behavior by state/output | DONE |
+| 5 | Unit test empty dataset behavior | DONE |
 
 - Commit: `feat(run): implement run snapshot assembly with batch fetching`
 - Scope: `L`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E7.3: Redis Streams Publisher
 
