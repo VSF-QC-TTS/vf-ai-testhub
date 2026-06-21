@@ -140,6 +140,11 @@ Implemented API slices after auth:
 - `GET /api/v1/datasets/{datasetId}`: get a dataset by its `publicId`.
 - `PUT /api/v1/datasets/{datasetId}`: update a dataset by its `publicId`.
 - `DELETE /api/v1/datasets/{datasetId}`: archive a dataset by its `publicId`.
+- `POST /api/v1/datasets/{datasetId}/test-cases`: create a test case inside a dataset.
+- `GET /api/v1/datasets/{datasetId}/test-cases`: get paginated/filterable test cases for a dataset.
+- `GET /api/v1/test-cases/{testCaseId}`: get a test case by its `publicId`.
+- `PUT /api/v1/test-cases/{testCaseId}`: update a test case by its `publicId`.
+- `DELETE /api/v1/test-cases/{testCaseId}`: delete a test case by its `publicId`.
 
 ## [MAIL] Mail
 
@@ -166,5 +171,7 @@ Focused tests:
   `rtk bash mvnw -Dtest=DatasetServiceImplTest,DatasetControllerTest test` -> 14 tests, 0 failures/errors.
 - TestCase entity/DTO/mapper compile verification on 2026-06-21:
   `rtk bash mvnw compile` -> success.
+- TestCase service focused verification on 2026-06-21:
+  `rtk bash mvnw -Dtest=TestCaseServiceImplTest test` -> 6 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.

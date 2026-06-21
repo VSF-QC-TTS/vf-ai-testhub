@@ -22,15 +22,15 @@ Test cases are QC-authored inputs and expected behavior. Results produced after 
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `TestCaseRepository` with filtering support | TODO |
-| 2 | Add `TestCaseService` interface and implementation | TODO |
-| 3 | Support CRUD scoped by dataset | TODO |
-| 4 | Support pagination, keyword search, enabled filter, and tag filter | TODO |
-| 5 | Add focused unit tests for CRUD and filtering behavior | TODO |
+| 1 | Add `TestCaseRepository` with filtering support | DONE |
+| 2 | Add `TestCaseService` interface and implementation | DONE |
+| 3 | Support CRUD scoped by dataset | DONE |
+| 4 | Support pagination, keyword search, enabled filter, and tag filter | DONE |
+| 5 | Add focused unit tests for CRUD and filtering behavior | DONE |
 
 - Commit: `feat(testcase): add repository, service with filtering and unit tests`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E4.3: Import Service
 
