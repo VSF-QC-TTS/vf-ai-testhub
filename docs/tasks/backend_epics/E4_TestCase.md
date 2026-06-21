@@ -51,12 +51,12 @@ Test cases are QC-authored inputs and expected behavior. Results produced after 
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `TestCaseController` at `/api/v1/datasets/{datasetId}/test-cases` | TODO |
-| 2 | Add list endpoint with pagination/filter query params | TODO |
-| 3 | Add multipart import endpoint | TODO |
-| 4 | MockMvc test list filtering | TODO |
-| 5 | MockMvc test CSV import success and validation failure | TODO |
+| 1 | Add `TestCaseController` at `/api/v1/datasets/{datasetId}/test-cases` | DONE |
+| 2 | Add list endpoint with pagination/filter query params | DONE |
+| 3 | Add multipart import endpoint | DONE |
+| 4 | MockMvc test list filtering | DONE |
+| 5 | MockMvc test CSV import success and validation failure | DONE |
 
 - Commit: `feat(testcase): add controller with filter, import endpoint and tests`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`

@@ -182,5 +182,7 @@ Focused tests:
 - TestCase import focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=CsvTestCaseImportStrategyTest,ExcelTestCaseImportStrategyTest,TestCaseImportServiceImplTest test`
   -> 6 tests, 0 failures/errors.
+- TestCase controller focused verification on 2026-06-21:
+  `rtk bash mvnw -Dtest=TestCaseControllerTest,TestCaseImportControllerTest test` -> 9 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
