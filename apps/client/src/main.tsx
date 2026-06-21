@@ -5,12 +5,28 @@ import App from './App.tsx'
 import { I18nProvider } from './app/providers/I18nProvider.tsx'
 import { QueryProvider } from './app/providers/QueryProvider.tsx'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <I18nProvider>
-      <QueryProvider>
-        <App />
-      </QueryProvider>
-    </I18nProvider>
-  </StrictMode>,
-)
+async function enableMocking() {
+  if (import.meta.env.VITE_USE_MOCK !== 'true') {
+    return
+  }
+
+  const { worker } = await import('./mocks/browser')
+  
+  // `worker.start()` returns a Promise that resolves
+  // once the Service Worker is up and ready to intercept requests.
+  return worker.start({
+    onUnhandledRequest: 'bypass',
+  })
+}
+
+enableMocking().then(() => {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <I18nProvider>
+        <QueryProvider>
+          <App />
+        </QueryProvider>
+      </I18nProvider>
+    </StrictMode>,
+  )
+});
