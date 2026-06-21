@@ -8,14 +8,14 @@ Rubrics provide reusable LLM judge criteria at global, project, dataset, or test
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `Rubric` entity linked to `Project` where applicable | TODO |
-| 2 | Support rubric name, scope, content, version/status, and metadata | TODO |
-| 3 | Add request/response DTOs and mapper | TODO |
-| 4 | Add Flyway migration for `rubrics` | TODO |
+| 1 | Add `Rubric` entity linked to `Project` where applicable | DONE |
+| 2 | Support rubric name, scope, content, version/status, and metadata | DONE |
+| 3 | Add request/response DTOs and mapper | DONE |
+| 4 | Add Flyway migration for `rubrics` | DONE |
 
 - Commit: `feat(rubric): add entity, dto, mapper and migration`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E6.2: Service + Controller
 
