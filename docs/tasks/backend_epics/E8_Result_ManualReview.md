@@ -63,10 +63,16 @@ Results are system-generated after a run. Manual reviews are QC decisions layere
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `ResultController` for run reports and result listing | TODO |
-| 2 | Add compare endpoint if product scope still needs it | TODO |
-| 3 | Add `ManualReviewController` for result review submission | TODO |
-| 4 | MockMvc test report shape and manual review submission | TODO |
+| 1 | Add `ResultController` for run reports and result listing | DONE |
+| 2 | Add compare endpoint if product scope still needs it | DONE |
+| 3 | Add `ManualReviewController` for result review submission | DONE |
+| 4 | MockMvc test report shape and manual review submission | DONE |
 
 - Commit: `feat(result): add controllers and integration tests`
-- Review: `TODO`
+- Review: `DONE`
+
+Checkpoint:
+
+1. `GET /api/v1/runs/{runId}/report` and `GET /api/v1/runs/{runId}/results` cover report and listing scope.
+2. Compare endpoint was not added because current product scope does not define a concrete compare contract beyond report/listing.
+3. `POST /api/v1/runs/{runId}/review` supports batch manual review submission.

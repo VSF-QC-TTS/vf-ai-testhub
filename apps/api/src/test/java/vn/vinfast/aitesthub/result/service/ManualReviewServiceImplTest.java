@@ -28,6 +28,7 @@ import vn.vinfast.aitesthub.result.request.ManualReviewRequest;
 import vn.vinfast.aitesthub.result.service.impl.ManualReviewServiceImpl;
 import vn.vinfast.aitesthub.run.entity.Run;
 import vn.vinfast.aitesthub.run.enums.RunStatus;
+import vn.vinfast.aitesthub.run.repository.RunRepository;
 import vn.vinfast.aitesthub.testcase.entity.TestCase;
 import vn.vinfast.aitesthub.user.entity.User;
 import vn.vinfast.aitesthub.user.repository.UserRepository;
@@ -42,6 +43,7 @@ class ManualReviewServiceImplTest {
   @Mock private TestResultRepository testResultRepository;
   @Mock private ManualReviewRepository manualReviewRepository;
   @Mock private UserRepository userRepository;
+  @Mock private RunRepository runRepository;
   @Spy private ManualReviewMapper manualReviewMapper = Mappers.getMapper(ManualReviewMapper.class);
 
   private ManualReviewServiceImpl manualReviewService;
@@ -56,7 +58,11 @@ class ManualReviewServiceImplTest {
   void setUp() {
     manualReviewService =
         new ManualReviewServiceImpl(
-            testResultRepository, manualReviewRepository, userRepository, manualReviewMapper);
+            testResultRepository,
+            manualReviewRepository,
+            userRepository,
+            runRepository,
+            manualReviewMapper);
 
     Project project = Project.builder().id(1L).publicId(UUID.randomUUID()).name("Bot").build();
     Dataset dataset =

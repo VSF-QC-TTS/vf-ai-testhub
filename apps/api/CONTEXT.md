@@ -178,6 +178,10 @@ Implemented API slices after auth:
 - `GET /api/v1/datasets/{datasetId}/runs`: get paginated run history for a dataset.
 - `POST /api/v1/internal/runs/{runId}/results`: ingest batched runner results, persist result rows in chunks, and mark
   the run `COMPLETED` when `finalBatch=true`.
+- `GET /api/v1/runs/{runId}/report`: get aggregate run report with final-status counts, pass rate, result details,
+  assertion/tool breakdowns, and manual review state.
+- `GET /api/v1/runs/{runId}/results`: get only the result detail list for a run.
+- `POST /api/v1/runs/{runId}/review`: submit batch manual review decisions for test results in a completed run.
 
 Manual review service state:
 
@@ -261,5 +265,10 @@ Focused tests:
   `rtk bash mvnw compile` -> success.
 - ReportService focused verification on 2026-06-22:
   `rtk bash mvnw -Dtest=ReportServiceImplTest test` -> 1 test, 0 failures/errors.
+- Result/ManualReview controller compile verification on 2026-06-22:
+  `rtk bash mvnw compile` -> success.
+- Result/ManualReview controller focused verification on 2026-06-22:
+  `rtk bash mvnw -Dtest=ResultControllerTest,ManualReviewControllerTest,ManualReviewServiceImplTest test`
+  -> 7 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
