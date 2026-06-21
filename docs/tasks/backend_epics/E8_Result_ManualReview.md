@@ -8,15 +8,15 @@ Results are system-generated after a run. Manual reviews are QC decisions layere
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `TestResult` entity linked to `Run` and `TestCase` | TODO |
-| 2 | Add `AssertionResult` entity linked to `TestResult` and `Assertion` | TODO |
-| 3 | Add `ToolExpectationResult` linked to `TestResult` and `ToolExpectation` | TODO |
-| 4 | Add DTOs and mappers | TODO |
-| 5 | Add Flyway migration for result tables | TODO |
+| 1 | Add `TestResult` entity linked to `Run` and `TestCase` | DONE |
+| 2 | Add `AssertionResult` entity linked to `TestResult` and `Assertion` | DONE |
+| 3 | Add `ToolExpectationResult` linked to `TestResult` and `ToolExpectation` | DONE |
+| 4 | Add DTOs and mappers | DONE |
+| 5 | Add Flyway migration for result tables | DONE |
 
 - Commit: `feat(result): add result entities, dto, mapper and migrations`
 - Scope: `L`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E8.2: Result Ingestion API
 

@@ -227,5 +227,7 @@ Focused tests:
   `rtk bash mvnw -Dtest=RunServiceImplTest test` -> 3 tests, 0 failures/errors.
 - Run controller focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=RunControllerTest test` -> 4 tests, 0 failures/errors.
+- Result entity/DTO/mapper compile verification on 2026-06-21:
+  `rtk bash mvnw compile` -> success.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
