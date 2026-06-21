@@ -8,15 +8,15 @@ Test cases are QC-authored inputs and expected behavior. Results produced after 
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `TestCase` entity linked to `Dataset` | TODO |
-| 2 | Include legacy import fields: `externalId`, `sectionName`, `input`, `expectedBehavior` | TODO |
-| 3 | Include roadmap fields: reference answer, variables/context, tags, priority, enabled, source, sort order | TODO |
-| 4 | Add request/response DTOs and mapper | TODO |
-| 5 | Add Flyway migration for `test_cases` with JSONB where appropriate | TODO |
+| 1 | Add `TestCase` entity linked to `Dataset` | DONE |
+| 2 | Include legacy import fields: `externalId`, `sectionName`, `input`, `expectedBehavior` | DONE |
+| 3 | Include roadmap fields: reference answer, variables/context, tags, priority, enabled, source, sort order | DONE |
+| 4 | Add request/response DTOs and mapper | DONE |
+| 5 | Add Flyway migration for `test_cases` with JSONB where appropriate | DONE |
 
 - Commit: `feat(testcase): add entity, dto, mapper and migration`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E4.2: CRUD + Filtering Service
 

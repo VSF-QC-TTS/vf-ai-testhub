@@ -97,6 +97,9 @@ Domain choices in current code:
   structured evaluation data.
 - `Dataset` entity is `vn.vinfast.aitesthub.dataset.entity.Dataset`. It groups evaluation test cases inside a
   `Project`, tracks its creator, stores category/tags/metadata, supports archiving, and exposes `UUID publicId`.
+- `TestCase` entity is `vn.vinfast.aitesthub.testcase.entity.TestCase`. It belongs to a `Dataset`, stores legacy import
+  fields (`externalId`, `sectionName`, `input`, `expectedBehavior`) plus roadmap fields such as reference answer,
+  variables, preconditions, tags, priority, enabled/source, generated metadata, and exposes `UUID publicId`.
 
 ## [CURRENT_STATE] Persistence
 
@@ -108,6 +111,7 @@ Persistence now vs target:
   - `V2__project_schema.sql`: projects.
   - `V3__target_schema.sql`: targets and response mappings.
   - `V4__dataset_schema.sql`: datasets.
+  - `V5__test_case_schema.sql`: test cases plus `test_priority` and `test_case_source` enum types.
 - Email verification and password reset tokens are opaque raw values; only SHA-256 hashes are stored.
 - `OpaqueTokenService` owns raw token generation and hashing for one-time email tokens.
 - Main tables use internal `BIGINT id` plus public UUID `public_id`; APIs should expose `publicId`, not internal `id`.
@@ -160,5 +164,7 @@ Focused tests:
   `rtk bash mvnw -Dtest=ProjectControllerTest,ProjectServiceImplTest test`.
 - Dataset focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=DatasetServiceImplTest,DatasetControllerTest test` -> 14 tests, 0 failures/errors.
+- TestCase entity/DTO/mapper compile verification on 2026-06-21:
+  `rtk bash mvnw compile` -> success.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
