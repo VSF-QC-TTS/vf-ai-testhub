@@ -1,21 +1,9 @@
-import { Home, FolderClosed, Target, FileText, PlayCircle, BarChart3, Settings, Database, Bot } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { type ComponentProps } from "react";
 
 import { ProjectSwitcher } from "./ProjectSwitcher";
-
-const navItems = [
-  { icon: Home, label: "Home", to: "/" },
-  { icon: FolderClosed, label: "Projects", to: "/projects" },
-  { icon: Target, label: "Targets", to: "/targets" },
-  { icon: Database, label: "Datasets", to: "/datasets" },
-  { icon: FileText, label: "Test Cases", to: "/test-cases" },
-  { icon: PlayCircle, label: "Runs", to: "/runs" },
-  { icon: BarChart3, label: "Reports", to: "/reports" },
-  { icon: Settings, label: "Settings", to: "/settings" },
-];
-
+import { navItems } from "./config";
 import { useProjects } from "../../features/projects/projects.queries";
 import { useProjectStore } from "../../features/projects/project.store";
 import { BrandLogo } from "../ui/Logo";

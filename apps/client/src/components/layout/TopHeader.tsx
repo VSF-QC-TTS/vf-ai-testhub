@@ -24,7 +24,7 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
   return (
     <header 
       className={cn(
-        "sticky top-0 z-10 flex h-14 lg:h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-md px-4 sm:px-6",
+        "sticky top-0 z-10 flex h-14 lg:h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-md pl-14 pr-4 md:px-4 lg:px-6",
         className
       )}
       {...props}
