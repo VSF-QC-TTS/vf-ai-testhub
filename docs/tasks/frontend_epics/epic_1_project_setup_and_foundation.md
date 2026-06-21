@@ -36,7 +36,7 @@ Acceptance:
 
 - Build script still works.
 - No duplicate package manager lock files are introduced.
-- Document any missing baseline item in this epic.
+- Document any missing baseline item in this epic. (Added missing dependencies: `clsx`, `tailwind-merge`, and `class-variance-authority` which were missing for UI components).
 
 Tests/checks:
 

@@ -24,6 +24,14 @@
 
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+
+  --color-status-passed: var(--status-passed);
+  --color-status-failed: var(--status-failed);
+  --color-status-error: var(--status-error);
+  --color-status-uncertain: var(--status-uncertain);
+  --color-status-pending: var(--status-pending);
+  --color-status-running: var(--status-running);
+  --color-status-skipped: var(--status-skipped);
 }
 
 /* Base Light/Dark mode variables following shadcn/ui & EvalDesk Design System */
@@ -50,6 +58,14 @@
 
     --muted: #f4f4f5;
     --muted-foreground: #71717a; /* zinc-500 */
+
+    --status-passed: #16a34a; /* green-600 */
+    --status-failed: #dc2626; /* red-600 */
+    --status-error: #dc2626; /* red-600 */
+    --status-uncertain: #eab308; /* yellow-500 */
+    --status-pending: #a1a1aa; /* zinc-400 */
+    --status-running: #2563eb; /* blue-600 */
+    --status-skipped: #71717a; /* zinc-500 */
   }
 
   .dark {
@@ -74,6 +90,14 @@
 
     --muted: #27272a;
     --muted-foreground: #a1a1aa; /* zinc-400 */
+
+    --status-passed: #22c55e; /* green-500 */
+    --status-failed: #ef4444; /* red-500 */
+    --status-error: #ef4444; /* red-500 */
+    --status-uncertain: #eab308; /* yellow-500 */
+    --status-pending: #a1a1aa; /* zinc-400 */
+    --status-running: #3b82f6; /* blue-500 */
+    --status-skipped: #71717a; /* zinc-500 */
   }
 }
 
@@ -84,5 +108,6 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    line-height: 1.5; /* Prevent Vietnamese text clipping */
   }
 }
