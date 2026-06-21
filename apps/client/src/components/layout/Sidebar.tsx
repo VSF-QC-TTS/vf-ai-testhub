@@ -51,18 +51,22 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
         <ul className="grid gap-1 px-2 lg:px-4">
           {navItems.map((item) => {
             const isActive = location.pathname === item.to || (item.to !== "/" && location.pathname.startsWith(item.to));
+            const isDisabled = item.projectScoped && !activeProjectId;
+            
             return (
               <li key={item.to}>
                 <Link
-                  to={item.to}
+                  to={isDisabled ? "#" : item.to}
                   className={cn(
                     "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    isActive 
+                    isActive && !isDisabled
                       ? "bg-primary text-primary-foreground" 
                       : "text-muted-foreground hover:bg-elevated hover:text-foreground",
+                    isDisabled && "opacity-50 pointer-events-none cursor-not-allowed",
                     "md:justify-center lg:justify-start"
                   )}
                   title={t(item.i18nKey as any)}
+                  aria-disabled={isDisabled}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
                   <span className="hidden lg:inline-block truncate">{t(item.i18nKey as any)}</span>
