@@ -104,6 +104,9 @@ export const vi = {
       cta: "Tạo dự án mới",
     },
     list: {
+      desc: "Quản lý các không gian làm việc và môi trường kiểm thử API của bạn.",
+      noDescription: "Không có mô tả.",
+      createdAt: "Tạo ngày {{date}}",
       search: "Tìm kiếm dự án...",
       create: "Tạo dự án",
       columns: {
@@ -117,7 +120,9 @@ export const vi = {
       createDesc: "Nhập thông tin cơ bản cho dự án của bạn.",
       editTitle: "Chỉnh sửa dự án",
       name: "Tên dự án",
+      namePlaceholder: "VD: Hệ thống Phân tích",
       description: "Mô tả",
+      descPlaceholder: "Chi tiết tùy chọn...",
       cancel: "Hủy",
       submit: "Lưu",
       creating: "Đang tạo...",
@@ -128,6 +133,12 @@ export const vi = {
       desc: "Bạn có chắc chắn muốn xóa dự án này? Hành động này không thể hoàn tác.",
       confirm: "Xóa",
       cancel: "Hủy",
+    },
+    switcher: {
+      select: "Chọn dự án",
+      title: "Dự án",
+      create: "Tạo dự án",
+      manage: "Quản lý dự án",
     },
   },
   targets: {

@@ -85,7 +85,7 @@ export function ProjectFormDialog({ open, onOpenChange, project }: ProjectFormDi
                   <FormItem>
                     <FormLabel>{t("projects:form.name")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Analytics Engine" disabled={isPending} {...field} />
+                      <Input placeholder={t("projects:form.namePlaceholder")} disabled={isPending} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -99,7 +99,7 @@ export function ProjectFormDialog({ open, onOpenChange, project }: ProjectFormDi
                   <FormItem>
                     <FormLabel>{t("projects:form.description")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Optional details..." disabled={isPending} {...field} value={field.value || ""} />
+                      <Input placeholder={t("projects:form.descPlaceholder")} disabled={isPending} {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

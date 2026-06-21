@@ -104,6 +104,9 @@ export const en = {
       cta: "Create new project",
     },
     list: {
+      desc: "Manage your workspaces and API testing environments.",
+      noDescription: "No description provided.",
+      createdAt: "Created {{date}}",
       search: "Search projects...",
       create: "Create project",
       columns: {
@@ -117,7 +120,9 @@ export const en = {
       createDesc: "Enter the basic information for your project.",
       editTitle: "Edit project",
       name: "Project Name",
+      namePlaceholder: "e.g. Analytics Engine",
       description: "Description",
+      descPlaceholder: "Optional details...",
       cancel: "Cancel",
       submit: "Save",
       creating: "Creating...",
@@ -128,6 +133,12 @@ export const en = {
       desc: "Are you sure you want to delete this project? This action cannot be undone.",
       confirm: "Delete",
       cancel: "Cancel",
+    },
+    switcher: {
+      select: "Select Project",
+      title: "Projects",
+      create: "Create Project",
+      manage: "Manage Projects",
     },
   },
   targets: {
