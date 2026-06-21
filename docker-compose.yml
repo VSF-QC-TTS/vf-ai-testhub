@@ -1,0 +1,79 @@
+# ============================================================
+# VF QC Copilot — Local Docker Compose
+# Frontend (Next.js standalone) + Backend (Spring Boot) + DB + Redis
+# All ports bound to 127.0.0.1 only
+# ============================================================
+
+services:
+  # ---------------------------------------------------------
+  # PostgreSQL
+  # ---------------------------------------------------------
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-vat_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-vat}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vat}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ---------------------------------------------------------
+  # Redis
+  # ---------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ---------------------------------------------------------
+  # Backend API (Spring Boot)
+  # ---------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    init: true
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - server/.env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-vat_dev}
+      DB_USERNAME: ${POSTGRES_USER:-vat}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-vat}
+
+      REDIS_HOST: redis
+    volumes:
+      - app-logs:/app/logs
+
+
+volumes:
+  pgdata:
+  app-runs:
+  app-exports:
+  app-logs:
