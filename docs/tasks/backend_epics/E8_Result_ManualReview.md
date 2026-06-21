@@ -36,15 +36,15 @@ Results are system-generated after a run. Manual reviews are QC decisions layere
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `ManualReview` entity linked to `TestResult` | TODO |
-| 2 | Support status override, notes, reviewer, and timestamps | TODO |
-| 3 | Add `ManualReviewService` | TODO |
-| 4 | Add Flyway migration | TODO |
-| 5 | Unit test override behavior | TODO |
+| 1 | Add `ManualReview` entity linked to `TestResult` | DONE |
+| 2 | Support status override, notes, reviewer, and timestamps | DONE |
+| 3 | Add `ManualReviewService` | DONE |
+| 4 | Add Flyway migration | DONE |
+| 5 | Unit test override behavior | DONE |
 
 - Commit: `feat(result): add manual review entity and service`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E8.4: Report Aggregation Service
 

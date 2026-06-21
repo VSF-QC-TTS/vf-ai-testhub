@@ -1,6 +1,7 @@
 package vn.vinfast.aitesthub.result.repository;
 
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import vn.vinfast.aitesthub.result.entity.TestResult;
@@ -14,6 +15,8 @@ import vn.vinfast.aitesthub.testcase.entity.TestCase;
  */
 @Repository
 public interface TestResultRepository extends JpaRepository<TestResult, Long> {
+
+  Optional<TestResult> findByPublicId(UUID publicId);
 
   Optional<TestResult> findByRunAndTestCase(Run run, TestCase testCase);
 

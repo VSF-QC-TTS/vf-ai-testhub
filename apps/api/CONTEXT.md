@@ -120,6 +120,7 @@ Persistence now vs target:
   - `V9__tool_expectation_schema.sql`: tool expectations and tool expectation enum types.
   - `V10__run_schema.sql`: async evaluation runs and run enum types.
   - `V11__result_schema.sql`: test/assertion/tool expectation results and `review_status`.
+  - `V12__manual_review_schema.sql`: manual QC review overrides for test results.
 - Email verification and password reset tokens are opaque raw values; only SHA-256 hashes are stored.
 - `OpaqueTokenService` owns raw token generation and hashing for one-time email tokens.
 - Main tables use internal `BIGINT id` plus public UUID `public_id`; APIs should expose `publicId`, not internal `id`.
@@ -177,6 +178,13 @@ Implemented API slices after auth:
 - `GET /api/v1/datasets/{datasetId}/runs`: get paginated run history for a dataset.
 - `POST /api/v1/internal/runs/{runId}/results`: ingest batched runner results, persist result rows in chunks, and mark
   the run `COMPLETED` when `finalBatch=true`.
+
+Manual review service state:
+
+- `ManualReview` is a 1:1 QC override record for `TestResult`, with `autoStatus`, `autoReason`, `reviewedStatus`,
+  `reviewerNote`, `reviewedBy`, `reviewedAt`, and computed `finalStatus`.
+- `ManualReviewService.reviewResult(...)` creates or updates the review for one `TestResult`; it requires the owning
+  run to be `COMPLETED` and stores the authenticated reviewer.
 
 ## [MAIL] Mail
 
@@ -242,5 +250,9 @@ Focused tests:
   `rtk bash mvnw compile` -> success.
 - Result ingestion focused verification on 2026-06-22:
   `rtk bash mvnw -Dtest=ResultIngestionServiceImplTest test` -> 1 test, 0 failures/errors.
+- ManualReview compile verification on 2026-06-22:
+  `rtk bash mvnw compile` -> success.
+- ManualReview focused verification on 2026-06-22:
+  `rtk bash mvnw -Dtest=ManualReviewServiceImplTest test` -> 2 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
