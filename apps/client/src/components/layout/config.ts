@@ -1,4 +1,4 @@
-import { Home, FolderClosed, Target, FileText, PlayCircle, BarChart3, Settings, Database } from "lucide-react";
+import { Home, Target, FileText, PlayCircle, BarChart3, Settings, Database } from "lucide-react";
 
 export const navItems = [
   { icon: Home, i18nKey: "common:home", to: "/", projectScoped: false },

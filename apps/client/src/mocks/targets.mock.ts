@@ -2,27 +2,9 @@ import { http, HttpResponse, delay } from 'msw';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
-let targets = [
-  {
-    publicId: "t-123",
-    projectId: "p-12345",
-    name: "Production RAG API",
-    environment: "prod",
-    targetType: "HTTP",
-    method: "POST",
-    url: "https://api.example.com/v1/chat",
-    isDefault: true,
-    timeoutMs: 30000,
-    headersTemplate: { "Authorization": "Bearer {{api_key}}" },
-    bodyTemplate: { "query": "{{input}}" },
-    responseMapping: {
-      answerPath: "choices[0].message.content",
-      latencyPath: "usage.total_tokens"
-    },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
+import { initialTargetsData } from './targets.data';
+
+let targets = [...initialTargetsData];
 
 export const targetHandlers = [
   http.get(`${API_BASE_URL}/projects/:projectId/targets`, async ({ params }) => {

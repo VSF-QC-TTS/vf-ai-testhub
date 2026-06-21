@@ -2,22 +2,9 @@ import { http, HttpResponse, delay } from 'msw';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
-let projects = [
-  {
-    id: "p-12345",
-    name: "Customer Support Bot",
-    description: "Evaluations for the new GenAI support bot.",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: "p-67890",
-    name: "Internal Knowledge Search",
-    description: "RAG pipeline for internal documentation.",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
+import { initialProjectsData } from './projects.data';
+
+let projects = [...initialProjectsData];
 
 export const projectHandlers = [
   http.get(`${API_BASE_URL}/projects`, async () => {
