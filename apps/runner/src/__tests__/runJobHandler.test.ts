@@ -41,4 +41,50 @@ describe("RunJobHandler", () => {
     expect(reported[0]?.toolExpectationResults).toHaveLength(1);
     expect(finished).toBe(true);
   });
+
+  it("retries retryable target failures before reporting success", async () => {
+    const reported: TestResultIngestionItem[] = [];
+    let attempts = 0;
+    const targetExecutor = {
+      execute: async (): Promise<TargetExecutionResult> => {
+        attempts += 1;
+        if (attempts === 1) {
+          throw new Error("temporary failure");
+        }
+        return {
+          requestSnapshot: { body: { message: "hello" } },
+          rawResponse: { body: { data: { answer: "hello Eco", tool_calls: [{ name: "search_product" }] } } },
+          latencyMs: 25,
+        };
+      },
+    } satisfies TargetRunner;
+    const reporter = {
+      start: () => undefined,
+      add: async (result: TestResultIngestionItem) => {
+        reported.push(result);
+      },
+      finish: async () => undefined,
+    } satisfies Pick<ResultReporter, "start" | "add" | "finish">;
+    const handler = new RunJobHandler(
+      targetExecutor,
+      new ResponseNormalizer(),
+      () => reporter as ResultReporter,
+    );
+    const baseEnvelope = runJobEnvelopeFixture();
+    const envelope = {
+      ...baseEnvelope,
+      snapshot: {
+        ...baseEnvelope.snapshot,
+        options: {
+          ...baseEnvelope.snapshot.options,
+          retryCount: 1,
+        },
+      },
+    };
+
+    await handler.handle(envelope);
+
+    expect(attempts).toBe(2);
+    expect(reported[0]?.status).toBe("PASSED");
+  });
 });

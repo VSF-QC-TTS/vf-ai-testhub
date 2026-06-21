@@ -11,12 +11,12 @@ Turn execution output into backend result callback payloads and artifacts.
 | 1 | Convert promptfoo/domain results into `TestResultIngestionItem` | DONE |
 | 2 | Convert assertion checks into `AssertionResultIngestionItem` | DONE |
 | 3 | Convert tool checks into `ToolExpectationResultIngestionItem` | DONE |
-| 4 | Compute `PASSED`, `FAILED`, `ERROR`, `SKIPPED`, and `UNCERTAIN` consistently | WARNING |
+| 4 | Compute `PASSED`, `FAILED`, `ERROR`, `SKIPPED`, and `UNCERTAIN` consistently | DONE |
 | 5 | Unit test status aggregation and nested result mapping | DONE |
 
 - Commit: `feat(runner): normalize evaluation results`
 - Scope: `L`
-- Review: `WARNING`
+- Review: `DONE`
 
 ## R5.2: Batched Result Reporter
 

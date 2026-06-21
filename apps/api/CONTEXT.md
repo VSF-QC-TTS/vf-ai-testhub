@@ -212,7 +212,8 @@ Runner integration state:
   `authConfig`, `inputBinding`, `variableBindings`, and `timeoutMs`. The Node runner currently executes HTTP targets
   from method/url/query/header/body templates and applies common bearer/basic/API-key `authConfig` shapes.
 - `RunSnapshotDto.responseMapping` uses backend keys ending in `Path` (`answerPath`, `toolCallsPath`, `traceIdPath`,
-  etc.). The runner normalizes these by removing the `Path` suffix and resolving the configured JSON path.
+  etc.). The runner normalizes these by removing the `Path` suffix, resolving the configured JSON path, and applying
+  `missingFieldBehavior` as `FAILED` for `FAIL`, `UNCERTAIN` for `WARNING`, and ignored missing fields for `SKIP`.
 - Runner result callbacks post to `POST /api/v1/internal/runs/{runId}/results` with `X-Runner-Token`. The payload must
   include `finalBatch` and `testResults[]`; child assertion/tool result IDs must be public UUIDs from the snapshot.
 - Runner domain evaluators are fail-safe for unsupported semantic checks: `llm_rubric`, deep tool argument matching, and
@@ -257,7 +258,7 @@ Focused tests:
   `rtk bash mvnw -Dtest=TestCaseControllerTest,TestCaseImportControllerTest test` -> 9 tests, 0 failures/errors.
 - Runner focused verification on 2026-06-22:
   `rtk npm run typecheck`, `rtk npm test`, `rtk npm run build`, and `rtk npm run smoke:promptfoo` from `apps/runner`
-  -> typecheck/build success, 30 runner tests passed, promptfoo smoke 1 success/0 failures/0 errors.
+  -> typecheck/build success, 36 runner tests passed, promptfoo smoke 1 success/0 failures/0 errors.
 - Rubric entity/DTO/mapper compile verification on 2026-06-21:
   `rtk bash mvnw compile` -> success.
 - Rubric service/controller compile verification on 2026-06-21:

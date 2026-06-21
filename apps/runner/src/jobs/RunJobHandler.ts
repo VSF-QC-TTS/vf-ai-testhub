@@ -1,4 +1,5 @@
 import type { TargetExecutionResult } from "../clients/TargetExecutor.js";
+import { AppError } from "../errors/AppError.js";
 import type { ResponseNormalizer } from "../normalizers/ResponseNormalizer.js";
 import type { ResultReporter } from "../reporting/ResultReporter.js";
 import type { ReviewStatus, RunJobEnvelope, RunSnapshot, TestCaseSnapshot } from "../types/RunSnapshot.js";
@@ -43,10 +44,11 @@ export class RunJobHandler {
     testCase: TestCaseSnapshot,
   ): Promise<TestResultIngestionItem> {
     try {
-      const execution = await this.targetExecutor.execute(
+      const execution = await this.executeTargetWithRetries(
         snapshot.target,
         testCase,
         snapshot.options.timeoutMs ?? snapshot.target.timeoutMs ?? 30000,
+        snapshot.options.retryCount ?? 0,
       );
       const normalized = this.responseNormalizer.normalize(execution.rawResponse.body, snapshot.responseMapping);
       const assertionResults = testCase.assertions.map((assertion) =>
@@ -57,7 +59,11 @@ export class RunJobHandler {
             this.toolExpectationEvaluator.evaluate(expectation, normalized.toolCalls),
           )
         : [];
-      const childStatuses = [...assertionResults, ...toolExpectationResults].map((item) => item.status);
+      const childStatuses = [
+        normalized.mappingStatus,
+        ...assertionResults.map((item) => item.status),
+        ...toolExpectationResults.map((item) => item.status),
+      ].filter((status): status is ReviewStatus => status !== null);
       const status = aggregateStatus(childStatuses);
       return {
         testCaseId: testCase.id,
@@ -69,6 +75,7 @@ export class RunJobHandler {
         extractedComponents: normalized.components,
         extractedToolCalls: normalized.toolCalls,
         latencyMs: execution.latencyMs,
+        errorMessage: normalized.mappingMessages.length > 0 ? normalized.mappingMessages.join("; ") : null,
         assertionResults,
         toolExpectationResults,
       };
@@ -82,6 +89,27 @@ export class RunJobHandler {
         toolExpectationResults: [],
       };
     }
+  }
+
+  private async executeTargetWithRetries(
+    target: RunSnapshot["target"],
+    testCase: TestCaseSnapshot,
+    timeoutMs: number,
+    retryCount: number,
+  ): Promise<TargetExecutionResult> {
+    let lastError: unknown;
+    for (let attempt = 0; attempt <= retryCount; attempt += 1) {
+      try {
+        return await this.targetExecutor.execute(target, testCase, timeoutMs);
+      } catch (error) {
+        lastError = error;
+        if (!isRetryable(error) || attempt >= retryCount) {
+          throw error;
+        }
+        await delay(Math.min(1000, 100 * (attempt + 1)));
+      }
+    }
+    throw lastError instanceof Error ? lastError : new Error("Target request failed after retries");
   }
 }
 
@@ -99,6 +127,16 @@ function aggregateStatus(statuses: readonly ReviewStatus[]): ReviewStatus {
     return "SKIPPED";
   }
   return "PASSED";
+}
+
+function isRetryable(error: unknown): boolean {
+  return error instanceof AppError ? error.retryable : true;
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 }
 
 export interface TargetRunner {
