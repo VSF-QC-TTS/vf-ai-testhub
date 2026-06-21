@@ -14,6 +14,7 @@ Backend:
 Design:
 
 - `Frontend_Design_System.md` table, JSON display, and status rules
+- `docs/product/EvalDeskQAPlatform.html` Results section as UX benchmark only
 
 ## Task 7.1: Report API Layer
 
@@ -42,12 +43,15 @@ Steps:
 3. Render status distribution.
 4. Render run metadata: target, dataset, run mode, created/completed times.
 5. Provide report refresh.
+6. Show pass/fail/error/uncertain counts and duration if backend returns them.
+7. Include comparison summary only when backend exposes A/B or version comparison result data.
 
 Acceptance:
 
 - Loading skeleton matches dashboard layout.
 - Failed/error/uncertain are visually distinct.
 - Empty or incomplete report state is handled.
+- Summary cards match prototype information density while using real report DTOs.
 
 ## Task 7.3: Results Table
 
@@ -58,12 +62,15 @@ Steps:
 3. Add filters by final status, section, severity, reviewed/unreviewed.
 4. Add row expansion or detail drawer.
 5. Keep filters in URL.
+6. Include quick filters equivalent to prototype: all, failed, passed, error, and uncertain when available.
+7. Expanded row preview should show the most important failed field diffs before opening the full drawer.
 
 Acceptance:
 
 - Large result sets remain usable.
 - Long text truncates with accessible detail.
 - Row actions work on touch devices.
+- Users can triage failures from the table without opening raw JSON first.
 
 ## Task 7.4: Result Detail Drawer
 
@@ -73,6 +80,7 @@ Sections:
 - Actual answer/components.
 - Assertion results.
 - Tool expectation results.
+- Field-level expected-vs-actual diffs.
 - Raw request/response JSON.
 - Manual review controls.
 
@@ -82,11 +90,15 @@ Steps:
 2. Use JSON/code display component for raw payloads.
 3. Add copy buttons.
 4. Add expand/collapse for large payloads.
+5. Add `ResultFieldDiff` rows with field path, expected value, actual value, assertion method, score/threshold, and status when available.
+6. Keep normalized answer/components side by side with raw payloads.
+7. Prefer redacted payloads from backend for copy; if backend does not redact, mask known secret headers before copying.
 
 Acceptance:
 
 - Raw JSON never overflows page.
 - Copy does not include secrets if redacted payload is provided.
+- Detail drawer exceeds prototype by separating assertion, tool expectation, raw payload, and manual review context.
 
 ## Task 7.5: Manual Review
 

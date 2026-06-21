@@ -19,6 +19,7 @@ Frontend:
 - Epic 1 AppShell
 - Epic 2 API client/query/i18n
 - `docs/architecture/Frontend_Design_System.md` table/form rules
+- `docs/product/EvalDeskQAPlatform.html` API Config tab as UX benchmark only
 
 ## Task 4.1: Project API Layer
 
@@ -132,6 +133,7 @@ Sections:
 - Templates: query params, headers, body.
 - Auth: auth config JSON or guided fields.
 - Bindings: input binding and variable bindings.
+- Connection preview: parsed cURL values and masked secrets.
 
 Steps:
 
@@ -140,12 +142,34 @@ Steps:
 3. Provide format/validate button for JSON fields.
 4. Support cURL parse preview and allow user to apply parsed values.
 5. Validate URL and timeout before submit.
+6. Show variables supported by backend/runner, such as testcase input, context, external ID, and dataset variables only after confirming exact backend names.
+7. Mask authorization headers and auth config secrets in previews.
 
 Acceptance:
 
 - Invalid JSON blocks submit and points to the field.
 - cURL parser result is previewed before persisting.
 - Secrets are visually masked if entered.
+- Target form meets prototype parity for API setup while keeping backend DTOs authoritative.
+
+## Task 4.6a: Configuration Workbench Composition
+
+Goal: create the production equivalent of the prototype's Config area without mixing unrelated persistence concerns.
+
+Steps:
+
+1. Build a workbench route or tab group under the selected project/target if the information architecture supports it.
+2. Include API target setup from Task 4.6.
+3. Link response mapping from Task 4.7.
+4. Link verification/rubric configuration to Epic 5/Epic 8 screens instead of duplicating forms.
+5. Keep active tab in URL search params.
+6. Show disabled roadmap items only for prototype concepts not backed by backend contracts, such as prompt version comparison if no version entity exists.
+
+Acceptance:
+
+- Workbench has clear tabs/sections for API config, response mapping, verification, and rubric/LLM judge references.
+- Each tab owns its own form state and save action.
+- No fake backend fields are added to make the prototype UI look complete.
 
 ## Task 4.7: Response Mapping UI
 

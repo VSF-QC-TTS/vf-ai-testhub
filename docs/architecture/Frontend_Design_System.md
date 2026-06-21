@@ -8,6 +8,31 @@ Read this together with `docs/architecture/Component_Contracts.md` before implem
 
 AI TestHub is an internal QA automation tool. It should feel precise, operational, and dense enough for repeated work.
 
+### 1.1 Mentor Prototype Benchmark
+
+`docs/product/EvalDeskQAPlatform.html` is the visual/product benchmark from mentor review. Treat it as a UX reference, not as implementation source code and not as an API contract.
+
+Preserve or exceed these prototype-level capabilities:
+
+- App shell with dark operational sidebar, project switcher, user/environment affordance, and clear current section state.
+- Dashboard with top metric cards, pass-rate trend, recent runs, and A/B prompt/config comparison when the backend exposes version comparison data.
+- Configuration workbench split into API target setup, LLM judge/rubric settings, verification rules, and dataset column mapping.
+- cURL import flow that parses method, URL, headers, body, and variables before the user persists target configuration.
+- Dataset library with grid/table access, upload preview, matched columns, row-level validation issues, and invalid-row correction flow.
+- Test run screen with dataset/target/config selectors, progress, live per-case feedback, latency, and terminal navigation to results.
+- Results screen with summary metrics, status filters, expandable rows, field-level expected-vs-actual diffs, raw payload inspection, and review workflow.
+
+Improve beyond the prototype in these areas:
+
+- Real backend DTOs and runner semantics are authoritative; never invent fields from the HTML.
+- All flows need loading, empty, error, success, and permission/auth states.
+- Keyboard navigation, visible focus, screen reader semantics, and WCAG AA contrast are required.
+- Responsive desktop/tablet/mobile behavior must be designed, not left as a desktop-only prototype.
+- URL state, i18n, tests, typed API clients, and accessibility checks are part of completion.
+- Secrets must be masked and excluded from copy/log output.
+- Runner statuses must include `UNCERTAIN` and manual review must distinguish auto status from final reviewed status.
+- Prompt/config A/B and version history are enabled only when backend contracts support them; otherwise show a disabled roadmap affordance or omit the control.
+
 Design goals:
 
 - Fast scanning over decorative presentation.
@@ -132,6 +157,7 @@ Fonts:
 
 - UI: Inter or an equivalent Latin Extended font.
 - Code/logs/JSON: JetBrains Mono or equivalent monospace.
+- IBM Plex Sans and IBM Plex Mono are acceptable alternatives when matching the mentor prototype more closely, but only if Vietnamese diacritics render cleanly.
 
 Rules:
 
@@ -295,31 +321,50 @@ Projects and targets:
 - Targets need a clear response mapping status because runner quality depends on it.
 - JSON templates must have validation and formatting.
 - URL/method/auth fields should be grouped.
+- cURL parsing must preview parsed request pieces before applying them.
 
 Datasets and test cases:
 
 - Test case tables need fast filtering by section, tag, enabled, and search.
 - Editors should not force full-page navigation for every row edit.
 - Import preview must show invalid rows and allow correction flow.
+- Dataset column roles should be visible during import: input, expected field, metadata, ignored.
+- Upload previews must show matched column count, valid/invalid row count, and row numbers for blocking issues.
 
 Assertions and tool expectations:
 
 - Use builder-style forms with dynamic fields.
 - Show examples for field paths and expected values.
 - Keep enum values translated but transport raw backend values.
+- Verification builders should support per-field rules, rubric-backed LLM judge rules, and hybrid modes only where backend and runner support them.
 
 Runs and reports:
 
 - Run status should be visible from dataset and run detail pages.
 - Reports need both summary cards and drill-down rows.
 - Raw response and normalized components should be inspectable side by side.
+- Live run views must show progress, current phase, per-case status, latency, and a path to the report when complete.
+- Results rows should expand into expected-vs-actual field diffs before forcing users into raw JSON.
 
 Manual review:
 
 - Distinguish auto status from reviewed/final status.
 - Reviewer notes need clear save state and audit metadata.
 
-## 10. Implementation Checklist
+## 10. Prototype Quality Bar
+
+A feature that appears in `EvalDeskQAPlatform.html` is not considered done merely because a similar screen exists. It must also meet the production bar:
+
+- Uses the real backend controller/request/response classes.
+- Handles auth/session and forbidden states.
+- Has responsive behavior across desktop, tablet, and mobile.
+- Is keyboard operable and screen-reader understandable.
+- Persists shareable view state in the URL where appropriate.
+- Has behavior tests for the primary workflow.
+- Keeps all user-visible strings in i18n resources.
+- Avoids inline-style monoliths and decomposes reusable surfaces into typed components.
+
+## 11. Implementation Checklist
 
 Before marking a UI slice complete:
 

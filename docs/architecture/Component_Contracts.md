@@ -17,6 +17,12 @@ Official React references used for these rules:
 - React 19 Release Notes: https://react.dev/blog/2024/12/05/react-19
 - `forwardRef` reference: https://react.dev/reference/react/forwardRef
 
+Mentor prototype reference:
+
+- `docs/product/EvalDeskQAPlatform.html`
+
+Use the prototype to understand expected product behavior and density. Do not copy its inline styles, generated structure, custom DSL, hardcoded data, or implied API shapes.
+
 ## 1. Contract Principles
 
 ### 1.1 Props Must Match Platform Semantics
@@ -74,6 +80,59 @@ Separate responsibilities:
 - `features/<feature>/api.ts`: API calls.
 - `features/<feature>/queries.ts`: TanStack Query hooks.
 - `features/<feature>/schemas.ts`: Zod schemas and form types.
+
+### 1.4 Prototype-Derived Components
+
+The mentor prototype implies these production components. Implement them as typed, reusable React components backed by real feature data, not as copied markup.
+
+`ProjectSwitcher`:
+
+- Lives in the app shell.
+- Accepts the current project, project list, loading state, and `onProjectChange`.
+- Supports keyboard search/selection when project count grows.
+- Does not fetch projects directly; it receives data from a layout/container query.
+
+`DashboardMetricCard` and `TrendPanel`:
+
+- Render summary numbers, deltas, and chart/table-friendly trend data.
+- Accept `isLoading`, `error`, and empty state props.
+- Do not calculate business metrics unless the backend response explicitly requires client-side derivation.
+
+`ConfigWorkbench`:
+
+- Owns tab state through URL search params.
+- Composes target API config, LLM judge/rubric config, verification rules, and dataset column mapping only when those contracts exist.
+- Keeps each tab form isolated so one invalid tab does not corrupt another unsaved tab.
+
+`CurlImportPanel`:
+
+- Accepts raw cURL input, parsed preview result, parse errors, and apply callback.
+- Must preview method, URL, headers, query params, body, and masked secrets before applying.
+- Uses backend parse endpoint when present; local parsing is only an enhancement after backend contract review.
+
+`DatasetUploadPreview`:
+
+- Shows file metadata, matched column count, valid/invalid row count, row-level issues, and preview rows.
+- Accepts backend preview DTOs directly or through a narrow mapper.
+- Keeps confirm disabled until backend preview state allows it.
+
+`VerificationRuleBuilder`:
+
+- Supports backend assertion enums and runner-supported methods only.
+- Keeps transported enum values raw while translating labels at render time.
+- Shows JSONPath examples and validates paths before submit when the runner requires a path format.
+
+`RunProgressPanel`:
+
+- Shows run status, progress counts, phase, elapsed time, per-case status rows, and report navigation.
+- Polling is owned by a container/query hook, not by the presentational panel.
+- Must represent `UNCERTAIN` distinctly from `FAILED` and `ERROR`.
+
+`ResultFieldDiff`:
+
+- Displays field name, expected value, actual value, assertion status, score/threshold when available, and reviewer context.
+- Large values collapse with accessible expand/copy controls.
+- Redacted payloads stay redacted when copied.
 
 ## 2. React 19 Rules
 

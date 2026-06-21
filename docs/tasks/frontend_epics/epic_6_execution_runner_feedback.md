@@ -15,6 +15,7 @@ Runner context:
 
 - `apps/api/CONTEXT.md` runner integration state
 - `docs/tasks/runner_epics/`
+- `docs/product/EvalDeskQAPlatform.html` Test Run section as UX benchmark only
 
 ## Task 6.1: Run API Layer
 
@@ -40,12 +41,15 @@ Steps:
 3. Let user select run scope: full dataset, selected section, selected cases if backend supports each.
 4. Include options: include LLM judge, include tool expectations, max concurrency, timeout, retry count if backend request supports them.
 5. Submit and navigate to run detail or show run status drawer.
+6. Show estimated call count before trigger when it can be derived from selected dataset/cases and enabled comparison modes.
+7. Support A/B target/config selection only if backend request DTO exposes comparison inputs; otherwise keep the prototype A/B concept out of the active form.
 
 Acceptance:
 
 - Cannot trigger without valid target/dataset.
 - User sees immediate feedback after trigger.
 - Backend validation errors map to form.
+- Trigger flow makes cost/risk visible before sending many runner calls.
 
 ## Task 6.3: Run Status Polling
 
@@ -56,12 +60,16 @@ Steps:
 3. Use backoff or sensible interval.
 4. Provide manual refresh.
 5. Show last updated time.
+6. Render a `RunProgressPanel` with completed/total counts, current phase/status, elapsed time, and terminal report link.
+7. Render recent or live per-case rows when the backend snapshot includes them: external ID, input preview, status, latency, and failure reason.
+8. Distinguish `FAILED`, `ERROR`, and `UNCERTAIN`; do not collapse them into one red state.
 
 Acceptance:
 
 - Polling stops when component unmounts.
 - Polling does not continue forever after completed/failed run.
 - User can navigate to report when completed.
+- Live run feedback reaches prototype parity without relying on fake progress rows.
 
 ## Task 6.4: Run History
 

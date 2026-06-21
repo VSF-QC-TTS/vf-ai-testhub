@@ -10,6 +10,10 @@ Backend:
 - `apps/api/src/main/java/vn/vinfast/aitesthub/ai/`
 - `apps/api/CONTEXT.md` AI generation service state
 
+UX benchmark:
+
+- `docs/product/EvalDeskQAPlatform.html` LLM Judge and Verification sections as workflow reference only
+
 ## Task 8.1: Rubric API Layer
 
 Steps:
@@ -47,11 +51,33 @@ Steps:
 3. Use textarea/editor for rubric content.
 4. Validate threshold range.
 5. Provide preview panel showing how rubric will be used by assertions.
+6. If backend supports criteria arrays, model criteria like answer correctness, intent match, tone, hallucination safety, and custom project checks.
+7. Show expected judge output schema only when the runner/backend requires structured JSON.
 
 Acceptance:
 
 - Long rubric content remains editable.
 - Validation errors are localized.
+- Rubric editor can express the prototype's judge prompt pattern without hardcoding unsupported fields.
+
+## Task 8.3a: LLM Judge Configuration Surface
+
+Goal: expose judge provider/model/runtime settings only if backend has a persisted contract for them.
+
+Steps:
+
+1. Read AI/rubric/backend configuration DTOs for provider, base URL, model, temperature, max tokens, response format, and API key handling.
+2. Build a settings panel linked from the config workbench when those DTOs exist.
+3. Mask API keys and never echo secret values from backend.
+4. Add connection test only when a backend endpoint exists.
+5. Show estimated cost per case only when backend returns pricing metadata or a documented local pricing table is approved.
+6. If backend lacks this contract, document it in the epic notes and keep the UI disabled/roadmap instead of adding local-only storage.
+
+Acceptance:
+
+- Provider/model controls are contract-backed.
+- Secrets are write-only or masked.
+- Users can understand whether rubric assertions will run with real AI judge support.
 
 ## Task 8.4: AI TestCase Generation
 
@@ -63,12 +89,15 @@ Steps:
 4. Submit request.
 5. Render returned `TestCaseDraft` list for review.
 6. Let user select drafts to persist only if backend has persistence endpoint; otherwise export/apply through existing testcase create flow.
+7. Show provenance: prompt/context used, provider/model if returned, and generation timestamp.
+8. Mark generated drafts as untrusted until the user reviews/edits them.
 
 Acceptance:
 
 - Generated content is never silently persisted without user review.
 - Model errors show retryable error state.
 - User can edit draft before saving.
+- AI output is assistive, not authoritative.
 
 ## Task 8.5: Assertion Suggestions
 

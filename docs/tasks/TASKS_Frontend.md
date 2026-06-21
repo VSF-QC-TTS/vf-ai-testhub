@@ -9,12 +9,27 @@ Read these before writing code:
 1. `docs/architecture/Frontend_Design_System.md`
 2. `docs/architecture/Component_Contracts.md`
 3. The relevant frontend epic file listed below.
-4. The exact backend Java files for the feature being implemented:
+4. `docs/product/EvalDeskQAPlatform.html` when implementing shell, dashboard, config, dataset, run, or results UX. Use it as a mentor benchmark for workflow density and screen intent, not as source code or API truth.
+5. The exact backend Java files for the feature being implemented:
    - `apps/api/src/main/java/vn/vinfast/aitesthub/<feature>/controller/`
    - `apps/api/src/main/java/vn/vinfast/aitesthub/<feature>/request/`
    - `apps/api/src/main/java/vn/vinfast/aitesthub/<feature>/response/`
 
 Do not guess API payloads from memory or from old docs. Backend source is the source of truth.
+
+## Prototype Parity Requirements
+
+The frontend must reach at least the workflow coverage shown in `docs/product/EvalDeskQAPlatform.html`, then exceed it with production behavior:
+
+- Epic 1 owns the app shell quality bar: dark operational sidebar, project switcher, current route state, responsive drawer/rail, and accessible header controls.
+- Epic 4 owns API target configuration parity: cURL parse preview, request templates, auth masking, response mapping status, and test-configuration affordances only where backend endpoints exist.
+- Epic 5 owns dataset authoring parity: dataset library, upload preview, matched columns, invalid rows, row correction path, assertion builder, and tool expectation builder.
+- Epic 6 owns run execution parity: run setup, progress, live per-case status, latency, terminal state, and report navigation.
+- Epic 7 owns report parity: summary metrics, status filters, expandable field diffs, raw JSON inspection, and manual review.
+- Epic 8 owns LLM judge/rubric parity where backend supports it: rubric prompts, thresholds, provider/model settings, cost estimates, and AI-generated drafts that require human review.
+- Epic 9 owns dashboard parity: project overview metrics, trend panels, recent runs, failing areas, and version/config comparison summaries where backend supports them.
+
+Anything shown in the prototype but missing from backend contracts must be marked as disabled/roadmap in UI planning rather than implemented with fake fields.
 
 ## Current Frontend Baseline
 
@@ -48,6 +63,7 @@ React 19 contract constraints:
 | 6 | `frontend_epics/epic_6_execution_runner_feedback.md` | PENDING | Trigger runs, status polling, run history |
 | 7 | `frontend_epics/epic_7_results_reporting_review.md` | PENDING | Run report, result details, raw JSON, manual review |
 | 8 | `frontend_epics/epic_8_rubrics_ai_generation.md` | PENDING | Rubrics, AI testcase generation, assertion suggestions |
+| 9 | `frontend_epics/epic_9_dashboard_overview.md` | PENDING | Project dashboard, metrics, trends, recent runs, comparison summaries |
 
 ## Workflow Rules
 

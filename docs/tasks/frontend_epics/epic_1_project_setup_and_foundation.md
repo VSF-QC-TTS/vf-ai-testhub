@@ -10,6 +10,7 @@ Goal: make the frontend shell, design tokens, component primitives, routing, and
 - `apps/client/src/index.css`
 - `apps/client/src/App.tsx`
 - Existing files under `apps/client/src/components/`
+- `docs/product/EvalDeskQAPlatform.html` for app shell density, not implementation code
 
 ## Current Observations
 
@@ -93,6 +94,7 @@ Target files:
 - `apps/client/src/components/layout/Sidebar.tsx`
 - `apps/client/src/components/layout/TopHeader.tsx`
 - `apps/client/src/components/layout/MobileDrawer.tsx`
+- `apps/client/src/components/layout/ProjectSwitcher.tsx`
 - `apps/client/src/App.tsx`
 
 Steps:
@@ -105,6 +107,8 @@ Steps:
 6. Add header breadcrumbs derived from route metadata.
 7. Add a user menu placeholder that later connects to auth.
 8. Ensure main content has stable responsive padding.
+9. Add `ProjectSwitcher` placeholder that can receive real project data from Epic 4/Epic 2 query wiring.
+10. Include environment/user affordance in the header without exposing tokens or secrets.
 
 Acceptance:
 
@@ -112,6 +116,8 @@ Acceptance:
 - Breadcrumbs are visible on app pages.
 - No page content overlaps sidebar/header.
 - Nav labels use i18n keys once i18n is available; until then mark the hardcoded labels as temporary in this epic.
+- Shell matches or exceeds mentor prototype density: clear current route state, compact nav, no landing page, no decorative hero.
+- Project switcher is keyboard reachable and does not fetch data inside the presentational component.
 
 ## Task 1.5: Routing and Suspense
 

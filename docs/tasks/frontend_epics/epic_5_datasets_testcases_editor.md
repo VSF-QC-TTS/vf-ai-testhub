@@ -15,21 +15,27 @@ Backend:
 - `apps/api/src/main/java/vn/vinfast/aitesthub/assertion/`
 - `apps/api/src/main/java/vn/vinfast/aitesthub/toolexpectation/`
 
+UX benchmark:
+
+- `docs/product/EvalDeskQAPlatform.html` Dataset and Verification sections as workflow reference only
+
 ## Task 5.1: Dataset API and List
 
 Steps:
 
 1. Implement dataset types and API functions.
 2. Build `/projects/:projectId/datasets`.
-3. Render dataset table with name, category, tags, creator, updated date, archived state if visible.
+3. Render dataset table with name, category, tags, case count if returned, creator, updated date, archived state if visible.
 4. Add create/edit/archive flows.
 5. Store page/search/filter in URL.
+6. Provide grid/card access only if it adds useful scan value; table remains required for dense operations.
 
 Acceptance:
 
 - Empty state points to create dataset.
 - Archive is confirmed.
 - Dataset route uses public UUID.
+- Dataset library is at least as navigable as the mentor prototype while staying data-dense.
 
 ## Task 5.2: TestCase API and Table
 
@@ -78,12 +84,16 @@ Steps:
 4. Highlight invalid rows.
 5. Let user confirm import.
 6. Show final imported count and skipped/error count.
+7. Show matched column count, required/missing columns, valid/invalid row counts, and row numbers for blocking issues.
+8. Show inferred dataset column roles: input, expected answer/field, metadata, ignored.
+9. Provide a correction path: remap columns, edit invalid cells inline if backend supports confirm payload changes, or require re-upload with a clear message.
 
 Acceptance:
 
 - Upload errors do not crash route.
 - Confirm button disabled until preview is valid enough to submit.
 - Large previews remain scrollable.
+- The upload preview exceeds the prototype by making validation errors actionable, not just visible.
 
 ## Task 5.5: Assertion Builder
 
@@ -94,12 +104,16 @@ Steps:
 3. Build dynamic form based on assertion `scope` and `type`.
 4. Support field path, field paths, expected value, threshold, weight, severity, rubric reference/override.
 5. Add inline examples for JSON paths.
+6. Include methods equivalent to the prototype only when supported by backend/runner: equals, contains, regex, range/threshold, and LLM judge/rubric.
+7. Show expected-vs-actual preview fields when editing an assertion from a result context.
+8. For rubric-backed assertions, link to the selected rubric and show pass threshold.
 
 Acceptance:
 
 - Changing assertion type updates fields without losing unrelated data unexpectedly.
 - Transport values stay backend enum strings.
 - `llm_rubric` clearly requires runner/AI judge support.
+- Per-field, rubric, and hybrid verification concepts are represented through backend-supported assertions instead of frontend-only modes.
 
 ## Task 5.6: Tool Expectation Builder
 
