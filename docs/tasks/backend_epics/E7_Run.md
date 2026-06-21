@@ -61,20 +61,20 @@ This is the highest-risk backend epic. Keep it small and preserve async executio
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `RunController` at `/api/v1/datasets/{datasetId}/runs` | TODO |
-| 2 | Add trigger endpoint returning `202 Accepted` | TODO |
-| 3 | Add get status endpoint by run `publicId` | TODO |
-| 4 | Add paginated run history endpoint | TODO |
-| 5 | MockMvc test trigger and status retrieval | TODO |
+| 1 | Add `RunController` at `/api/v1/datasets/{datasetId}/runs` | DONE |
+| 2 | Add trigger endpoint returning `202 Accepted` | DONE |
+| 3 | Add get status endpoint by run `publicId` | DONE |
+| 4 | Add paginated run history endpoint | DONE |
+| 5 | MockMvc test trigger and status retrieval | DONE |
 
 - Commit: `feat(run): add controller and integration tests`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## Checkpoint: Core Evaluation Flow
 
 | # | Check | Status |
 |---|---|---|
-| 1 | Project -> Target -> Dataset -> TestCase -> Assertion -> Trigger Run flow works | TODO |
-| 2 | Redis Stream receives a job with the expected run reference or snapshot | TODO |
-| 3 | Large snapshot payload risk is explicitly handled before production use | TODO |
+| 1 | Project -> Target -> Dataset -> TestCase -> Assertion -> Trigger Run flow works | DONE |
+| 2 | Redis Stream receives a job with the expected run reference or snapshot | DONE |
+| 3 | Large snapshot payload risk is explicitly handled before production use | WARNING |

@@ -165,6 +165,9 @@ Implemented API slices after auth:
 - `GET /api/v1/rubrics/{rubricId}`: get a rubric by its `publicId`.
 - `PUT /api/v1/rubrics/{rubricId}`: update a rubric by its `publicId`.
 - `DELETE /api/v1/rubrics/{rubricId}`: archive a rubric by its `publicId`.
+- `POST /api/v1/datasets/{datasetId}/runs`: trigger an async dataset run and publish a job to `run:jobs`.
+- `GET /api/v1/runs/{runId}`: get run status by `publicId`.
+- `GET /api/v1/datasets/{datasetId}/runs`: get paginated run history for a dataset.
 
 ## [MAIL] Mail
 
@@ -222,5 +225,7 @@ Focused tests:
   `rtk bash mvnw -Dtest=RunStreamPublisherTest test` -> 1 test, 0 failures/errors.
 - Run service focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=RunServiceImplTest test` -> 3 tests, 0 failures/errors.
+- Run controller focused verification on 2026-06-21:
+  `rtk bash mvnw -Dtest=RunControllerTest test` -> 4 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
