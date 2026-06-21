@@ -12,6 +12,8 @@ export const en = {
     WRONG_PASSWORD: "Current password is incorrect.",
     INTERNAL_SERVER_ERROR: "An unexpected error occurred. Please try again.",
     UNAUTHORIZED: "You must be logged in to perform this action.",
+    PROJECT_NOT_FOUND: "The requested project could not be found.",
+    TARGET_NOT_FOUND: "The requested target could not be found.",
   },
   common: {
     language: "Language",
@@ -19,6 +21,20 @@ export const en = {
     vietnamese: "Vietnamese",
     loading: "Loading...",
     home: "Home",
+    settings: "Settings",
+    validation: {
+      required: "This field is required",
+      invalidEmail: "Invalid email address",
+      invalidUrl: "Invalid URL",
+      invalidId: "Invalid UUID format",
+      maxLength: "Must be at most {{max}} characters",
+      minLength: "Must be at least {{min}} characters",
+      min: "Must be at least {{min}}",
+      max: "Must be at most {{max}}"
+    },
+    actions: {
+      deleteConfirm: "Are you sure you want to delete this item? This action cannot be undone."
+    }
   },
   auth: {
     hero: {

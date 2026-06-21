@@ -3,12 +3,14 @@ import { cn } from "@/lib/utils";
 import { type ComponentProps } from "react";
 
 import { ProjectSwitcher } from "./ProjectSwitcher";
+import { useTranslation } from "react-i18next";
 import { navItems } from "./config";
 import { useProjects } from "../../features/projects/projects.queries";
 import { useProjectStore } from "../../features/projects/project.store";
 import { BrandLogo } from "../ui/Logo";
 
 export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
+  const { t } = useTranslation();
   const location = useLocation();
   const { data } = useProjects();
   const activeProjectId = useProjectStore((s) => s.activeProjectId);
@@ -60,10 +62,10 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
                       : "text-muted-foreground hover:bg-elevated hover:text-foreground",
                     "md:justify-center lg:justify-start"
                   )}
-                  title={item.label}
+                  title={t(item.i18nKey as any)}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
-                  <span className="hidden lg:inline-block truncate">{item.label}</span>
+                  <span className="hidden lg:inline-block truncate">{t(item.i18nKey as any)}</span>
                 </Link>
               </li>
             );

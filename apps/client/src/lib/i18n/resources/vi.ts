@@ -12,6 +12,8 @@ export const vi = {
     WRONG_PASSWORD: "Mật khẩu hiện tại không đúng.",
     INTERNAL_SERVER_ERROR: "Lỗi hệ thống. Vui lòng thử lại sau.",
     UNAUTHORIZED: "Bạn cần đăng nhập để thực hiện hành động này.",
+    PROJECT_NOT_FOUND: "Không tìm thấy dự án yêu cầu.",
+    TARGET_NOT_FOUND: "Không tìm thấy mục tiêu yêu cầu.",
   },
   common: {
     language: "Ngôn ngữ",
@@ -19,6 +21,20 @@ export const vi = {
     vietnamese: "Tiếng Việt",
     loading: "Đang tải...",
     home: "Trang chủ",
+    settings: "Cài đặt",
+    validation: {
+      required: "Trường này là bắt buộc",
+      invalidEmail: "Địa chỉ email không hợp lệ",
+      invalidUrl: "URL không hợp lệ",
+      invalidId: "Định dạng UUID không hợp lệ",
+      maxLength: "Tối đa {{max}} ký tự",
+      minLength: "Tối thiểu {{min}} ký tự",
+      min: "Phải lớn hơn hoặc bằng {{min}}",
+      max: "Phải nhỏ hơn hoặc bằng {{max}}"
+    },
+    actions: {
+      deleteConfirm: "Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác."
+    }
   },
   auth: {
     hero: {

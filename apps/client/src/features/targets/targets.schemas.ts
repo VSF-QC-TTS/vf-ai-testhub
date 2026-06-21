@@ -21,8 +21,8 @@ export const getResponseMappingSchema = (t: TFunction) => z.object({
 
 export const getTargetSchema = (t: TFunction) => z.object({
   projectId: z.string().uuid(t("common:validation.invalidId")),
-  name: z.string().min(1, t("common:validation.required")).max(255),
-  environment: z.string().max(50).optional().nullable(),
+  name: z.string().min(1, t("common:validation.required")).max(255, t("common:validation.maxLength", { max: 255 })),
+  environment: z.string().max(50, t("common:validation.maxLength", { max: 50 })).optional().nullable(),
   targetType: z.enum(["HTTP"] as const),
   method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"] as const).optional().nullable(),
   url: z.string().url(t("common:validation.invalidUrl")).optional().nullable().or(z.literal("")),
@@ -30,7 +30,7 @@ export const getTargetSchema = (t: TFunction) => z.object({
   headersTemplate: z.record(z.any()).optional().nullable(),
   bodyTemplate: z.record(z.any()).optional().nullable(),
   authConfig: z.record(z.any()).optional().nullable(),
-  timeoutMs: z.number().min(1000).max(300000).optional().nullable(),
+  timeoutMs: z.number().min(1000, t("common:validation.min", { min: 1000 })).max(300000, t("common:validation.max", { max: 300000 })).optional().nullable(),
   isDefault: z.boolean().optional().nullable(),
   responseMapping: getResponseMappingSchema(t).optional().nullable(),
 });

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
+import { useTranslation } from "react-i18next";
 import { navItems } from "./config";
 import { ProjectSwitcher } from "./ProjectSwitcher";
 import { useProjects } from "../../features/projects/projects.queries";
@@ -11,6 +12,7 @@ import { useProjectStore } from "../../features/projects/project.store";
 import { BrandLogo } from "../ui/Logo";
 
 export function MobileDrawer() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { data } = useProjects();
@@ -75,7 +77,7 @@ export function MobileDrawer() {
                         )}
                       >
                         <item.icon className="h-5 w-5 shrink-0" />
-                        <span>{item.label}</span>
+                        <span>{t(item.i18nKey as any)}</span>
                       </Link>
                     </li>
                   );

@@ -398,6 +398,22 @@ export function TargetConfigurationWorkbench() {
                   Test Connection
                 </Button>
               </div>
+
+              {(createMutation.error || updateMutation.error) && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20 mt-4"
+                >
+                  {(() => {
+                    const err = createMutation.error || updateMutation.error;
+                    if (err && (err as any).code) {
+                      return t(`api:${(err as any).code}`, { defaultValue: t("errors:unknown") as string });
+                    }
+                    return t("errors:unknown");
+                  })()}
+                </motion.div>
+              )}
             </div>
           </div>
         </form>
