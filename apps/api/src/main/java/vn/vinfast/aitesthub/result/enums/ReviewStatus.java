@@ -8,5 +8,6 @@ public enum ReviewStatus {
   PASSED,
   FAILED,
   ERROR,
-  SKIPPED
+  SKIPPED,
+  UNCERTAIN
 }

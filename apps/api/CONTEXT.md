@@ -1,6 +1,6 @@
 # Backend Context
 
-Date: 2026-06-21
+Date: 2026-06-22
 
 Repo area: `apps/api`
 
@@ -50,6 +50,8 @@ Current implemented auth state:
   `token_type=refresh`, returns a new access token, and rotates the refresh cookie.
 - `POST /api/v1/auth/logout` clears `refresh_token` with `Max-Age=0`; no token store/revocation exists yet.
 - Protected APIs use `Authorization: Bearer ...`; CSRF is disabled.
+- Internal runner callbacks under `/api/v1/internal/**` bypass user JWT but must pass `X-Runner-Token` matching
+  `vat.worker.runner-token` (`RUNNER_TOKEN` env; dev default is `local-runner-token`).
 - Spring Security validates protected APIs through OAuth2 Resource Server `JwtDecoder`; do not add a duplicate
   handwritten JWT request filter.
 - Main `JwtDecoder` accepts only JWTs with `token_type=access`; named `refreshTokenJwtDecoder` accepts only
@@ -113,6 +115,11 @@ Persistence now vs target:
   - `V4__dataset_schema.sql`: datasets.
   - `V5__test_case_schema.sql`: test cases plus `test_priority` and `test_case_source` enum types.
   - `V6__test_case_import_preview_schema.sql`: persisted CSV/Excel import previews and uploaded file references.
+  - `V7__rubric_schema.sql`: rubrics, rubric versions, and rubric criteria.
+  - `V8__assertion_schema.sql`: assertions and assertion enum types.
+  - `V9__tool_expectation_schema.sql`: tool expectations and tool expectation enum types.
+  - `V10__run_schema.sql`: async evaluation runs and run enum types.
+  - `V11__result_schema.sql`: test/assertion/tool expectation results and `review_status`.
 - Email verification and password reset tokens are opaque raw values; only SHA-256 hashes are stored.
 - `OpaqueTokenService` owns raw token generation and hashing for one-time email tokens.
 - Main tables use internal `BIGINT id` plus public UUID `public_id`; APIs should expose `publicId`, not internal `id`.
@@ -168,6 +175,8 @@ Implemented API slices after auth:
 - `POST /api/v1/datasets/{datasetId}/runs`: trigger an async dataset run and publish a job to `run:jobs`.
 - `GET /api/v1/runs/{runId}`: get run status by `publicId`.
 - `GET /api/v1/datasets/{datasetId}/runs`: get paginated run history for a dataset.
+- `POST /api/v1/internal/runs/{runId}/results`: ingest batched runner results, persist result rows in chunks, and mark
+  the run `COMPLETED` when `finalBatch=true`.
 
 ## [MAIL] Mail
 
@@ -229,5 +238,9 @@ Focused tests:
   `rtk bash mvnw -Dtest=RunControllerTest test` -> 4 tests, 0 failures/errors.
 - Result entity/DTO/mapper compile verification on 2026-06-21:
   `rtk bash mvnw compile` -> success.
+- Result ingestion compile verification on 2026-06-22:
+  `rtk bash mvnw compile` -> success.
+- Result ingestion focused verification on 2026-06-22:
+  `rtk bash mvnw -Dtest=ResultIngestionServiceImplTest test` -> 1 test, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.

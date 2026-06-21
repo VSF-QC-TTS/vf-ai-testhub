@@ -20,4 +20,7 @@ public class WorkerProperties {
 
   /** Redis queue key for job dispatching. */
   private String queueKey = "vat:jobs:queue";
+
+  /** Shared secret used by workers to call internal backend endpoints. */
+  private String runnerToken;
 }

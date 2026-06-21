@@ -117,3 +117,4 @@ vat:
   worker:
     enabled: true
     queue-key: vat:jobs:queue
+    runner-token: ${RUNNER_TOKEN:local-runner-token}

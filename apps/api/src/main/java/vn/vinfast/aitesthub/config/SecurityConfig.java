@@ -55,7 +55,7 @@ public class SecurityConfig {
     "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**"
   };
 
-  private static final String[] INTERNAL_PATHS = {};
+  private static final String[] INTERNAL_PATHS = {API_BASE_PATH + "/internal/**"};
 
   private static final String[] ACTUATOR_GET_PUBLIC = {};
 
@@ -130,6 +130,16 @@ public class SecurityConfig {
 
     if (HttpMethod.OPTIONS.matches(method)) {
       return true;
+    }
+
+    for (String internalPath : INTERNAL_PATHS) {
+      if (internalPath.endsWith("/**")
+          && path.startsWith(internalPath.substring(0, internalPath.length() - 3))) {
+        return true;
+      }
+      if (internalPath.equals(path)) {
+        return true;
+      }
     }
 
     if (HttpMethod.POST.matches(method)) {

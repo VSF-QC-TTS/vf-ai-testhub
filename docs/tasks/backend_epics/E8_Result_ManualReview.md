@@ -22,15 +22,15 @@ Results are system-generated after a run. Manual reviews are QC decisions layere
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add internal endpoint `POST /internal/runs/{runId}/results` or versioned equivalent | TODO |
-| 2 | Authenticate runner-to-backend calls with service credentials, not user JWT | TODO |
-| 3 | Accept batched result payloads and persist in chunks | TODO |
-| 4 | Mark run `COMPLETED` when final batch is received | TODO |
-| 5 | Unit test batch save and completion update behavior | TODO |
+| 1 | Add internal endpoint `POST /internal/runs/{runId}/results` or versioned equivalent | DONE |
+| 2 | Authenticate runner-to-backend calls with service credentials, not user JWT | DONE |
+| 3 | Accept batched result payloads and persist in chunks | DONE |
+| 4 | Mark run `COMPLETED` when final batch is received | DONE |
+| 5 | Unit test batch save and completion update behavior | DONE |
 
 - Commit: `feat(result): add result ingestion api for runner callback`
 - Scope: `L`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E8.3: ManualReview Entity + Service
 
