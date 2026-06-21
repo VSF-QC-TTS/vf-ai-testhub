@@ -1,6 +1,6 @@
 # ============================================================
-# VF QC Copilot — Backend Dockerfile
-# Multi-stage build: Maven build → Promptfoo runner → runtime
+# VF AI TestHub - Backend Dockerfile
+# Multi-stage build: Maven build -> Spring Boot runtime
 # ============================================================
 
 # -----------------------------------------------------------
@@ -10,14 +10,14 @@ FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /build
 
-COPY server/.mvn .mvn
-COPY server/mvnw mvnw
-COPY server/pom.xml pom.xml
+COPY .mvn .mvn
+COPY mvnw mvnw
+COPY pom.xml pom.xml
 
 RUN chmod +x mvnw \
     && ./mvnw dependency:go-offline -B -q
 
-COPY server/src src
+COPY src src
 
 RUN ./mvnw package -DskipTests -B -q \
     && find target -maxdepth 1 -type f -name "*.jar" \
@@ -32,7 +32,7 @@ RUN ./mvnw package -DskipTests -B -q \
 FROM eclipse-temurin:21-jre
 
 LABEL maintainer="nghlong3004"
-LABEL description="VF QC Copilot Backend API"
+LABEL description="VF AI TestHub Backend API"
 
 WORKDIR /app
 

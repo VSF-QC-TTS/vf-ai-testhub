@@ -222,6 +222,16 @@ Runner integration state:
   `promptfoo@0.121.17`: 1 success, 0 failures, 0 errors. Production runner still keeps promptfoo behind a wrapper and
   does not enable the placeholder provider in the main worker loop.
 
+Docker/Compose state:
+
+- Backend Docker build context is `apps/api` and uses `apps/api/Dockerfile`; do not use the old `server/` paths.
+- Root `docker-compose.yml` defines `db`, `redis`, `api`, `runner`, and `mock-target`. It is prepared for future runner
+  e2e smoke flows, but no full Docker smoke has been executed yet.
+- Compose `runner` connects to Redis through `redis://redis:6379`, backend through `http://api:8080`, and uses stream
+  key `run:jobs`.
+- Compose `mock-target` exposes `POST /chat` inside the network at `http://mock-target:8090/chat` for future target
+  execution smoke tests.
+
 ## [MAIL] Mail
 
 Mail state:

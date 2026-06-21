@@ -1,6 +1,6 @@
 # Build artifacts
-server/target/
-server/.idea/
+target/
+.idea/
 
 # Docs (not needed at runtime)
 docs/
@@ -14,7 +14,4 @@ docs/
 .codex/
 
 # Local env files (secrets injected via Docker env vars)
-server/.env
-
-# Node modules (rebuilt in Docker)
-tooling/promptfoo-runner/node_modules/
+.env
