@@ -149,6 +149,12 @@ Implemented API slices after auth:
 - `POST /api/v1/datasets/{datasetId}/test-cases/import/preview`: parse and store a CSV/XLS/XLSX import preview.
 - `POST /api/v1/datasets/{datasetId}/test-cases/import/confirm`: confirm an import preview and persist imported test
   cases in batches.
+- `POST /api/v1/projects/{projectId}/rubrics`: create a project or dataset scoped rubric.
+- `GET /api/v1/projects/{projectId}/rubrics`: get paginated/filterable rubrics for a project.
+- `GET /api/v1/rubrics/global`: get paginated/filterable global rubrics.
+- `GET /api/v1/rubrics/{rubricId}`: get a rubric by its `publicId`.
+- `PUT /api/v1/rubrics/{rubricId}`: update a rubric by its `publicId`.
+- `DELETE /api/v1/rubrics/{rubricId}`: archive a rubric by its `publicId`.
 
 ## [MAIL] Mail
 
@@ -185,6 +191,8 @@ Focused tests:
 - TestCase controller focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=TestCaseControllerTest,TestCaseImportControllerTest test` -> 9 tests, 0 failures/errors.
 - Rubric entity/DTO/mapper compile verification on 2026-06-21:
+  `rtk bash mvnw compile` -> success.
+- Rubric service/controller compile verification on 2026-06-21:
   `rtk bash mvnw compile` -> success.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.

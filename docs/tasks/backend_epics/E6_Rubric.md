@@ -21,14 +21,14 @@ Rubrics provide reusable LLM judge criteria at global, project, dataset, or test
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `RubricRepository` | TODO |
-| 2 | Add `RubricService` interface and implementation | TODO |
-| 3 | Support CRUD plus publish/archive behavior if versioning is implemented | TODO |
-| 4 | Add `RubricController` under `/api/v1/projects/{projectId}/rubrics` | TODO |
+| 1 | Add `RubricRepository` | DONE |
+| 2 | Add `RubricService` interface and implementation | DONE |
+| 3 | Support CRUD plus publish/archive behavior if versioning is implemented | DONE |
+| 4 | Add `RubricController` under `/api/v1/projects/{projectId}/rubrics` | DONE |
 
 - Commit: `feat(rubric): add service and controller`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E6.3: Tests
 
