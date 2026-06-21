@@ -149,6 +149,16 @@ Implemented API slices after auth:
 - `POST /api/v1/datasets/{datasetId}/test-cases/import/preview`: parse and store a CSV/XLS/XLSX import preview.
 - `POST /api/v1/datasets/{datasetId}/test-cases/import/confirm`: confirm an import preview and persist imported test
   cases in batches.
+- `POST /api/v1/test-cases/{testCaseId}/assertions`: create an assertion inside a test case.
+- `GET /api/v1/test-cases/{testCaseId}/assertions`: get paginated assertions for a test case.
+- `GET /api/v1/assertions/{assertionId}`: get an assertion by its `publicId`.
+- `PUT /api/v1/assertions/{assertionId}`: update an assertion by its `publicId`.
+- `DELETE /api/v1/assertions/{assertionId}`: delete an assertion by its `publicId`.
+- `POST /api/v1/test-cases/{testCaseId}/tool-expectations`: create a tool expectation inside a test case.
+- `GET /api/v1/test-cases/{testCaseId}/tool-expectations`: get paginated tool expectations for a test case.
+- `GET /api/v1/tool-expectations/{expectationId}`: get a tool expectation by its `publicId`.
+- `PUT /api/v1/tool-expectations/{expectationId}`: update a tool expectation by its `publicId`.
+- `DELETE /api/v1/tool-expectations/{expectationId}`: delete a tool expectation by its `publicId`.
 - `POST /api/v1/projects/{projectId}/rubrics`: create a project or dataset scoped rubric.
 - `GET /api/v1/projects/{projectId}/rubrics`: get paginated/filterable rubrics for a project.
 - `GET /api/v1/rubrics/global`: get paginated/filterable global rubrics.
@@ -202,5 +212,7 @@ Focused tests:
   `rtk bash mvnw compile` -> success.
 - Assertion/ToolExpectation service focused verification on 2026-06-21:
   `rtk bash mvnw -Dtest=AssertionServiceImplTest,ToolExpectationServiceImplTest test` -> 11 tests, 0 failures/errors.
+- Assertion/ToolExpectation controller focused verification on 2026-06-21:
+  `rtk bash mvnw -Dtest=AssertionControllerTest,ToolExpectationControllerTest test` -> 8 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.

@@ -48,10 +48,10 @@ Assertions evaluate chatbot outputs. Tool expectations evaluate tool/agent behav
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `AssertionController` at `/api/v1/test-cases/{testCaseId}/assertions` | TODO |
-| 2 | Add `ToolExpectationController` at `/api/v1/test-cases/{testCaseId}/tool-expectations` | TODO |
-| 3 | Add MockMvc CRUD tests for both controllers | TODO |
-| 4 | Add validation tests for unsupported assertion/tool expectation types | TODO |
+| 1 | Add `AssertionController` at `/api/v1/test-cases/{testCaseId}/assertions` | DONE |
+| 2 | Add `ToolExpectationController` at `/api/v1/test-cases/{testCaseId}/tool-expectations` | DONE |
+| 3 | Add MockMvc CRUD tests for both controllers | DONE |
+| 4 | Add validation tests for unsupported assertion/tool expectation types | DONE |
 
 - Commit: `feat(assertion): add controllers and integration tests`
-- Review: `TODO`
+- Review: `DONE`
