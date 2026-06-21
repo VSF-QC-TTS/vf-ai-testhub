@@ -22,15 +22,15 @@ Assertions evaluate chatbot outputs. Tool expectations evaluate tool/agent behav
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `ToolExpectation` entity linked to `TestCase` | TODO |
-| 2 | Support expected source/tool/agent, argument assertions, sequence, min/max calls | TODO |
-| 3 | Support optional rubric link/override, threshold, required flag, severity, enabled | TODO |
-| 4 | Add request/response DTOs and mapper | TODO |
-| 5 | Add Flyway migration for `tool_expectations` | TODO |
+| 1 | Add `ToolExpectation` entity linked to `TestCase` | DONE |
+| 2 | Support expected source/tool/agent, argument assertions, sequence, min/max calls | DONE |
+| 3 | Support optional rubric link/override, threshold, required flag, severity, enabled | DONE |
+| 4 | Add request/response DTOs and mapper | DONE |
+| 5 | Add Flyway migration for `tool_expectations` | DONE |
 
 - Commit: `feat(tool-expectation): add entity, dto, mapper and migration`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E5.3: Services
 
