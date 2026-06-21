@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { BrandLogo } from "../../components/ui/Logo";
 import { AuthDynamicCanvas } from "../../features/auth/components/AuthDynamicCanvas";
 
