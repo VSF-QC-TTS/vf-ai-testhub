@@ -1,1 +1,88 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", "Liberation Sans", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-popover: var(--popover);
+  --color-elevated: var(--elevated);
+
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+}
+
+/* Base Light/Dark mode variables following shadcn/ui & EvalDesk Design System */
+@layer base {
+  :root {
+    --background: #fafafa; /* zinc-50 */
+    --foreground: #18181b; /* zinc-900 */
+
+    --surface: #ffffff;
+    --popover: #ffffff;
+    --elevated: #f4f4f5; /* zinc-100 */
+
+    --border: #e4e4e7; /* zinc-200 */
+    --ring: #a1a1aa; /* zinc-400 */
+
+    --primary: #2563eb; /* blue-600 */
+    --primary-foreground: #ffffff;
+
+    --secondary: #059669; /* emerald-600 */
+    --secondary-foreground: #ffffff;
+
+    --destructive: #dc2626; /* red-600 */
+    --destructive-foreground: #ffffff;
+
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a; /* zinc-500 */
+  }
+
+  .dark {
+    --background: #09090b; /* zinc-950 */
+    --foreground: #fafafa; /* zinc-50 */
+
+    --surface: #18181b; /* zinc-900 */
+    --popover: #18181b; /* zinc-900 */
+    --elevated: #27272a; /* zinc-800 */
+
+    --border: #27272a; /* zinc-800 */
+    --ring: #52525b; /* zinc-600 */
+
+    --primary: #2563eb; /* blue-600 */
+    --primary-foreground: #ffffff;
+
+    --secondary: #059669; /* emerald-600 */
+    --secondary-foreground: #ffffff;
+
+    --destructive: #dc2626; /* red-600 */
+    --destructive-foreground: #ffffff;
+
+    --muted: #27272a;
+    --muted-foreground: #a1a1aa; /* zinc-400 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
