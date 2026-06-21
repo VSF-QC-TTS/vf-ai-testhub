@@ -1,7 +1,8 @@
-import { ChevronRight, User } from "lucide-react";
+import { ChevronRight, User, Languages } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 // This would typically come from shadcn/ui but we'll mock it if it's not ready
 // and the user will run shadcn add later.
@@ -18,6 +19,7 @@ import { Button } from "@/components/ui/button";
 export function TopHeader({ className, ...props }: ComponentProps<"header">) {
   const location = useLocation();
   const paths = location.pathname.split("/").filter(Boolean);
+  const { i18n } = useTranslation("common");
 
   return (
     <header 
@@ -59,7 +61,18 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
           DEV
         </div>
 
-        {/* Language Switcher will go here later */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Languages className="h-5 w-5" />
+              <span className="sr-only">Toggle language</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => i18n.changeLanguage("en")}>English</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => i18n.changeLanguage("vi")}>Tiếng Việt</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
