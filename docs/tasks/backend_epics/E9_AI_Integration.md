@@ -35,10 +35,14 @@ This module calls external LLM APIs. Tests must mock external calls.
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Mock LLM provider with WireMock or an equivalent Spring test double | TODO |
-| 2 | Test valid JSON response parsing | TODO |
-| 3 | Test malformed response retry and final failure | TODO |
-| 4 | Test timeout/error mapping | TODO |
+| 1 | Mock LLM provider with WireMock or an equivalent Spring test double | DONE |
+| 2 | Test valid JSON response parsing | DONE |
+| 3 | Test malformed response retry and final failure | DONE |
+| 4 | Test timeout/error mapping | DONE |
 
 - Commit: `test(ai): add wiremock tests for ai services`
-- Review: `TODO`
+- Review: `DONE`
+
+Checkpoint:
+
+1. Tests use an `AiChatClient` test double instead of WireMock because production provider calls are isolated behind that interface.

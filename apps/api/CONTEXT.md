@@ -285,5 +285,9 @@ Focused tests:
   `rtk bash mvnw compile` -> success.
 - AI assertion suggestion compile verification on 2026-06-22:
   `rtk bash mvnw compile` -> success.
+- AI service test verification on 2026-06-22:
+  `rtk bash mvnw -Dtest=AIGeneratorServiceImplTest test` -> 5 tests, 0 failures/errors.
+- AI service compile verification on 2026-06-22:
+  `rtk bash mvnw compile` -> success.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
