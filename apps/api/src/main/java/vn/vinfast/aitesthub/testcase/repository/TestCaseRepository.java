@@ -1,6 +1,8 @@
 package vn.vinfast.aitesthub.testcase.repository;
 
 import java.util.Optional;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -19,4 +21,6 @@ public interface TestCaseRepository
   Optional<TestCase> findByPublicId(UUID publicId);
 
   Optional<TestCase> findByDatasetAndExternalId(Dataset dataset, String externalId);
+
+  List<TestCase> findByDatasetAndExternalIdIn(Dataset dataset, Collection<String> externalIds);
 }

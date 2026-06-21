@@ -36,16 +36,16 @@ Test cases are QC-authored inputs and expected behavior. Results produced after 
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `ImportStrategy` interface | TODO |
-| 2 | Implement CSV import for the legacy four testcase definition columns | TODO |
-| 3 | Implement Excel import only if product scope confirms it is still needed | TODO |
-| 4 | Process rows in chunks and batch-check duplicates by dataset/external ID | TODO |
-| 5 | Return import summary: imported, skipped, failed, and row-level errors | TODO |
-| 6 | Unit test valid import, duplicates, empty file, and missing required columns | TODO |
+| 1 | Add `ImportStrategy` interface | DONE |
+| 2 | Implement CSV import for the legacy four testcase definition columns | DONE |
+| 3 | Implement Excel import only if product scope confirms it is still needed | DONE |
+| 4 | Process rows in chunks and batch-check duplicates by dataset/external ID | DONE |
+| 5 | Return import summary: imported, skipped, failed, and row-level errors | DONE |
+| 6 | Unit test valid import, duplicates, empty file, and missing required columns | DONE |
 
 - Commit: `feat(testcase): add import service with batch processing`
 - Scope: `L`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E4.4: Controller + Tests
 

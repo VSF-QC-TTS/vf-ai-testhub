@@ -146,6 +146,9 @@ Implemented API slices after auth:
 - `GET /api/v1/test-cases/{testCaseId}`: get a test case by its `publicId`.
 - `PUT /api/v1/test-cases/{testCaseId}`: update a test case by its `publicId`.
 - `DELETE /api/v1/test-cases/{testCaseId}`: delete a test case by its `publicId`.
+- `POST /api/v1/datasets/{datasetId}/test-cases/import/preview`: parse and store a CSV/XLS/XLSX import preview.
+- `POST /api/v1/datasets/{datasetId}/test-cases/import/confirm`: confirm an import preview and persist imported test
+  cases in batches.
 
 ## [MAIL] Mail
 
@@ -176,5 +179,8 @@ Focused tests:
   `rtk bash mvnw -Dtest=TestCaseServiceImplTest test` -> 6 tests, 0 failures/errors.
 - TestCase import preview persistence compile verification on 2026-06-21:
   `rtk bash mvnw compile` -> success.
+- TestCase import focused verification on 2026-06-21:
+  `rtk bash mvnw -Dtest=CsvTestCaseImportStrategyTest,ExcelTestCaseImportStrategyTest,TestCaseImportServiceImplTest test`
+  -> 6 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
