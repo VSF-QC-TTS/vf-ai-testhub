@@ -115,6 +115,14 @@ public enum ErrorCode {
       HttpStatus.NOT_FOUND.value(),
       "TEST_CASE_NOT_FOUND",
       "No test case found with the provided ID."),
+  ASSERTION_NOT_FOUND(
+      HttpStatus.NOT_FOUND.value(),
+      "ASSERTION_NOT_FOUND",
+      "No assertion found with the provided ID."),
+  TOOL_EXPECTATION_NOT_FOUND(
+      HttpStatus.NOT_FOUND.value(),
+      "TOOL_EXPECTATION_NOT_FOUND",
+      "No tool expectation found with the provided ID."),
   RUBRIC_NOT_FOUND(
       HttpStatus.NOT_FOUND.value(), "RUBRIC_NOT_FOUND", "No rubric found with the provided ID."),
   RUBRIC_ARCHIVED(

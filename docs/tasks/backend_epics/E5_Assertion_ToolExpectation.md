@@ -36,13 +36,13 @@ Assertions evaluate chatbot outputs. Tool expectations evaluate tool/agent behav
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `AssertionService` CRUD scoped by test case | TODO |
-| 2 | Add `ToolExpectationService` CRUD scoped by test case | TODO |
-| 3 | Validate assertion/tool expectation types against supported enum values | TODO |
-| 4 | Unit test both services | TODO |
+| 1 | Add `AssertionService` CRUD scoped by test case | DONE |
+| 2 | Add `ToolExpectationService` CRUD scoped by test case | DONE |
+| 3 | Validate assertion/tool expectation types against supported enum values | DONE |
+| 4 | Unit test both services | DONE |
 
 - Commit: `feat(assertion): add assertion and tool expectation services`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E5.4: Controllers + Tests
 
