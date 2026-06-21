@@ -82,6 +82,29 @@ Acceptance:
 - Save button has stable loading state.
 - Vietnamese labels do not overflow.
 
+## Task 4.3a: First-Run Project Creation
+
+Routes:
+
+- `/projects/new`
+- `/projects?empty=1`
+
+Steps:
+
+1. Build a focused create-project screen for users with zero projects.
+2. Reuse the same schema and mutation as the create/edit dialog.
+3. Explain the setup sequence compactly: create project, configure target, import dataset, run evaluation.
+4. After successful create, navigate to `/projects/:projectId/targets` or the configuration workbench.
+5. Keep the app shell in no-project mode: sidebar visible, project-scoped nav disabled, create-project action prominent.
+6. If project list fetch fails, show retry and keep logout/user menu reachable.
+
+Acceptance:
+
+- First login with no projects has an obvious next action.
+- No fake project, dashboard metrics, target, dataset, or sample run data is shown.
+- The same validation and backend error mapping as normal project creation are used.
+- The project switcher shows create action instead of an empty dropdown.
+
 ## Task 4.4: Target API Layer
 
 Target files:
@@ -210,10 +233,11 @@ Cases:
 
 1. Project list renders loading, empty, and populated states.
 2. Project form validates required fields.
-3. Target JSON template field rejects invalid JSON.
-4. cURL preview can apply parsed values.
-5. Response mapping saves `missingFieldBehavior`.
-6. Archive/delete confirmations protect destructive actions.
+3. First-run no-project route creates a project and navigates to setup.
+4. Target JSON template field rejects invalid JSON.
+5. cURL preview can apply parsed values.
+6. Response mapping saves `missingFieldBehavior`.
+7. Archive/delete confirmations protect destructive actions.
 
 ## Suggested Commit Slices
 

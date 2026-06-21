@@ -51,12 +51,15 @@ Steps:
 4. Render empty state when no runs or datasets exist.
 5. Render API error state with retry.
 6. Keep dashboard date range/filter state in URL search params if filters are added.
+7. If no projects exist, never render this route as the first-login surface; rely on Epic 3/4 first-run routing.
+8. If the current project exists but setup is incomplete, render the correct setup CTA instead of empty metrics.
 
 Acceptance:
 
 - Dashboard is the first useful project screen, not a marketing page.
 - Project switcher and breadcrumbs stay coherent.
 - Mobile layout stacks panels without overlap.
+- Dashboard is project-scoped and never fabricates data for onboarding.
 
 ## Task 9.3: Metric Cards
 
@@ -106,12 +109,15 @@ Steps:
 3. Add quick filters by status if backend supports them.
 4. Show failure hotspots by section/assertion/tool only if report/result data exposes enough grouping fields.
 5. Provide clear call to action: run dataset, review failed results, or configure target depending on current project state.
+6. Show "Compare runs" only when two compatible completed runs exist and a real compare endpoint/backend contract is available.
+7. Do not show A/B experiment controls from the dashboard until Epic 10/backend experiment support exists.
 
 Acceptance:
 
 - Recent runs table is keyboard accessible.
 - Long target/dataset names truncate with full value available.
 - Failure hotspots help triage; they do not replace the detailed report.
+- A/B language is not used for plain independent runs.
 
 ## Task 9.6: Tests
 

@@ -41,9 +41,9 @@ Each `_INDEX.md` has two sections - follow both:
 
 | File type | Read category index |
 | --------- | ------------------- |
-| `*.java` | `<SKILLS>/java/_INDEX.md`, `<SKILLS>/spring-boot/_INDEX.md` |
-| `*.kt`, `*.kts` | `<SKILLS>/kotlin/_INDEX.md` |
-| `*.sql`, `*.entity.ts`, `*.prisma` | `<SKILLS>/database/_INDEX.md` |
+| `*.ts`, `*.tsx` | `<SKILLS>/react/_INDEX.md`, `<SKILLS>/typescript/_INDEX.md` |
+| `*.js`, `*.mjs` | `<SKILLS>/javascript/_INDEX.md` |
+| `*.jsx`, `*.test.tsx`, `*.spec.tsx` | `<SKILLS>/react/_INDEX.md` |
 | `*.spec.ts`, `*.test.ts` | `<SKILLS>/common/_INDEX.md` |
 | Any file (keyword match) | `<SKILLS>/common/_INDEX.md` |
 | QE workflow | `<SKILLS>/quality-engineering/_INDEX.md` |

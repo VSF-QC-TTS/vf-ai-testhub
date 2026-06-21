@@ -17,6 +17,7 @@ These choices are already implemented. Do not rebuild them unless the task expli
 | JWT validation | Spring Security OAuth2 Resource Server with `JwtDecoder`; no separate handwritten JWT request filter is needed |
 | Refresh flow | HttpOnly `refresh_token` cookie, rotated by `POST /api/v1/auth/refresh-token` |
 | Implemented APIs | Auth, OAuth2, `GET /api/v1/users/me`, Project CRUD/archive, Target CRUD/parse-curl, ResponseMapping get/save, Dataset CRUD/archive, TestCase CRUD/list/filter/import, Assertion CRUD/list, ToolExpectation CRUD/list, Rubric CRUD/archive/list, Run trigger/status/history, Result ingestion/report/listing, ManualReview batch submission |
+| Not yet implemented | Dashboard aggregate endpoint, run comparison endpoint, A/B experiment/variant/versioning contracts |
 
 ## Status Legend
 
@@ -75,7 +76,8 @@ apps/api/
 |-- E7: Run Module
 |-- E8: Result & ManualReview Module
 |-- E9: AI Integration Module
-`-- E10: Security Hardening
+|-- E10: Security Hardening
+`-- E11: Run Comparison & Experiment Module
 ```
 
 ## Epic Details
@@ -91,6 +93,7 @@ apps/api/
 - [E8: Result & ManualReview Module](./backend_epics/E8_Result_ManualReview.md)
 - [E9: AI Integration Module](./backend_epics/E9_AI_Integration.md)
 - [E10: Security Hardening](./backend_epics/E10_Security.md)
+- [E11: Run Comparison & Experiment Module](./backend_epics/E11_Experiment_Comparison.md)
 
 ## Dependency Graph
 
@@ -110,6 +113,8 @@ graph TD
     E7 --> E8[E8: Result]
     E4 --> E9[E9: AI]
     E5 --> E9
+    E7 --> E11[E11: Comparison]
+    E8 --> E11
 ```
 
 ## Product Prototype Note
@@ -121,6 +126,13 @@ graph TD
 - Dataset: import/preview/manage test cases and columns.
 - Test Run: trigger asynchronous evaluation and stream status.
 - Results: field-level pass/fail breakdown, comparison, and manual review.
+
+Comparison/A-B clarification:
+
+- Current backend supports independent runs and reports.
+- Current backend does not expose a run compare endpoint in code and does not have experiment/variant entities.
+- `A/B Experiment` should be planned as E11 work, not inferred from the UI prototype.
+- Until E11 exists, frontend may only show comparison controls when a real backend compare contract is implemented.
 
 ## Resolved Decisions
 

@@ -107,6 +107,7 @@ Target files:
 
 - `apps/client/src/app/router/ProtectedRoute.tsx`
 - `apps/client/src/app/router/routes.tsx`
+- `apps/client/src/app/router/FirstRunProjectGate.tsx`
 
 Steps:
 
@@ -114,11 +115,17 @@ Steps:
 2. Preserve `redirectTo` location.
 3. Render skeleton while auth bootstrap is checking.
 4. Redirect authenticated users away from login/register.
+5. After auth succeeds, load active projects before routing to project-scoped pages.
+6. If there are no projects, route to `/projects/new` or `/projects?empty=1`.
+7. If projects exist but no project is selected, route to `/projects`.
+8. If the intended route is project-scoped, allow it only when the project exists and is accessible.
 
 Acceptance:
 
 - Unauthenticated app route access redirects to login.
 - Authenticated users can access app shell.
+- First login with zero projects shows create-project flow, not an empty dashboard.
+- Project-scoped navigation is disabled or redirected until a project exists.
 
 ## Task 3.6: Security Rules
 

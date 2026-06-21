@@ -4,6 +4,9 @@ apps/client/node_modules/
 node_modules/
 npm-debug.log
 yarn-error.log
+.skillsrc
+.antigravity
+.agents/
 
 apps/client/dist
 apps/client/dist-ssr

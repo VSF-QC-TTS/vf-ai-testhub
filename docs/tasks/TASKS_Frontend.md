@@ -28,6 +28,7 @@ The frontend must reach at least the workflow coverage shown in `docs/product/Ev
 - Epic 7 owns report parity: summary metrics, status filters, expandable field diffs, raw JSON inspection, and manual review.
 - Epic 8 owns LLM judge/rubric parity where backend supports it: rubric prompts, thresholds, provider/model settings, cost estimates, and AI-generated drafts that require human review.
 - Epic 9 owns dashboard parity: project overview metrics, trend panels, recent runs, failing areas, and version/config comparison summaries where backend supports them.
+- Epic 10 owns comparison/experiment UI after backend support exists. Until then, A/B controls stay hidden/disabled and completed independent runs may only be compared if a real compare endpoint exists.
 
 Anything shown in the prototype but missing from backend contracts must be marked as disabled/roadmap in UI planning rather than implemented with fake fields.
 
@@ -64,6 +65,7 @@ React 19 contract constraints:
 | 7 | `frontend_epics/epic_7_results_reporting_review.md` | PENDING | Run report, result details, raw JSON, manual review |
 | 8 | `frontend_epics/epic_8_rubrics_ai_generation.md` | PENDING | Rubrics, AI testcase generation, assertion suggestions |
 | 9 | `frontend_epics/epic_9_dashboard_overview.md` | PENDING | Project dashboard, metrics, trends, recent runs, comparison summaries |
+| 10 | `frontend_epics/epic_10_run_comparison_experiments.md` | BLOCKED | Run comparison and A/B experiment UI; blocked until backend comparison/experiment contracts exist |
 
 ## Workflow Rules
 

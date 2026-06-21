@@ -91,6 +91,15 @@ The mentor prototype implies these production components. Implement them as type
 - Accepts the current project, project list, loading state, and `onProjectChange`.
 - Supports keyboard search/selection when project count grows.
 - Does not fetch projects directly; it receives data from a layout/container query.
+- Supports no-project state by rendering a create-project action instead of an empty menu.
+
+`FirstRunProjectGate`:
+
+- Runs after auth bootstrap and project list load.
+- Receives project list state, current location, and navigation callbacks.
+- Routes users without projects to the create/project list flow.
+- Routes users with projects but no selected project to project selection.
+- Must not call project APIs directly; it composes project query state from the route/layout container.
 
 `DashboardMetricCard` and `TrendPanel`:
 
@@ -133,6 +142,13 @@ The mentor prototype implies these production components. Implement them as type
 - Displays field name, expected value, actual value, assertion status, score/threshold when available, and reviewer context.
 - Large values collapse with accessible expand/copy controls.
 - Redacted payloads stay redacted when copied.
+
+`RunComparisonSummary`:
+
+- Represents two completed runs or one backend experiment result.
+- Accepts backend-provided summary numbers for regressions, fixes, unchanged cases, pass-rate delta, latency delta, and cost delta when available.
+- Must not compute statistical confidence unless backend returns enough explicit fields and the calculation is documented.
+- Uses "Compare runs" labels for independent runs and "A/B experiment" labels only for backend experiment contracts.
 
 ## 2. React 19 Rules
 

@@ -33,6 +33,49 @@ Improve beyond the prototype in these areas:
 - Runner statuses must include `UNCERTAIN` and manual review must distinguish auto status from final reviewed status.
 - Prompt/config A/B and version history are enabled only when backend contracts support them; otherwise show a disabled roadmap affordance or omit the control.
 
+### 1.2 First-Run and No-Project UX
+
+After login, the app must not drop users into an empty dashboard that depends on a selected project.
+
+Route behavior:
+
+- If the user has no active projects, route to `/projects/new` or `/projects?empty=1`, not `/projects/:projectId/dashboard`.
+- If the user has projects but no selected/deep-linked project, route to `/projects` with a compact project picker.
+- If the user opens a stale project URL and receives `404` or forbidden, show a recovery state with links to project list and create project.
+- App shell may render in no-project mode, but project-scoped nav items must be disabled or hidden until a project exists.
+
+First-run screen requirements:
+
+- Explain the minimum setup path in one compact flow: create project, configure target, import dataset, run evaluation.
+- Primary action is create project.
+- Secondary action can be view docs/sample import only if implemented.
+- No fake dashboard metrics, no sample project data, and no decorative landing hero.
+
+A project-scoped page must handle these setup states:
+
+- Project exists but has no targets: show configure target CTA.
+- Project has target but no datasets: show import/create dataset CTA.
+- Project has dataset but no runs: show run dataset CTA.
+- Project has runs: show dashboard/report content.
+
+### 1.3 A/B and Comparison UX
+
+Use precise naming:
+
+- `Run Compare`: compare two completed runs on the same dataset or comparable testcase set.
+- `A/B Experiment`: trigger and track two or more variants as one planned experiment.
+- `Prompt/Config Version`: saved target/rubric/prompt configuration snapshot used by a run.
+
+Do not label a feature as A/B if the backend only supports independent runs. In that case, show "Compare runs" after both runs exist.
+
+Better-than-prototype behavior:
+
+- Require the same dataset/testcase scope before comparing variants.
+- Show regressions, fixes, unchanged cases, and latency/cost deltas instead of only "A wins".
+- Keep statistical confidence optional and backend-computed; do not invent significance client-side.
+- Show what changed between variants: target, response mapping, rubric, prompt/config version, model, or runtime options when available.
+- Allow users to promote a winner only if backend implements version/promotion state.
+
 Design goals:
 
 - Fast scanning over decorative presentation.
