@@ -17,6 +17,7 @@ document.
 - `apps/api/AGENTS.md`: backend coding rules and API conventions.
 - `apps/api/CONTEXT.md`: current backend implementation state.
 - `docs/tasks/TASKS_Backend.md`: backend roadmap and current baseline.
+- `docs/tasks/TASKS_Runner.md`: runner roadmap for Redis consumer, promptfoo adapter, result reporting, and operations.
 - `docs/agent/AGENT_WORKFLOW.md`: multi-agent workflow, review, and commit responsibilities.
 
 ## Product And UX Target
@@ -44,6 +45,8 @@ document.
 
 - `docs/tasks/TASKS_Backend.md`: high-level backend task plan and dependencies.
 - `docs/tasks/backend_epics/`: per-epic backend implementation tasks.
+- `docs/tasks/TASKS_Runner.md`: high-level runner task plan and dependencies.
+- `docs/tasks/runner_epics/`: per-epic runner implementation tasks.
 
 ## Recommended Reading Sets
 
@@ -51,6 +54,7 @@ document.
   relevant design doc.
 - API contract change: `apps/api/CONTEXT.md`, `docs/architecture/API_Design.md`, `docs/tasks/TASKS_Backend.md`.
 - Database change: `apps/api/CONTEXT.md`, `docs/architecture/Database_Design.md`, matching Flyway migrations.
-- Runner/evaluation change: `docs/architecture/C4_Architecture.md`, `docs/integrations/promptfoo_yaml_nodejs_llm_spec.md`,
+- Runner/evaluation change: `docs/tasks/TASKS_Runner.md`, `docs/architecture/C4_Architecture.md`,
+  `docs/integrations/promptfoo_yaml_nodejs_llm_spec.md`, `docs/decisions/ADR_001_Redis_Streams.md`, and
   `docs/decisions/ADR_002_Promptfoo_Evaluation_Engine.md`.
 - Product scope discussion: `docs/product/PRD.md`, `docs/product/EvalDeskQAPlatform.html`, `docs/tasks/TASKS_Backend.md`.
