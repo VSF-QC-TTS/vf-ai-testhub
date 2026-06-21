@@ -26,6 +26,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 import vn.vinfast.aitesthub.dataset.request.CreateDatasetRequest;
@@ -70,12 +72,19 @@ class DatasetControllerTest {
     MockDatasetService.reset();
   }
 
-  private TestingAuthenticationToken getAuthToken() {
-    Jwt jwt = Jwt.withTokenValue("mock-token")
-        .header("alg", "none")
-        .claim("sub", currentUsername)
-        .build();
-    return new TestingAuthenticationToken(jwt, null);
+  private org.springframework.test.web.servlet.request.RequestPostProcessor currentJwt() {
+    return request -> {
+      Jwt jwt =
+          Jwt.withTokenValue("mock-token")
+              .header("alg", "none")
+              .claim("sub", currentUsername)
+              .subject(currentUsername)
+              .build();
+      SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+      securityContext.setAuthentication(new TestingAuthenticationToken(jwt, null));
+      SecurityContextHolder.setContext(securityContext);
+      return request;
+    };
   }
 
   @Test
@@ -88,7 +97,7 @@ class DatasetControllerTest {
             post("/api/v1/projects/{projectId}/datasets", projectId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
-                .principal(getAuthToken()))
+                .with(currentJwt()))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.name").value("Auth Tests"));
   }
@@ -102,7 +111,7 @@ class DatasetControllerTest {
             post("/api/v1/projects/{projectId}/datasets", projectId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
-                .principal(getAuthToken()))
+                .with(currentJwt()))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
         .andExpect(jsonPath("$.errors[0].field").value("name"));
@@ -115,7 +124,7 @@ class DatasetControllerTest {
     mockMvc
         .perform(
             get("/api/v1/datasets/{datasetId}", datasetId)
-                .principal(getAuthToken()))
+                .with(currentJwt()))
         .andExpect(status().isOk());
   }
 
@@ -126,7 +135,7 @@ class DatasetControllerTest {
     mockMvc
         .perform(
             get("/api/v1/projects/{projectId}/datasets", projectId)
-                .principal(getAuthToken()))
+                .with(currentJwt()))
         .andExpect(status().isOk());
   }
 
@@ -140,7 +149,7 @@ class DatasetControllerTest {
             put("/api/v1/datasets/{datasetId}", datasetId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
-                .principal(getAuthToken()))
+                .with(currentJwt()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value("Updated Name"));
   }
@@ -150,7 +159,7 @@ class DatasetControllerTest {
     mockMvc
         .perform(
             delete("/api/v1/datasets/{datasetId}", datasetId)
-                .principal(getAuthToken()))
+                .with(currentJwt()))
         .andExpect(status().isNoContent());
 
     assertThat(MockDatasetService.isArchived).isTrue();
@@ -167,7 +176,7 @@ class DatasetControllerTest {
             post("/api/v1/projects/{projectId}/datasets", projectId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
-                .principal(getAuthToken()))
+                .with(currentJwt()))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("PROJECT_NOT_FOUND"));
   }

@@ -114,7 +114,7 @@ class DatasetServiceImplTest {
 
     assertThatThrownBy(() -> datasetService.createDataset(projectPublicId, request, username))
         .isInstanceOf(ResourceException.class)
-        .hasFieldOrPropertyWithValue("response.code", ErrorCode.VALIDATION_ERROR.getCode());
+        .hasFieldOrPropertyWithValue("response.code", "PROJECT_ARCHIVED");
   }
 
   @Test
@@ -128,7 +128,7 @@ class DatasetServiceImplTest {
 
     assertThatThrownBy(() -> datasetService.createDataset(projectPublicId, request, username))
         .isInstanceOf(ResourceException.class)
-        .hasFieldOrPropertyWithValue("response.code", ErrorCode.VALIDATION_ERROR.getCode());
+        .hasFieldOrPropertyWithValue("response.code", "DATASET_NAME_EXISTS");
   }
 
   @Test

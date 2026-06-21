@@ -1,6 +1,6 @@
 # Backend Context
 
-Date: 2026-06-20
+Date: 2026-06-21
 
 Repo area: `apps/api`
 
@@ -95,6 +95,8 @@ Domain choices in current code:
 - `ResponseMapping` entity is `vn.vinfast.aitesthub.target.entity.ResponseMapping`. It has a `OneToOne` association with
   `Target` and maps dynamic JSON response paths such as answer, suggestions, intent, tool calls, and trace fields into
   structured evaluation data.
+- `Dataset` entity is `vn.vinfast.aitesthub.dataset.entity.Dataset`. It groups evaluation test cases inside a
+  `Project`, tracks its creator, stores category/tags/metadata, supports archiving, and exposes `UUID publicId`.
 
 ## [CURRENT_STATE] Persistence
 
@@ -105,6 +107,7 @@ Persistence now vs target:
   - `V1__init_schema.sql`: users, email verification tokens, password reset tokens.
   - `V2__project_schema.sql`: projects.
   - `V3__target_schema.sql`: targets and response mappings.
+  - `V4__dataset_schema.sql`: datasets.
 - Email verification and password reset tokens are opaque raw values; only SHA-256 hashes are stored.
 - `OpaqueTokenService` owns raw token generation and hashing for one-time email tokens.
 - Main tables use internal `BIGINT id` plus public UUID `public_id`; APIs should expose `publicId`, not internal `id`.
@@ -128,6 +131,11 @@ Implemented API slices after auth:
 - `DELETE /api/v1/targets/{targetId}`: delete a target by its `publicId`.
 - `GET /api/v1/targets/{targetId}/response-mapping`: get response mapping configuration for a target.
 - `PUT /api/v1/targets/{targetId}/response-mapping`: save or update response mapping configuration for a target.
+- `POST /api/v1/projects/{projectId}/datasets`: create a new dataset inside a project.
+- `GET /api/v1/projects/{projectId}/datasets`: get paginated active datasets for a project.
+- `GET /api/v1/datasets/{datasetId}`: get a dataset by its `publicId`.
+- `PUT /api/v1/datasets/{datasetId}`: update a dataset by its `publicId`.
+- `DELETE /api/v1/datasets/{datasetId}`: archive a dataset by its `publicId`.
 
 ## [MAIL] Mail
 
@@ -150,5 +158,7 @@ Focused tests:
   `rtk bash mvnw test` -> 52 tests, 0 failures/errors.
 - Prefer focused commands for changed slices, for example:
   `rtk bash mvnw -Dtest=ProjectControllerTest,ProjectServiceImplTest test`.
+- Dataset focused verification on 2026-06-21:
+  `rtk bash mvnw -Dtest=DatasetServiceImplTest,DatasetControllerTest test` -> 14 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.

@@ -11,12 +11,12 @@ These choices are already implemented. Do not rebuild them unless the task expli
 | Area | Current state |
 |---|---|
 | Framework | Spring Boot 4.0.7, Java 21, Maven |
-| Persistence | PostgreSQL + Flyway. Current migrations: `V1__init_schema.sql`, `V2__project_schema.sql`, `V3__target_schema.sql` |
+| Persistence | PostgreSQL + Flyway. Current migrations: `V1__init_schema.sql`, `V2__project_schema.sql`, `V3__target_schema.sql`, `V4__dataset_schema.sql` |
 | Identity model | Internal `BIGINT id`; public APIs expose UUID `publicId` |
 | Auth | Local email/password auth, Google/GitHub OAuth2 login, custom JWT issuing |
 | JWT validation | Spring Security OAuth2 Resource Server with `JwtDecoder`; no separate handwritten JWT request filter is needed |
 | Refresh flow | HttpOnly `refresh_token` cookie, rotated by `POST /api/v1/auth/refresh-token` |
-| Implemented APIs | Auth, OAuth2, `GET /api/v1/users/me`, Project CRUD/archive, Target CRUD/parse-curl, ResponseMapping get/save |
+| Implemented APIs | Auth, OAuth2, `GET /api/v1/users/me`, Project CRUD/archive, Target CRUD/parse-curl, ResponseMapping get/save, Dataset CRUD/archive |
 
 ## Status Legend
 
