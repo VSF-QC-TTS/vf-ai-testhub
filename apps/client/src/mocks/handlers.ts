@@ -1,8 +1,12 @@
 import { http, HttpResponse, delay } from 'msw';
+import { projectHandlers } from './projects.mock';
+import { targetHandlers } from './targets.mock';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 export const handlers = [
+  ...projectHandlers,
+  ...targetHandlers,
   // Mock POST /auth/login
   http.post(`${API_BASE_URL}/auth/login`, async ({ request }) => {
     const body = await request.json() as any;

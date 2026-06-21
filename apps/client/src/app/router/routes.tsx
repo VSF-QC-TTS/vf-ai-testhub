@@ -17,6 +17,10 @@ import { VerifyEmailPage } from "../../features/auth/pages/VerifyEmailPage";
 // Project Pages
 import { ProjectListPage } from "../../features/projects/pages/ProjectListPage";
 
+// Target Pages
+import { TargetListPage } from "../../features/targets/pages/TargetListPage";
+import { TargetConfigurationWorkbench } from "../../features/targets/pages/TargetConfigurationWorkbench";
+
 // Lazy-loaded placeholder pages
 const Home = lazy(() => Promise.resolve({ 
   default: () => (
@@ -102,7 +106,8 @@ export const router = createBrowserRouter([
                 element: <FirstRunProjectGate />,
                 children: [
                   { index: true, element: <Suspense fallback={null}><Home /></Suspense> },
-                  { path: "targets", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                  { path: "targets", element: <TargetListPage /> },
+                  { path: "targets/:id", element: <TargetConfigurationWorkbench /> },
                   { path: "datasets", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
                   { path: "test-cases", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
                   { path: "runs", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
