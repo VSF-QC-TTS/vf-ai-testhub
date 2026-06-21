@@ -1,1 +1,254 @@
 .env
+.idea/
+apps/client/node_modules/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+apps/client/dist
+apps/client/dist-ssr
+apps/client/*.local
+
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+*.sw?
+
+# Promptfoo output
+apps/runner/output/
+apps/runner/cache/
+apps/runner/evals/
+
+# Backend test logs
+apps/api/logs/
+
+# Claude / AI specific
+.claude/
+*.claude*
+.promptfoo/
+
+# Root files
+*.pem
+*.crt
+*.key
+
+# Database and persistent data
+data/postgres/
+data/redis/
+docker-data/
+
+# MacOS
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Icon?
+
+# Windows
+Thumbs.db
+ehthumbs_vista.db
+*.cab
+
+# IntelliJ IDEA
+*.iml
+out/
+.idea/
+.idea_modules/
+
+# Maven
+target/
+*.releaseBackup
+release.properties
+m2/
+.m2/
+
+# Java
+*.class
+*.log
+
+# Coverage
+coverage/
+.nyc_output/
+
+# NPM / Yarn / PNPM
+.pnp.*
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnpm-store/
+
+# Other
+tmp/
+temp/
+.env.*
+!.env.example
+!.env.template
+
+# Frontend Client
+apps/client/dist/
+apps/client/coverage/
+apps/client/.eslintcache
+apps/client/.vite/
+apps/client/.turbo/
+
+# Promptfoo Config
+promptfoo.yaml
+promptfoo.json
+
+# Result output
+results/
+
+# Logs
+logs/
+*.log
+
+# Temporary
+*.tmp
+*~
+
+# Secret
+*.secret
+*.private
+
+# DB Config
+database.yml
+config/database.yml
+
+# Build
+build/
+dist/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Custom
+local-*.sh
+scripts/local-*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Test Results
+test-results/
+
+# Ignore package-lock.json at the root level if you prefer
+# package-lock.json
+
+# Frontend env files
+apps/client/.env.local
+apps/client/.env.development.local
+apps/client/.env.test.local
+apps/client/.env.production.local
+
+apps/client/.env
+
+apps/api/target/
+
+# Local DB Volume
+volumes/
+
+# Spring Boot
+apps/api/logs/
+apps/api/bin/
+apps/api/build/
+apps/api/.settings/
+apps/api/.classpath
+apps/api/.project
+
+# Ignore promptfoo output
+apps/runner/output/
+apps/runner/cache/
+
+# Monorepo wide node_modules
+**/node_modules/
+**/.pnp.*
+
+# Ignore all .env files
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.template
+
+# IDE / Editor
+**/.vscode/*
+!**/.vscode/extensions.json
+**/.idea/
+**/*.iml
+
+# OS specific
+**/.DS_Store
+**/Thumbs.db
+
+# Log files
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# Coverage / Build
+**/coverage/
+**/dist/
+**/build/
+**/target/
+**/.next/
+**/.nuxt/
+
+# Vite
+**/.vite/
+
+# ESLint
+**/.eslintcache
+
+# Turbo
+**/.turbo/
+
+# Claude
+.claude/
+
+# Temporary
+**/*.tmp
+**/*~
+**/*.swp
+
+# Data
+**/data/
+**/volumes/
+
+# Secrets
+**/*.pem
+**/*.crt
+**/*.key
+**/*.private
+**/*.secret
+
+# Specific
+promptfoo.yaml
+promptfoo.json
+results/
+
+# Ignore nested node_modules
+node_modules
+apps/*/node_modules
+
+# Modern Frontend Setup (React 19, Vite, Tailwind, npm root logs)
+apps/client/.env.development
+apps/client/.env.production
+apps/client/.env.test
+apps/client/components.json.backup
+package-lock.json
+package.json
