@@ -1,5 +1,7 @@
 package vn.vinfast.aitesthub.result.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,4 +17,6 @@ import vn.vinfast.aitesthub.result.entity.TestResult;
 public interface AssertionResultRepository extends JpaRepository<AssertionResult, Long> {
 
   Optional<AssertionResult> findByTestResultAndAssertion(TestResult testResult, Assertion assertion);
+
+  List<AssertionResult> findByTestResultIn(Collection<TestResult> testResults);
 }

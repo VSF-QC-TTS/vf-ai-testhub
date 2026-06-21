@@ -185,6 +185,9 @@ Manual review service state:
   `reviewerNote`, `reviewedBy`, `reviewedAt`, and computed `finalStatus`.
 - `ManualReviewService.reviewResult(...)` creates or updates the review for one `TestResult`; it requires the owning
   run to be `COMPLETED` and stores the authenticated reviewer.
+- `ReportService.getRunReport(...)` returns run summary counts, pass rate, per-test result details, assertion/tool
+  expectation breakdowns, and manual review state. Summary counts use `finalStatus`, so manual overrides affect pass
+  rate.
 
 ## [MAIL] Mail
 
@@ -254,5 +257,9 @@ Focused tests:
   `rtk bash mvnw compile` -> success.
 - ManualReview focused verification on 2026-06-22:
   `rtk bash mvnw -Dtest=ManualReviewServiceImplTest test` -> 2 tests, 0 failures/errors.
+- ReportService compile verification on 2026-06-22:
+  `rtk bash mvnw compile` -> success.
+- ReportService focused verification on 2026-06-22:
+  `rtk bash mvnw -Dtest=ReportServiceImplTest test` -> 1 test, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.

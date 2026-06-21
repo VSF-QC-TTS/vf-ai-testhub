@@ -50,14 +50,14 @@ Results are system-generated after a run. Manual reviews are QC decisions layere
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `ReportService` for totals, passed, failed, uncertain, and pass rate | TODO |
-| 2 | Return test results with assertion/tool expectation breakdown | TODO |
-| 3 | Include manual review override state when present | TODO |
-| 4 | Unit test pass-rate and override calculations | TODO |
+| 1 | Add `ReportService` for totals, passed, failed, uncertain, and pass rate | DONE |
+| 2 | Return test results with assertion/tool expectation breakdown | DONE |
+| 3 | Include manual review override state when present | DONE |
+| 4 | Unit test pass-rate and override calculations | DONE |
 
 - Commit: `feat(result): add report aggregation service`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E8.5: Controllers + Tests
 

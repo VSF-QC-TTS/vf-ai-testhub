@@ -1,5 +1,7 @@
 package vn.vinfast.aitesthub.result.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,4 +19,6 @@ public interface ToolExpectationResultRepository
 
   Optional<ToolExpectationResult> findByTestResultAndToolExpectation(
       TestResult testResult, ToolExpectation toolExpectation);
+
+  List<ToolExpectationResult> findByTestResultIn(Collection<TestResult> testResults);
 }
