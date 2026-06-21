@@ -1,159 +1,333 @@
 # Frontend Design System & UI/UX Guidelines
 
-This document outlines the comprehensive design system, UI/UX guidelines, and component specifications for the EvalDesk frontend application. It serves as the single source of truth for developers to maintain visual consistency, responsive behavior, and accessibility across the entire platform.
+This document is the visual and interaction standard for the AI TestHub frontend. It defines how the product should look, respond, and degrade across dashboards, forms, data tables, reports, and authentication screens.
 
-## 1. Design Philosophy
-- **Dual-Theme Support (Light & Dark):** Semantic design tokens (CSS variables) ensure seamless switching between themes.
-- **High Information Density:** Spaces are utilized efficiently without feeling cluttered.
-- **Fluid & Meaningful Motion:** State changes and interactions use smooth, physics-based animations to guide user attention.
-- **Consistent Layouts:** Reusable layout patterns for sidebars, headers, and content areas.
+Read this together with `docs/architecture/Component_Contracts.md` before implementing UI.
 
-## 2. Accessibility (a11y) Baseline (CRITICAL)
-EvalDesk is a professional tool. It must be fully navigable and operable by all users, including those relying on keyboards or screen readers.
+## 1. Product UI Direction
 
-- **Keyboard Navigation First:** Every interactive element MUST be reachable via the `Tab` key.
-- **Visible Focus States:** When an element receives keyboard focus, it must display a highly visible focus ring (`focus-visible:ring-2`).
-- **Semantic HTML:** Use appropriate semantic tags (`<button>`, `<a>`).
-- **ARIA Attributes:** Use `aria-label` for icon-only buttons. Use `aria-expanded`/`aria-invalid`.
-- **Contrast Ratios:** Text must meet WCAG AA standards (minimum 4.5:1).
+AI TestHub is an internal QA automation tool. It should feel precise, operational, and dense enough for repeated work.
 
-## 3. Motion & Choreography System
-Motion is not decorative; it is functional. It explains changes in state, establishes spatial relationships, and provides tactile feedback.
+Design goals:
 
-### 3.1 Core Motion Patterns
-- **Shared Axis:** Navigating between sibling views (sliding X/Y).
-- **Elevation (Scale & Pop):** For overlays (Modals/Dropdowns) `scale: 0.95 -> 1`.
-- **Morph (Layout):** Interpolating bounds and positions using `layoutId`.
-- **Staggered List:** Cascading entrance for lists and table rows.
+- Fast scanning over decorative presentation.
+- Clear hierarchy over oversized marketing sections.
+- High information density without cramped text.
+- Predictable navigation for repeated daily workflows.
+- Strong table, form, and report ergonomics.
+- Full Vietnamese text support from day one.
 
-### 3.2 Physics over Durations (Framer Motion)
-- **Spring Physics:** *Standard UI Pop:* `type: "spring", stiffness: 300, damping: 25, mass: 0.5`.
+Avoid:
 
-### 3.3 Timing & Easing (CSS)
-- *Micro-interactions:* `150ms ease-out`.
-- *Page Transitions:* `300ms ease-in-out`.
+- Landing-page hero layouts inside the app.
+- Decorative gradient/orb/bokeh backgrounds.
+- Card-inside-card page composition.
+- One-hue palettes dominated by purple, slate, beige, or brown.
+- Fixed-width text containers that break Vietnamese or long translated labels.
 
-## 4. State Management Patterns (Loading, Empty, Error)
-A premium UI must degrade gracefully.
+## 2. Accessibility Baseline
 
-### 4.1 Loading States & Skeleton Rules
-- **Page/Route Loading:** Use React `<Suspense>` paired with **Skeleton components**. Never show a blank white screen. 
-- **Skeleton Design Rules:**
-  - **Shape Mapping:** Skeletons must mimic the exact layout of the impending data.
-  - **Randomized Text Widths:** Skeleton line widths should vary (e.g., `w-full`, `w-4/5`).
-  - **Motion:** Use a smooth breathing animation (`animate-pulse`). Use `--elevated` background.
-  - **Avoid Skeleton Overload:** Render only enough rows to fill the immediate viewport (5-7 rows).
+Accessibility is not optional.
 
-### 4.2 Empty States
-- **Visuals:** Centered, subtle illustration or prominent faded icon.
-- **Messaging & CTA:** Short headline and a primary action button.
+Rules:
 
-### 4.3 Error & Fallback States
-- **API/Data Fetch Errors:** Use **React Error Boundaries**. Display a localized error card with a "Retry" button instead of crashing the page.
-- **Global/Critical Errors:** Use Toast Notifications or Modal Dialogs.
+- Every interactive control must be keyboard reachable.
+- Use native semantic elements first: `button`, `a`, `form`, `label`, `input`, `table`.
+- Icon-only buttons require `aria-label`.
+- Form fields must connect labels and errors through `htmlFor`, `aria-invalid`, and `aria-describedby`.
+- Dialogs, dropdowns, popovers, and menus should use Radix primitives or components with equivalent focus management.
+- Visible focus must use `focus-visible` and meet contrast requirements.
+- Text contrast must meet WCAG AA: 4.5:1 for normal text, 3:1 for large text and non-text UI indicators.
+- Minimum pointer target should be 40px; use 44px where space allows.
+- Toast/error regions need `aria-live` when they are not directly triggered by focused controls.
+- Respect `prefers-reduced-motion`.
 
-## 5. Color Palette & Semantic Tokens
+## 3. Layout System
 
-### Backgrounds & Surfaces
-- **`--background`:** Light: `zinc-50` | Dark: `zinc-950`
-- **`--surface`:** Light: `white` | Dark: `zinc-900`
-- **`--popover`:** Light: `white` | Dark: `zinc-900`
-- **`--elevated`:** Light: `zinc-100` | Dark: `zinc-800`
+### 3.1 App Shell
 
-### Borders, Rings & Shadows
-- **`--border`:** Light: `zinc-200` | Dark: `zinc-800`
-- **`--ring` (Focus):** Light: `zinc-400` | Dark: `zinc-600`
-- **Border Radius:** `rounded-md` (inputs), `rounded-lg` (cards), `rounded-xl` (modals), `rounded-full` (pills).
-- **Shadows:** `shadow-sm` (cards), `shadow-md` (dropdowns), `shadow-xl` (modals).
+Desktop:
 
-### Typography Colors
-- **`--foreground`:** Light: `zinc-900` | Dark: `zinc-50`
-- **`--muted-foreground`:** Light: `zinc-500` | Dark: `zinc-400`
+- Sidebar: fixed, `w-64`, full height.
+- Header: sticky top, height `56px` or `64px`.
+- Main: `flex-1`, width constrained by content type.
+- Breadcrumbs: always visible in header for nested pages.
 
-### Brand, Actions & Status
-- **`--primary`:** `blue-600`
-- **`--secondary`:** `emerald-600`
-- **`--destructive`:** `red-600`
-- **Status:** PASSED (Emerald), FAILED (Red), UNCERTAIN (Amber), PENDING (Blue).
+Tablet:
 
-## 6. Spacing & Layout Architecture
+- Sidebar collapses to icon rail, `w-16`.
+- Tooltips reveal nav item names.
 
-### 6.1 Spacing Scale (8pt Grid System)
-- **Micro (`4px`):** Between icons and text.
-- **Tiny (`8px`):** Inside buttons/badges, or between a Field Label and its Input.
-- **Small (`16px`):** Card padding, gaps between different Form Fields.
-- **Medium (`24px`):** Column gaps.
-- **Large (`32px`):** Section dividers.
+Mobile:
 
-### 6.2 App Shell & Navigation Placement
-- **Global Sidebar (Primary Navigation):** Fixed width (`w-64`), full height (`h-screen`). 
-- **Top Header (Contextual Navigation):** Fixed height (`h-14` or `h-16`). Sticky (`sticky top-0 z-10`) with a frosted glass effect (`bg-background/80 backdrop-blur-md`). Must always display **Breadcrumbs** on the left.
-- **Main Content Area:** Takes remaining width (`flex-1`). Constrained to `max-w-7xl mx-auto`.
+- Sidebar hidden.
+- Header includes menu button.
+- Navigation opens in drawer.
+- Dialog-heavy flows convert to bottom sheets where appropriate.
 
-## 7. Typography & Localization Rules (CRITICAL)
-EvalDesk must be built for internationalization (i18n), specifically addressing the quirks of Vietnamese diacritics and European language lengths.
+### 3.2 Page Layouts
 
-- **Font Family:** Inter (UI), JetBrains Mono (Code/Logs). Must support full Latin Extended character sets.
-- **Weights:** Regular (400), Medium (500), SemiBold (600).
-- **Line Height & Clipping Prevention:** 
-  - NEVER use `leading-none` (line-height: 1) on Vietnamese text. It will instantly clip upper/lower diacritics.
-  - Default line-height must be generous (`leading-normal` or `leading-relaxed`).
-- **The "German" Test (Flexible Widths):** Text length varies wildly by language (e.g., "Save" in English is "Speichern" in German, or "Lưu thay đổi" in Vietnamese). 
-  - **Rule:** Never set fixed widths (e.g., `w-32`) on buttons, labels, or text containers. 
-  - **Implementation:** Design components to use intrinsic sizing (`w-fit`, `flex-1`) with comfortable padding (`px-4`) so the container expands to fit the translated text naturally. Where space is strictly constrained (like Sidebar links), use `truncate` explicitly.
+Use three page templates:
 
-## 8. Iconography
-Inconsistent icons instantly degrade perceived quality. 
-- **Single Library:** Strictly use **Lucide React**. 
-- **Stroke Width:** Maintain a consistent `strokeWidth={2}`.
-- **Contextual Sizing:** `w-4 h-4` (Inline), `w-5 h-5` (Menu), `w-12 h-12` (Empty States). Align using Flexbox (`items-center`), not exact height matching.
-- **Accessibility:** Icon-only buttons MUST include an `aria-label`.
+- List page: title row, filters, table/list, pagination.
+- Detail page: header, tabs, primary content, right-side metadata panel when useful.
+- Workbench page: resizable or stacked panels for editors/builders.
 
-## 9. Component Specifications
+Do not wrap whole page sections in decorative cards. Use full-width sections with constrained inner content. Cards are allowed for repeated records, modal bodies, and framed tools.
 
-### 9.1 Forms & Validation Architecture (CRITICAL)
-Forms dictate the core experience of EvalDesk. We enforce strict spatial and behavioral rules.
+### 3.3 Responsive Data Rules
 
-- **Floating Inputs vs. Standard Inputs:**
-  - **Auth Screens (Login/Register):** Use the `<FloatingInput>` component (animated placeholder that shrinks to a top label on focus). This provides a spacious, premium, consumer-like feel.
-  - **Dashboard/Data-Entry (Internal App):** NEVER use `<FloatingInput>`. Dense forms (Target Config, Assertion Builder) MUST use the standard `<Input>` with a statically positioned `<Label>` directly above it (`gap-2`). Floating labels in dense forms create visual fatigue and make scanning difficult.
-- **Validation UX:** Do NOT yell early. Validate on `onBlur` or `onSubmit`. Once errored, switch to `onChange` for instant recovery.
-- **Complex Forms:** Use Progressive Disclosure (Accordions, Tabs, or Steppers).
+- Tables live inside `overflow-x-auto`.
+- Important first columns may be sticky on mobile.
+- Tabs become horizontally scrollable.
+- Filter bars wrap into two lines before collapsing into a filter drawer.
+- Text must not overlap adjacent controls; truncate only when a tooltip or full-detail view exists.
 
-### 9.2 Data Tables & Data Density (CRITICAL)
-- **Compact Density:** Table cells should use compact padding (e.g., `py-2 px-3`) and standard text (`text-sm`). 
-- **Sticky Headers:** The table header (`thead`) MUST remain pinned (`sticky top-0`).
-- **Hover Highlights:** Table rows must change background (`hover:bg-elevated`) on mouse hover.
-- **Overflowing Text:** Extremely long strings must NOT wrap. Use CSS `truncate` and provide a Tooltip for the full text.
-- **Row Actions & Touch Support:** 
-  - On Desktop (mouse): Hide action buttons until hover.
-  - On Mobile/Tablet (touch devices): Use `@media (pointer: coarse)` to **always display** the actions or use an Ellipsis (`...`) Dropdown Menu.
+## 4. Design Tokens
 
-### 9.3 JSON & Code Display Rules
-- **Typography:** Must strictly use a Monospace font (`JetBrains Mono`). Font size should be smaller (`text-sm` or `text-xs`) to prevent excessive wrapping.
-- **Container Styling:** Code blocks must reside in a darker/lighter container (e.g., `bg-zinc-950` within a `bg-zinc-900` card) with `rounded-md` corners and a subtle border.
-- **Syntax Highlighting:** Raw JSON or Code must be syntax-highlighted.
-- **Essential Utilities:** Every code block MUST have a "Copy to Clipboard" button firmly anchored at the top-right. Large JSON blobs (> 10 lines) MUST support Expand/Collapse.
+Use Tailwind CSS v4 CSS-first tokens in `apps/client/src/index.css` or the shared global CSS file.
 
-### 9.4 Data Display & Feedback
-- **Buttons:** `<motion.button whileTap={{ scale: 0.95 }} />`. Minimum width should allow for the "German" test expansion.
-- **Dialogs:** Elevation Pattern. Backdrop uses `bg-black/50 backdrop-blur-sm`.
-- **Toasts:** Slide in (`x: 100` -> `0`).
+Token categories:
 
-## 10. Responsive Layout Behaviors (CRITICAL)
-- **Global App Shell:**
-  - **Desktop (>1024px):** Sidebar is fully expanded (`w-64`) and pinned.
-  - **Tablet (768px - 1023px):** Sidebar auto-collapses to an icon-only state (`w-16`).
-  - **Mobile (< 768px):** Sidebar is hidden. A Hamburger Menu opens a sliding Drawer.
-- **Complex Components on Mobile:**
-  - **Data Tables:** Wrap the table in a container with `overflow-x-auto`. Ensure the first column (e.g., Name/ID) is sticky `sticky left-0 bg-surface`.
-  - **Tabs:** The tab container must be scrollable horizontally (`overflow-x-auto scrollbar-hide`) with edge fading.
-  - **Dialogs/Modals:** On mobile screens, Modals should convert from a centered floating box into a Bottom Sheet (Drawer) that slides up from the bottom of the screen.
+```css
+@theme {
+  --color-background: ...;
+  --color-foreground: ...;
+  --color-surface: ...;
+  --color-surface-muted: ...;
+  --color-border: ...;
+  --color-ring: ...;
+  --color-primary: ...;
+  --color-primary-foreground: ...;
+  --color-destructive: ...;
+  --color-warning: ...;
+  --color-success: ...;
+}
+```
 
-## 11. Implementation Strategy
-1. Configure Tailwind CSS v4 variables (`:root` and `.dark`).
-2. Install `framer-motion`, `clsx`, `tailwind-merge`.
-3. Implement `React.lazy()` with `<Suspense>` Skeletons.
-4. Adopt a form library like `React Hook Form` paired with `zod`.
-5. Use a robust headless table library (e.g., `@tanstack/react-table`).
-6. Establish a set of accessible base components using Radix UI primitives to enforce the a11y baseline automatically.
+Semantic usage:
+
+- `background`: app background.
+- `surface`: panels, tables, dialogs.
+- `surface-muted`: subtle row hover, skeletons, inactive nav.
+- `border`: dividers, input borders, table borders.
+- `ring`: focus states.
+- `primary`: main action.
+- `destructive`: destructive actions and failed statuses.
+- `warning`: uncertain statuses.
+- `success`: passed statuses.
+
+Status colors:
+
+- `PASSED`: success/emerald.
+- `FAILED`: destructive/red.
+- `ERROR`: destructive/red plus stronger iconography.
+- `UNCERTAIN`: warning/amber.
+- `PENDING` or `RUNNING`: primary/blue.
+- `SKIPPED`: muted/neutral.
+
+## 5. Typography
+
+Fonts:
+
+- UI: Inter or an equivalent Latin Extended font.
+- Code/logs/JSON: JetBrains Mono or equivalent monospace.
+
+Rules:
+
+- Do not use `leading-none` for Vietnamese text.
+- Default line height should be `leading-normal`.
+- Dense table cells may use `text-sm`, but not clipped line-height.
+- Labels use medium weight, not tiny low-contrast text.
+- Button text must remain readable at mobile widths.
+- Letter spacing should remain normal; avoid negative tracking.
+
+Localization stress tests:
+
+- English short label: `Save`.
+- Vietnamese label: `Lưu thay đổi`.
+- German-style long label: `Änderungen speichern`.
+
+Any button, tab, nav item, and table action must survive these lengths.
+
+## 6. Spacing, Radius, and Elevation
+
+Spacing:
+
+- 4px: icon/text gap, tight inline controls.
+- 8px: field label gap, compact toolbar gap.
+- 12px: dense card/table internal spacing.
+- 16px: standard form field gap, card padding.
+- 24px: panel gap, section gap.
+- 32px: major page division.
+
+Radius:
+
+- Inputs/buttons/badges: 6px to 8px.
+- Cards: 8px maximum.
+- Dialogs/sheets: 10px to 12px.
+- Pills/avatar circles: full radius.
+
+Elevation:
+
+- Default surfaces use borders, not heavy shadows.
+- Dropdowns/popovers may use `shadow-md`.
+- Dialogs may use `shadow-xl`.
+- Avoid nested elevated surfaces.
+
+## 7. Motion
+
+Motion should communicate state changes, not decorate.
+
+Preferred defaults:
+
+- Micro interactions: 120-180ms ease-out.
+- Overlays: 160-220ms with opacity and small scale/translate.
+- Route transitions: use sparingly; no animation that slows repeated workflows.
+
+Use CSS transitions and Radix state attributes first. Add Framer Motion only when the feature needs layout animation or complex choreography and the dependency is already accepted.
+
+Rules:
+
+- Respect `prefers-reduced-motion`.
+- Do not animate table rows in a way that makes scanning harder.
+- Keep skeleton animation subtle.
+
+## 8. Components
+
+### 8.1 Buttons
+
+Required variants:
+
+- `primary`
+- `secondary`
+- `ghost`
+- `outline`
+- `destructive`
+
+Required sizes:
+
+- `sm`
+- `md`
+- `lg`
+- `icon`
+
+Rules:
+
+- Icon buttons use Lucide icons and `aria-label`.
+- Buttons default to `type="button"` unless used as form submit.
+- Loading state keeps stable width and shows spinner or pending icon.
+- Destructive actions require confirmation unless easily reversible.
+
+### 8.2 Forms
+
+Auth screens:
+
+- May use floating inputs.
+- May have more spacious layout.
+
+Dashboard forms:
+
+- Use static labels above fields.
+- Use compact field groups.
+- Use progressive disclosure for advanced settings.
+- JSON inputs use monospace editor styling and validation feedback.
+
+Validation:
+
+- Validate on blur or submit initially.
+- After error, validate on change.
+- Show one primary error per field.
+- Keep backend validation errors mapped to fields when possible.
+
+### 8.3 Tables
+
+Tables are central to AI TestHub.
+
+Rules:
+
+- Compact density: `text-sm`, `py-2`, `px-3`.
+- Sticky header.
+- Row hover state.
+- Sort indicators where sorting exists.
+- Explicit empty state.
+- Pagination footer with current range.
+- Long IDs and URLs truncate with tooltip/copy.
+- Row actions hidden on desktop hover only when discoverability remains acceptable; always visible or in menu on touch devices.
+
+### 8.4 JSON, Code, and Logs
+
+Rules:
+
+- Monospace font.
+- Syntax highlighting for JSON/code.
+- Copy button top-right.
+- Expand/collapse for large payloads.
+- Preserve whitespace.
+- Never put secrets in copied/logged content.
+
+### 8.5 Empty, Loading, and Error States
+
+Loading:
+
+- Use skeletons matching the target layout.
+- Use 5-7 table skeleton rows for viewport fill.
+- Do not show blank pages.
+
+Empty:
+
+- Short headline.
+- One sentence max.
+- One primary action.
+- Use a Lucide icon or small illustration.
+
+Error:
+
+- Recoverable errors show retry.
+- Route-level failures use Error Boundary fallback.
+- API errors use localized messages.
+- Critical errors can use toast or dialog.
+
+## 9. Feature-Specific UX Rules
+
+Projects and targets:
+
+- Targets need a clear response mapping status because runner quality depends on it.
+- JSON templates must have validation and formatting.
+- URL/method/auth fields should be grouped.
+
+Datasets and test cases:
+
+- Test case tables need fast filtering by section, tag, enabled, and search.
+- Editors should not force full-page navigation for every row edit.
+- Import preview must show invalid rows and allow correction flow.
+
+Assertions and tool expectations:
+
+- Use builder-style forms with dynamic fields.
+- Show examples for field paths and expected values.
+- Keep enum values translated but transport raw backend values.
+
+Runs and reports:
+
+- Run status should be visible from dataset and run detail pages.
+- Reports need both summary cards and drill-down rows.
+- Raw response and normalized components should be inspectable side by side.
+
+Manual review:
+
+- Distinguish auto status from reviewed/final status.
+- Reviewer notes need clear save state and audit metadata.
+
+## 10. Implementation Checklist
+
+Before marking a UI slice complete:
+
+- Component follows `Component_Contracts.md`.
+- All text uses i18n.
+- Keyboard navigation tested manually.
+- Loading, empty, error states exist.
+- Mobile behavior checked.
+- No text clipping with Vietnamese labels.
+- No hardcoded API payload guesses.
+- Tests cover the main user behavior.

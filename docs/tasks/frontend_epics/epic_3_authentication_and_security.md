@@ -1,29 +1,151 @@
 # Epic 3: Authentication & Security
 
-**Goal:** Implement login flows against the fully implemented Spring Security (OAuth2/JWT) backend.
+Goal: implement local auth, OAuth entrypoints, session handling, route protection, and account recovery flows against the Spring backend.
 
-## Tasks
+## Read First
 
-### TASK 3.1: Login Page UI
-- [ ] Build the `/login` route.
-- [ ] Implement UI for social login buttons ("Continue with Google", "Continue with GitHub").
-- [ ] Ensure the login card is perfectly centered on desktop and responsive on mobile.
+- `apps/api/CONTEXT.md` auth and OAuth sections
+- `apps/api/src/main/java/vn/vinfast/aitesthub/auth/controller/`
+- `apps/api/src/main/java/vn/vinfast/aitesthub/auth/request/`
+- `apps/api/src/main/java/vn/vinfast/aitesthub/auth/response/`
+- `apps/api/src/main/java/vn/vinfast/aitesthub/user/response/`
+- Epic 2 API client and auth store docs
 
-### TASK 3.2: OAuth2 Flow Integration
-- [ ] Wire social login buttons to redirect to the Backend's OAuth2 authorization endpoints (`/oauth2/authorization/google`, etc.).
-- [ ] Implement the OAuth2 callback handler page to extract the JWT token returned by the backend after successful social authentication.
-- [ ] Save the token securely via `useAuthStore`.
+## Backend Facts to Preserve
 
-### TASK 3.3: Local Credentials Flow (Optional/If Supported)
-- [ ] Build Local Login and Registration forms.
-- [ ] Implement form validation using React Hook Form + Zod.
-- [ ] Connect forms to `/api/v1/auth/login` and `/api/v1/auth/register`.
+- Local auth endpoints live under `/api/v1/auth`.
+- Login returns access token in JSON.
+- Refresh token is HttpOnly cookie only.
+- Refresh endpoint reads cookie and returns a new access token.
+- Logout clears refresh cookie.
+- OAuth providers are Google and GitHub.
+- `GET /api/v1/users/me` returns current authenticated user.
 
-### TASK 3.4: Route Protection
-- [ ] Build a `<ProtectedRoute>` wrapper component.
-- [ ] Redirect unauthenticated users to `/login`.
-- [ ] Ensure expired tokens automatically clear the auth store and trigger a redirect.
+## Task 3.1: Auth API Layer
 
-## Notes
-- Refer to `apps/api/CLAUDE.md` and Backend code for exact Auth paths.
-- Ensure the login flow feels snappy using Framer Motion page transitions.
+Target files:
+
+- `apps/client/src/features/auth/auth.api.ts`
+- `apps/client/src/features/auth/auth.types.ts`
+- `apps/client/src/features/auth/auth.schemas.ts`
+- `apps/client/src/features/auth/auth.queries.ts`
+
+Steps:
+
+1. Read backend request/response DTOs.
+2. Define DTO types exactly.
+3. Implement `login`, `register`, `refreshToken`, `logout`, `verifyEmail`, `forgotPassword`, `resetPassword`, and `getMe` if backend supports each endpoint.
+4. Add Zod schemas for local forms.
+5. Keep transport enum/string values in English.
+
+Acceptance:
+
+- API functions match backend paths and methods.
+- No refresh token is stored in JS.
+
+## Task 3.2: Auth Pages
+
+Routes:
+
+- `/login`
+- `/register`
+- `/forgot-password`
+- `/reset-password`
+- `/verify-email`
+
+Steps:
+
+1. Use auth layout separate from app shell.
+2. Build local login form with floating inputs.
+3. Build register form.
+4. Build forgot/reset password forms.
+5. Build verify-email result page reading token from URL.
+6. Show localized errors and success states.
+7. Provide Google/GitHub buttons that redirect to backend OAuth authorization endpoints.
+
+Acceptance:
+
+- Forms are keyboard usable.
+- Loading state does not shift layout.
+- Error messages are localized.
+- Auth screens use no app sidebar.
+
+## Task 3.3: OAuth Flow
+
+Steps:
+
+1. Confirm exact backend OAuth redirect behavior in success handler.
+2. If token is returned in URL, parse it in a callback route and immediately remove it from visible URL.
+3. If token is returned by cookie/redirect flow, call `getMe` after redirect.
+4. Store access token only in auth store.
+5. Navigate to the intended route after login.
+
+Acceptance:
+
+- OAuth callback does not leave tokens visible in browser history if avoidable.
+- Failed OAuth shows a localized error state.
+
+## Task 3.4: Session Bootstrapping
+
+Steps:
+
+1. On app startup, attempt session restore only if safe state indicates a prior login.
+2. Call refresh endpoint when access token is missing/expired and refresh cookie may exist.
+3. Call `getMe` after refresh succeeds.
+4. Clear session on refresh failure.
+5. Avoid infinite refresh loops.
+
+Acceptance:
+
+- Reloading the app preserves a valid session.
+- Expired sessions redirect to login.
+- API 401 is handled once, not repeatedly.
+
+## Task 3.5: Protected Routes
+
+Target files:
+
+- `apps/client/src/app/router/ProtectedRoute.tsx`
+- `apps/client/src/app/router/routes.tsx`
+
+Steps:
+
+1. Guard app routes.
+2. Preserve `redirectTo` location.
+3. Render skeleton while auth bootstrap is checking.
+4. Redirect authenticated users away from login/register.
+
+Acceptance:
+
+- Unauthenticated app route access redirects to login.
+- Authenticated users can access app shell.
+
+## Task 3.6: Security Rules
+
+Rules:
+
+- Never log tokens.
+- Never store refresh token in local storage/session storage.
+- Do not put access token in query params except when backend OAuth requires it; remove immediately.
+- Use `autocomplete` attributes correctly on auth forms.
+- Treat backend errors as untrusted display input; map through known translations.
+
+## Task 3.7: Tests
+
+Cases:
+
+1. Login validation blocks invalid email/password.
+2. Successful login stores access token and current user.
+3. Logout clears session and calls backend.
+4. Protected route redirects unauthenticated users.
+5. Session bootstrap handles refresh success and failure.
+6. Forgot/reset forms call expected API functions with token.
+
+Use React Testing Library and MSW or mocked API module.
+
+## Suggested Commit Slices
+
+1. `feat(frontend): add auth api layer`
+2. `feat(frontend): add auth pages`
+3. `feat(frontend): add session route guards`
+4. `test(frontend): cover auth flows`
