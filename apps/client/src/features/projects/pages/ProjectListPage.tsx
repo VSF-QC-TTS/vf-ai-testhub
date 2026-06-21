@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, FolderGit2, Search, MoreVertical, Trash2, Edit2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,20 +10,48 @@ import { Skeleton } from "../../../components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
 import type { ProjectResponse } from "../projects.types";
 import { useProjectStore } from "../project.store";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export function ProjectListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data, isLoading } = useProjects();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchString = searchParams.get("search") || "";
+  const isEmptyParam = searchParams.get("empty") === "1";
+  const isNewParam = searchParams.get("action") === "new";
+
+  const { data, isLoading } = useProjects({ search: searchString });
   const archiveMutation = useArchiveProject();
   const setActiveProject = useProjectStore((s) => s.setActiveProject);
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(isEmptyParam || isNewParam);
   const [editingProject, setEditingProject] = useState<ProjectResponse | null>(null);
+
+  // Sync form open state with URL
+  useEffect(() => {
+    if (isFormOpen && !isEmptyParam && !isNewParam) {
+      // User opened manually
+    } else if (!isFormOpen && (isEmptyParam || isNewParam)) {
+      // User closed the form, remove params
+      setSearchParams(prev => {
+        prev.delete("empty");
+        prev.delete("action");
+        return prev;
+      }, { replace: true });
+    }
+  }, [isFormOpen, isEmptyParam, isNewParam, setSearchParams]);
 
   const projects = data?.content || [];
   const isEmpty = !isLoading && projects.length === 0;
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchParams(prev => {
+      if (val) prev.set("search", val);
+      else prev.delete("search");
+      return prev;
+    }, { replace: true });
+  };
 
   const handleCreate = () => {
     setEditingProject(null);
@@ -94,6 +122,8 @@ export function ProjectListPage() {
             <Input 
               placeholder={t("projects:list.search")} 
               className="pl-9 bg-white dark:bg-zinc-950"
+              value={searchString}
+              onChange={handleSearch}
             />
           </div>
 

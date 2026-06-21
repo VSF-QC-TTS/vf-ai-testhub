@@ -19,9 +19,8 @@ i18n
   .init({
     resources: {
       en: {
+        ...en,
         translation: en,
-        auth: en.auth,
-        api: en.api,
         zod: {
           errors: {
             invalid_string: { email: "Invalid email address" },
@@ -31,9 +30,8 @@ i18n
         },
       },
       vi: {
+        ...vi,
         translation: vi,
-        auth: vi.auth,
-        api: vi.api,
         zod: zodVi,
       },
     },

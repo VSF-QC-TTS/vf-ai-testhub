@@ -18,7 +18,7 @@ export const projectsApi = {
     return res.data;
   },
 
-  list: async (params?: { page?: number; size?: number }): Promise<PageResponse<ProjectResponse>> => {
+  list: async (params?: { page?: number; size?: number; search?: string }): Promise<PageResponse<ProjectResponse>> => {
     const res = await apiClient.get<PageResponse<ProjectResponse>>("/api/v1/projects", { params });
     return res.data;
   },

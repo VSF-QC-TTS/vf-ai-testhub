@@ -59,7 +59,12 @@ export function ProjectSwitcher({
           <DropdownMenuLabel>Projects</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {projects.length === 0 ? (
-            <div className="px-2 py-1.5 text-sm text-muted-foreground">No projects found</div>
+            <DropdownMenuItem asChild className="cursor-pointer text-muted-foreground">
+              <Link to="/projects?action=new" className="w-full flex items-center">
+                <Settings2 className="mr-2 h-4 w-4" />
+                Create Project
+              </Link>
+            </DropdownMenuItem>
           ) : (
             projects.map((project) => (
               <DropdownMenuItem

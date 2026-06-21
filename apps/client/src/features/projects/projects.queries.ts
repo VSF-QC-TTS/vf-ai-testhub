@@ -6,12 +6,12 @@ import type { UUID } from "../../lib/api/types";
 export const projectKeys = {
   all: ["projects"] as const,
   lists: () => [...projectKeys.all, "list"] as const,
-  list: (filters: { page?: number; size?: number }) => [...projectKeys.lists(), filters] as const,
+  list: (filters: { page?: number; size?: number; search?: string }) => [...projectKeys.lists(), filters] as const,
   details: () => [...projectKeys.all, "detail"] as const,
   detail: (id: UUID) => [...projectKeys.details(), id] as const,
 };
 
-export function useProjects(params?: { page?: number; size?: number }) {
+export function useProjects(params?: { page?: number; size?: number; search?: string }) {
   return useQuery({
     queryKey: projectKeys.list(params || {}),
     queryFn: () => projectsApi.list(params),
