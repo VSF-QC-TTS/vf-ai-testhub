@@ -1,4 +1,5 @@
-import { ChevronsUpDown, Folder } from "lucide-react";
+import { ChevronsUpDown, Folder, Settings2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -70,6 +71,13 @@ export function ProjectSwitcher({
               </DropdownMenuItem>
             ))
           )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild className="cursor-pointer text-muted-foreground mt-2">
+            <Link to="/projects" className="w-full flex items-center">
+              <Settings2 className="mr-2 h-4 w-4" />
+              Manage Projects
+            </Link>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
