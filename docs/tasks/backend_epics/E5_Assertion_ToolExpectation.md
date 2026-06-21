@@ -8,15 +8,15 @@ Assertions evaluate chatbot outputs. Tool expectations evaluate tool/agent behav
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Add `Assertion` entity linked to `TestCase` | TODO |
-| 2 | Support scope/type/target component/field path/multi-field configuration | TODO |
-| 3 | Support expected value, optional rubric link/override, threshold, weight, severity, enabled, sort order | TODO |
-| 4 | Add request/response DTOs and mapper | TODO |
-| 5 | Add Flyway migration for `assertions` | TODO |
+| 1 | Add `Assertion` entity linked to `TestCase` | DONE |
+| 2 | Support scope/type/target component/field path/multi-field configuration | DONE |
+| 3 | Support expected value, optional rubric link/override, threshold, weight, severity, enabled, sort order | DONE |
+| 4 | Add request/response DTOs and mapper | DONE |
+| 5 | Add Flyway migration for `assertions` | DONE |
 
 - Commit: `feat(assertion): add entity, dto, mapper and migration`
 - Scope: `M`
-- Review: `TODO`
+- Review: `DONE`
 
 ## E5.2: ToolExpectation Entity + DTO + Mapper
 
