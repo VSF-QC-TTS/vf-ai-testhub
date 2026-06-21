@@ -34,9 +34,9 @@ Rubrics provide reusable LLM judge criteria at global, project, dataset, or test
 
 | # | Checklist | Status |
 |---|---|---|
-| 1 | Unit test `RubricServiceImpl` | TODO |
-| 2 | MockMvc test rubric CRUD endpoints | TODO |
-| 3 | Test invalid publish/archive transitions if supported | TODO |
+| 1 | Unit test `RubricServiceImpl` | DONE |
+| 2 | MockMvc test rubric CRUD endpoints | DONE |
+| 3 | Test invalid publish/archive transitions if supported | DONE |
 
 - Commit: `test(rubric): add unit and integration tests`
-- Review: `TODO`
+- Review: `DONE`

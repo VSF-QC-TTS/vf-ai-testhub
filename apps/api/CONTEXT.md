@@ -194,5 +194,7 @@ Focused tests:
   `rtk bash mvnw compile` -> success.
 - Rubric service/controller compile verification on 2026-06-21:
   `rtk bash mvnw compile` -> success.
+- Rubric focused verification on 2026-06-21:
+  `rtk bash mvnw -Dtest=RubricServiceImplTest,RubricControllerTest test` -> 14 tests, 0 failures/errors.
 - Public controller tests should cover HTTP status, JSON body, Problem Details validation errors, cookies/headers, and
   service delegation.
