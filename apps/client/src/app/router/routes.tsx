@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { useTranslation } from "react-i18next";
 import { AppShell } from "../../components/layout/AppShell";
 import { PageTransition } from "../../components/layout/PageTransition";
 import { ProtectedRoute, GuestRoute } from "./ProtectedRoute";
@@ -23,13 +24,22 @@ import { TargetConfigurationWorkbench } from "../../features/targets/pages/Targe
 
 // Lazy-loaded placeholder pages
 const Home = lazy(() => Promise.resolve({ 
-  default: () => (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-      <p className="text-muted-foreground">Welcome to VinFast AI TestHub. Select a project to get started.</p>
-    </div>
-  )
+  default: () => {
+    // Need to avoid require. We can't easily use hooks inside a dynamically resolved component without importing them at the top.
+    // Instead of inline require, we should just use a normal component that imports useTranslation.
+    return <DashboardPlaceholder />;
+  }
 }));
+
+function DashboardPlaceholder() {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col gap-4">
+      <h1 className="text-3xl font-bold tracking-tight">{t("common:dashboardTitle", "Dashboard")}</h1>
+      <p className="text-muted-foreground">{t("common:dashboardDesc", "Welcome to VinFast AI TestHub. Select a project to get started.")}</p>
+    </div>
+  );
+}
 
 const PlaceholderPage = lazy(() => Promise.resolve({
   default: () => (
