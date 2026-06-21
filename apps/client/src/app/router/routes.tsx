@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, Outlet, useRouteError } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { AppShell } from "../../components/layout/AppShell";
 import { PageTransition } from "../../components/layout/PageTransition";
@@ -14,12 +14,15 @@ import { ForgotPasswordPage } from "../../features/auth/pages/ForgotPasswordPage
 import { ResetPasswordPage } from "../../features/auth/pages/ResetPasswordPage";
 import { VerifyEmailPage } from "../../features/auth/pages/VerifyEmailPage";
 
+// Project Pages
+import { ProjectListPage } from "../../features/projects/pages/ProjectListPage";
+
 // Lazy-loaded placeholder pages
 const Home = lazy(() => Promise.resolve({ 
   default: () => (
     <div className="flex flex-col gap-4">
       <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-      <p className="text-muted-foreground">Welcome to AI TestHub. Select a project to get started.</p>
+      <p className="text-muted-foreground">Welcome to VinFast AI TestHub. Select a project to get started.</p>
     </div>
   )
 }));
@@ -109,8 +112,7 @@ export const router = createBrowserRouter([
               },
               
               // Project management pages (not guarded by project selection)
-              { path: "projects", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
-              { path: "projects/new", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+              { path: "projects", element: <ProjectListPage /> },
               
               {
                 path: "*",

@@ -1,5 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import { zodVi } from "./resources/zod-vi";
 import { en } from "./resources/en";
 import { vi } from "./resources/vi";
 
@@ -10,15 +11,31 @@ const getInitialLanguage = () => {
   if (saved && (saved === "en" || saved === "vi")) {
     return saved;
   }
-  return "en";
+  return "vi";
 };
 
 i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en,
-      vi,
+      en: {
+        translation: en,
+        auth: en.auth,
+        api: en.api,
+        zod: {
+          errors: {
+            invalid_string: { email: "Invalid email address" },
+            too_small: { string: { inclusive: "Must contain at least {{minimum}} character(s)" } },
+            invalid_type_received_undefined: "Required"
+          }
+        },
+      },
+      vi: {
+        translation: vi,
+        auth: vi.auth,
+        api: vi.api,
+        zod: zodVi,
+      },
     },
     lng: getInitialLanguage(),
     fallbackLng: "en",
@@ -31,6 +48,9 @@ i18n.on("languageChanged", (lng) => {
   localStorage.setItem(LANGUAGE_KEY, lng);
   document.documentElement.lang = lng;
 });
+
+// Set initial document language
+document.documentElement.lang = i18n.language;
 
 // Set initial document language
 document.documentElement.lang = i18n.language;

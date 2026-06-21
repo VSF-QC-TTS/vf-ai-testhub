@@ -1,9 +1,9 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { env } from "../env";
 import { ApiError } from "./errors";
 import { useAuthStore } from "../../features/auth/auth.store";
 import i18n from "../i18n";
-import { ApiErrorResponse } from "./types";
+import type { ApiErrorResponse } from "./types";
 
 export const apiClient = axios.create({
   baseURL: env.VITE_API_BASE_URL,

@@ -1,14 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "./auth.api";
-import { queryKeys } from "../../lib/query/keys";
 import { useAuthStore } from "./auth.store";
-import { 
+import type { 
   LoginRequest, 
   RegisterRequest, 
   ForgotPasswordRequest, 
   ResetPasswordRequest, 
   VerifyEmailRequest 
 } from "./auth.types";
+
+export const queryKeys = {
+  auth: {
+    all: ["auth"] as const,
+    session: () => ["auth", "session"] as const,
+    me: () => ["auth", "me"] as const,
+  },
+};
 
 export function useLogin() {
   const setSession = useAuthStore((state) => state.setSession);

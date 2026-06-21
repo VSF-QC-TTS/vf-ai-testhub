@@ -1,12 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface UserSummary {
-  id: string;
+export interface UserSummary {
+  publicId: string;
   email: string;
   displayName: string;
-  avatarUrl?: string;
   role: string;
+  avatarUrl: string | null;
 }
 
 interface AuthState {

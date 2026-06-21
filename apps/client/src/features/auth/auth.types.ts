@@ -1,4 +1,4 @@
-import { Role, UserStatus } from "../../lib/api/types";
+import type { Role, UserStatus } from "../../lib/api/types";
 
 export interface UserResponse {
   publicId: string;

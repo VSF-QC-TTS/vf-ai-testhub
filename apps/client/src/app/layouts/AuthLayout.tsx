@@ -1,24 +1,27 @@
-import { Outlet } from "react-router-dom";
-import { Bot } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Outlet, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { BrandLogo } from "../../components/ui/Logo";
+import { AuthDynamicCanvas } from "../../features/auth/components/AuthDynamicCanvas";
 
 export function AuthLayout() {
-  const { t } = useTranslation();
+  const location = useLocation();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="flex flex-col items-center space-y-2 text-center">
-          <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Bot className="h-6 w-6 text-primary" />
-          </div>
-          <h1 className="text-2xl font-semibold tracking-tight">AI TestHub</h1>
-          <p className="text-sm text-muted-foreground">
-            {t("auth:slogan", "Quality Engineering at Scale")}
-          </p>
+    <div className="min-h-[100dvh] relative flex flex-col items-center bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-8">
+      {/* Dynamic Bento Canvas Background */}
+      <AuthDynamicCanvas />
+
+      {/* Centered Glass Card */}
+      <div
+        className="relative z-10 w-full max-w-[440px] my-auto rounded-[2rem] bg-white/80 dark:bg-zinc-900/60 backdrop-blur-2xl border border-zinc-200/50 dark:border-white/10 p-6 sm:p-10 shadow-2xl transition-[height] duration-300"
+      >
+        <div className="flex justify-center mb-8">
+          <BrandLogo textClassName="text-xl dark:text-white" iconClassName="bg-zinc-100 dark:bg-white/10 dark:border dark:border-white/10 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]" />
         </div>
         
-        <Outlet />
+        <div className="w-full">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

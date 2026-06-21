@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import MockAdapter from "axios-mock-adapter";
 import { apiClient } from "./client";
 import { useAuthStore } from "../../features/auth/auth.store";
@@ -15,10 +15,11 @@ describe("API Client", () => {
 
   it("sends Authorization header when token exists", async () => {
     useAuthStore.getState().setSession("test-token", {
-      id: "1",
+      publicId: "1",
       email: "test@example.com",
       displayName: "Test",
       role: "QC_MEMBER",
+      avatarUrl: null,
     });
 
     mock.onGet("/test").reply((config) => {
@@ -42,10 +43,11 @@ describe("API Client", () => {
 
   it("clears auth session on 401 and throws ApiError", async () => {
     useAuthStore.getState().setSession("test-token", {
-      id: "1",
+      publicId: "1",
       email: "test@example.com",
       displayName: "Test",
       role: "QC_MEMBER",
+      avatarUrl: null
     });
 
     mock.onGet("/test-401").reply(401, {

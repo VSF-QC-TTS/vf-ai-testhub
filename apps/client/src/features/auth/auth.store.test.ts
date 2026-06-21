@@ -8,10 +8,11 @@ describe("Auth Store", () => {
 
   it("updates state on setSession", () => {
     const user = {
-      id: "1",
+      publicId: "1",
       email: "test@example.com",
       displayName: "Test User",
-      role: "ADMIN",
+      role: "QC_MEMBER",
+      avatarUrl: null
     };
 
     useAuthStore.getState().setSession("test-token", user);
@@ -22,15 +23,18 @@ describe("Auth Store", () => {
     expect(state.user).toEqual(user);
   });
 
-  it("clears state on clearSession", () => {
-    useAuthStore.getState().setSession("test-token", {
-      id: "1",
-      email: "test@example.com",
-      displayName: "Test User",
-      role: "ADMIN",
-    });
-
-    useAuthStore.getState().clearSession();
+  it("should clear session", () => {
+    useAuthStore.setState({
+      isAuthenticated: true,
+      accessToken: "test-token",
+      user: {
+        publicId: "1",
+        email: "test@example.com",
+        displayName: "Test User",
+        role: "QC_MEMBER",
+        avatarUrl: null
+      },
+    });useAuthStore.getState().clearSession();
 
     const state = useAuthStore.getState();
     expect(state.isAuthenticated).toBe(false);

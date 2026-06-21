@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
-import { useVerifyEmail } from "../../auth.queries";
+import { useVerifyEmail } from "../auth.queries";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApiError } from "@/lib/api/errors";
@@ -27,7 +27,7 @@ export function VerifyEmailPage() {
       onSuccess: () => {
         setStatus('success');
       },
-      onError: (err) => {
+      onError: (err: Error) => {
         setStatus('error');
         if (err instanceof ApiError) {
           setErrorMessage(err.message);

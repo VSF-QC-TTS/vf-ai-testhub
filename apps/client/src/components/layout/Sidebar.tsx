@@ -1,4 +1,4 @@
-import { Home, FolderClosed, Target, FileText, PlayCircle, BarChart3, Settings, Database } from "lucide-react";
+import { Home, FolderClosed, Target, FileText, PlayCircle, BarChart3, Settings, Database, Bot } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { type ComponentProps } from "react";
@@ -16,14 +16,18 @@ const navItems = [
   { icon: Settings, label: "Settings", to: "/settings" },
 ];
 
+import { useProjects } from "../../features/projects/projects.queries";
+import { useProjectStore } from "../../features/projects/project.store";
+import { BrandLogo } from "../ui/Logo";
+
 export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
   const location = useLocation();
+  const { data } = useProjects();
+  const activeProjectId = useProjectStore((s) => s.activeProjectId);
+  const setActiveProject = useProjectStore((s) => s.setActiveProject);
   
-  // Placeholder mock data
-  const mockProjects = [
-    { id: "1", name: "EvalDesk Beta" },
-    { id: "2", name: "Customer LLM Eval" }
-  ];
+  const projects = data?.content || [];
+  const currentProject = projects.find(p => p.id === activeProjectId);
 
   return (
     <aside 
@@ -34,20 +38,21 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
       {...props}
     >
       <div className="flex h-14 lg:h-16 items-center border-b px-4 lg:px-6">
-        <Link to="/" className="flex items-center gap-2 font-semibold text-primary">
-          <Target className="h-6 w-6 shrink-0" />
-          <span className="hidden lg:inline-block">EvalDesk</span>
+        <Link to="/" className="flex items-center">
+          <BrandLogo hideTextOnMobile textClassName="text-sm" />
         </Link>
       </div>
       
       <ProjectSwitcher 
-        projects={mockProjects} 
-        currentProject={mockProjects[0]}
+        projects={projects} 
+        currentProject={currentProject}
+        onProjectSelect={(p) => setActiveProject(p.id)}
         className="hidden lg:block"
       />
       <ProjectSwitcher 
-        projects={mockProjects} 
-        currentProject={mockProjects[0]}
+        projects={projects} 
+        currentProject={currentProject}
+        onProjectSelect={(p) => setActiveProject(p.id)}
         className="md:block lg:hidden"
         isCollapsed
       />
