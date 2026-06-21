@@ -1,0 +1,26 @@
+{
+  "name": "runner",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "ioredis": "5.11.1",
+    "promptfoo": "0.121.17"
+  },
+  "devDependencies": {
+    "@types/node": "26.0.0",
+    "tsx": "4.22.4",
+    "typescript": "6.0.3",
+    "vitest": "4.1.9"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}
