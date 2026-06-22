@@ -1,6 +1,6 @@
 # E11: Run Comparison & Experiment Module
 
-Status: TODO
+Status: IN_PROGRESS
 
 Goal: support contract-backed run comparison first, then optional A/B experiment orchestration. This epic exists because the mentor prototype shows A/B-style UI, but the current backend only supports independent runs and reports.
 
@@ -8,8 +8,8 @@ Goal: support contract-backed run comparison first, then optional A/B experiment
 
 - `RunRequest` accepts one `targetId`; it does not accept variants.
 - `RunController` supports trigger/status/history only.
-- `ResultController` supports `GET /api/v1/runs/{runId}/report` and `GET /api/v1/runs/{runId}/results`.
-- There is no implemented `GET /api/v1/runs/compare`.
+- `ResultController` supports `GET /api/v1/runs/{runId}/report`, `GET /api/v1/runs/{runId}/results`, and
+  `GET /api/v1/runs/compare`.
 - There are no experiment, variant, prompt/config version, or promotion entities.
 
 ## Definitions
@@ -27,12 +27,16 @@ Checklist:
 
 | # | Task | Status |
 |---|---|---|
-| 1 | Define `RunComparisonResponse` with base run, candidate run, summary, and testcase diffs | TODO |
-| 2 | Add `RunComparisonService` interface with Javadoc for params/return behavior | TODO |
-| 3 | Implement `RunComparisonServiceImpl` using existing run/report/result repositories | TODO |
-| 4 | Validate both runs exist, are terminal, and are comparable by dataset/scope when fields are available | TODO |
-| 5 | Add `GET /api/v1/runs/compare?baseRunId=&candidateRunId=` | TODO |
-| 6 | Add service and controller tests for regressions, fixes, unchanged, missing run, non-terminal run, and incompatible runs | TODO |
+| 1 | Define `RunComparisonResponse` with base run, candidate run, summary, and testcase diffs | DONE |
+| 2 | Add `RunComparisonService` interface with Javadoc for params/return behavior | DONE |
+| 3 | Implement `RunComparisonServiceImpl` using existing run/report/result repositories | DONE |
+| 4 | Validate both runs exist, are terminal, and are comparable by dataset/scope when fields are available | DONE |
+| 5 | Add `GET /api/v1/runs/compare?baseRunId=&candidateRunId=` | DONE |
+| 6 | Add service and controller tests for regressions, fixes, unchanged, missing run, non-terminal run, and incompatible runs | DONE |
+
+- Commit: `feat(result): add run comparison api`
+- Scope: `M`
+- Review: `DONE`
 
 Response requirements:
 

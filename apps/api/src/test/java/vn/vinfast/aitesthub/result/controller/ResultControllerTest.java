@@ -24,15 +24,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import vn.vinfast.aitesthub.exception.BusinessException;
 import vn.vinfast.aitesthub.exception.ErrorCode;
 import vn.vinfast.aitesthub.exception.GlobalException;
 import vn.vinfast.aitesthub.exception.ResourceException;
 import vn.vinfast.aitesthub.result.enums.ReviewStatus;
 import vn.vinfast.aitesthub.result.response.AssertionResultResponse;
 import vn.vinfast.aitesthub.result.response.ManualReviewResponse;
+import vn.vinfast.aitesthub.result.response.RunComparisonResponse;
+import vn.vinfast.aitesthub.result.response.RunComparisonRunSummary;
+import vn.vinfast.aitesthub.result.response.RunComparisonSummary;
 import vn.vinfast.aitesthub.result.response.RunReportResponse;
 import vn.vinfast.aitesthub.result.response.TestResultReportItem;
+import vn.vinfast.aitesthub.result.service.RunComparisonService;
 import vn.vinfast.aitesthub.result.service.ReportService;
+import vn.vinfast.aitesthub.run.enums.RunStatus;
 
 /**
  * @author nghlong3004 (Long Nguyen Hoang)
@@ -54,17 +60,26 @@ class ResultControllerTest {
     ReportService reportService() {
       return new MockReportService();
     }
+
+    @Bean
+    RunComparisonService runComparisonService() {
+      return new MockRunComparisonService();
+    }
   }
 
   @Autowired private MockMvc mockMvc;
 
   private final UUID runId = UUID.randomUUID();
+  private final UUID candidateRunId = UUID.randomUUID();
   private final String currentUsername = "qc@test.com";
 
   @BeforeEach
   void setUp() {
     MockReportService.expectedRunId = runId;
     MockReportService.throwNotFound = false;
+    MockRunComparisonService.expectedBaseRunId = runId;
+    MockRunComparisonService.expectedCandidateRunId = candidateRunId;
+    MockRunComparisonService.throwNotComparable = false;
     SecurityContextHolder.clearContext();
   }
 
@@ -98,6 +113,35 @@ class ResultControllerTest {
         .perform(get("/api/v1/runs/{runId}/report", runId).with(currentJwt()))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("EVALUATION_RUN_NOT_FOUND"));
+  }
+
+  @Test
+  void compareRuns_returnsComparisonSummary() throws Exception {
+    mockMvc
+        .perform(
+            get("/api/v1/runs/compare")
+                .queryParam("baseRunId", runId.toString())
+                .queryParam("candidateRunId", candidateRunId.toString())
+                .with(currentJwt()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.baseRun.publicId").value(runId.toString()))
+        .andExpect(jsonPath("$.candidateRun.publicId").value(candidateRunId.toString()))
+        .andExpect(jsonPath("$.summary.regressions").value(1))
+        .andExpect(jsonPath("$.summary.fixes").value(2));
+  }
+
+  @Test
+  void compareRuns_notComparable_returns422() throws Exception {
+    MockRunComparisonService.throwNotComparable = true;
+
+    mockMvc
+        .perform(
+            get("/api/v1/runs/compare")
+                .queryParam("baseRunId", runId.toString())
+                .queryParam("candidateRunId", candidateRunId.toString())
+                .with(currentJwt()))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.code").value("RUN_COMPARISON_NOT_COMPARABLE"));
   }
 
   private RequestPostProcessor currentJwt() {
@@ -165,6 +209,39 @@ class ResultControllerTest {
           .uncertain(0)
           .passRate(new BigDecimal("0.5000"))
           .results(List.of(item))
+          .build();
+    }
+  }
+
+  static class MockRunComparisonService implements RunComparisonService {
+    static UUID expectedBaseRunId = UUID.randomUUID();
+    static UUID expectedCandidateRunId = UUID.randomUUID();
+    static boolean throwNotComparable = false;
+
+    @Override
+    public RunComparisonResponse compareRuns(UUID baseRunId, UUID candidateRunId) {
+      if (throwNotComparable) {
+        throw new BusinessException(ErrorCode.RUN_COMPARISON_NOT_COMPARABLE);
+      }
+      return RunComparisonResponse.builder()
+          .baseRun(
+              RunComparisonRunSummary.builder()
+                  .publicId(expectedBaseRunId)
+                  .status(RunStatus.COMPLETED)
+                  .build())
+          .candidateRun(
+              RunComparisonRunSummary.builder()
+                  .publicId(expectedCandidateRunId)
+                  .status(RunStatus.COMPLETED)
+                  .build())
+          .summary(
+              RunComparisonSummary.builder()
+                  .totalComparableCases(10)
+                  .regressions(1)
+                  .fixes(2)
+                  .unchanged(7)
+                  .build())
+          .diffs(List.of())
           .build();
     }
   }

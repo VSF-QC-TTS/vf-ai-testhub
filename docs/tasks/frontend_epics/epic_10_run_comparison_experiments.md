@@ -1,6 +1,6 @@
 # Epic 10: Run Comparison & A/B Experiments
 
-Status: BLOCKED until backend comparison/experiment contracts exist.
+Status: PENDING for Run Compare UI. A/B Experiment UI remains BLOCKED until backend experiment/variant contracts exist.
 
 Goal: help QA users compare completed runs and, later, manage planned A/B experiments without pretending independent runs are controlled experiments.
 
@@ -19,6 +19,7 @@ Backend:
 - `docs/tasks/backend_epics/E11_Experiment_Comparison.md`
 - `apps/api/src/main/java/vn/vinfast/aitesthub/run/`
 - `apps/api/src/main/java/vn/vinfast/aitesthub/result/`
+- `GET /api/v1/runs/compare?baseRunId=&candidateRunId=`
 - Any future `comparison` or `experiment` package.
 
 Frontend:
@@ -34,14 +35,15 @@ Frontend:
 Steps:
 
 1. Read backend controllers before exposing any compare/experiment button.
-2. Add API types only for implemented response DTOs.
-3. Hide or disable comparison UI when backend support is missing.
-4. If disabled, show a concise roadmap label in development builds only or in documented product planning surfaces, not as broken user-facing controls.
+2. Add API types for implemented run comparison response DTOs.
+3. Hide or disable experiment UI when backend experiment support is missing.
+4. If experiment controls are disabled, show a concise roadmap label in development builds only or in documented product planning surfaces, not as broken user-facing controls.
 
 Acceptance:
 
 - No frontend-only fake comparison payloads.
 - No hardcoded demo A/B rows from the mentor prototype.
+- Run Compare uses `GET /api/v1/runs/compare`.
 
 ## Task 10.2: Run Compare UI
 

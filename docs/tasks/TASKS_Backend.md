@@ -16,8 +16,8 @@ These choices are already implemented. Do not rebuild them unless the task expli
 | Auth | Local email/password auth, Google/GitHub OAuth2 login, custom JWT issuing |
 | JWT validation | Spring Security OAuth2 Resource Server with `JwtDecoder`; no separate handwritten JWT request filter is needed |
 | Refresh flow | HttpOnly `refresh_token` cookie, rotated by `POST /api/v1/auth/refresh-token` |
-| Implemented APIs | Auth, OAuth2, `GET /api/v1/users/me`, Project CRUD/archive, Target CRUD/parse-curl, ResponseMapping get/save, Dataset CRUD/archive, TestCase CRUD/list/filter/import, Assertion CRUD/list, ToolExpectation CRUD/list, Rubric CRUD/archive/list, Run trigger/status/history, Result ingestion/report/listing, ManualReview batch submission |
-| Not yet implemented | Dashboard aggregate endpoint, run comparison endpoint, A/B experiment/variant/versioning contracts |
+| Implemented APIs | Auth, OAuth2, `GET /api/v1/users/me`, Project CRUD/archive, Target CRUD/parse-curl, ResponseMapping get/save, Dataset CRUD/archive, TestCase CRUD/list/filter/import, Assertion CRUD/list, ToolExpectation CRUD/list, Rubric CRUD/archive/list, Run trigger/status/history, Result ingestion/report/listing/comparison, ManualReview batch submission |
+| Not yet implemented | Dashboard aggregate endpoint, A/B experiment/variant/versioning contracts |
 
 ## Status Legend
 
@@ -130,9 +130,11 @@ graph TD
 Comparison/A-B clarification:
 
 - Current backend supports independent runs and reports.
-- Current backend does not expose a run compare endpoint in code and does not have experiment/variant entities.
+- Current backend exposes `GET /api/v1/runs/compare?baseRunId=&candidateRunId=` for completed compatible runs.
+- Current backend does not have experiment/variant entities.
 - `A/B Experiment` should be planned as E11 work, not inferred from the UI prototype.
-- Until E11 exists, frontend may only show comparison controls when a real backend compare contract is implemented.
+- Frontend may show "Compare runs" for compatible completed runs, but must not label it as A/B Experiment until
+  experiment/variant contracts exist.
 
 ## Resolved Decisions
 

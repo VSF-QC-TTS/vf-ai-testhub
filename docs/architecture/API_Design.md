@@ -3687,6 +3687,9 @@ curl -X POST https://host/api/v1/runs/run_efg012/review \
 
 Lấy chi tiết sự khác biệt giữa 2 lần chạy trên cùng một Dataset (thường là để đối chiếu Regression test hoặc so sánh version LLM).
 
+Current implementation note: endpoint này trả JSON trực tiếp, không bọc trong `{ code, data }`. Hai run phải `COMPLETED`,
+cùng dataset, cùng `runMode`, cùng `selectedSection`, và cùng tập `selectedCaseIds`.
+
 **Query Parameters:**
 
 | Name | Type | Req | Mô tả |
@@ -3698,51 +3701,62 @@ Lấy chi tiết sự khác biệt giữa 2 lần chạy trên cùng một Datas
 
 ```json
 {
-  "code": "SUCCESS",
-  "data": {
-    "baseRun": {
-      "id": "run_base_1",
-      "name": "v3.1",
-      "targetName": "GPT-4"
-    },
-    "compareRun": {
-      "id": "run_comp_2",
-      "name": "v3.2",
-      "targetName": "GPT-4o"
-    },
-    "summary": {
-      "totalCases": 120,
-      "regressions": 3,
-      "fixed": 5,
-      "unchanged": 112
-    },
-    "diffs": [
-      {
-        "testCaseId": "tc_123",
-        "input": "Phí ship về Đà Nẵng bao nhiêu?",
-        "statusShift": "PASS_TO_FAIL",
-        "latencyShift": "+120ms",
-        "baseResult": {
-          "latencyMs": 380,
-          "autoStatus": "PASSED"
-        },
-        "compareResult": {
-          "latencyMs": 500,
-          "autoStatus": "FAILED"
-        },
-        "assertionDiffs": [
-          {
-            "assertionId": "as_789",
-            "field": "$.intent",
-            "baseStatus": "PASSED",
-            "baseOutput": "shipping_fee",
-            "compareStatus": "FAILED",
-            "compareOutput": "faq"
-          }
-        ]
-      }
-    ]
-  }
+  "baseRun": {
+    "publicId": "11111111-1111-1111-1111-111111111111",
+    "datasetPublicId": "22222222-2222-2222-2222-222222222222",
+    "datasetName": "Checkout regression",
+    "targetPublicId": "33333333-3333-3333-3333-333333333333",
+    "targetName": "Chatbot v3.1",
+    "status": "COMPLETED"
+  },
+  "candidateRun": {
+    "publicId": "44444444-4444-4444-4444-444444444444",
+    "datasetPublicId": "22222222-2222-2222-2222-222222222222",
+    "datasetName": "Checkout regression",
+    "targetPublicId": "55555555-5555-5555-5555-555555555555",
+    "targetName": "Chatbot v3.2",
+    "status": "COMPLETED"
+  },
+  "summary": {
+    "totalComparableCases": 120,
+    "regressions": 3,
+    "fixes": 5,
+    "unchanged": 110,
+    "statusChanged": 2,
+    "newCases": 0,
+    "missingCases": 0,
+    "basePassRate": 0.8417,
+    "candidatePassRate": 0.8583,
+    "passRateDelta": 0.0166,
+    "averageLatencyDeltaMs": 42
+  },
+  "diffs": [
+    {
+      "testCasePublicId": "66666666-6666-6666-6666-666666666666",
+      "externalId": "TC-123",
+      "testCaseName": "Shipping fee intent",
+      "testCaseInput": "Phí ship về Đà Nẵng bao nhiêu?",
+      "baseStatus": "PASSED",
+      "candidateStatus": "FAILED",
+      "statusShift": "PASS_TO_FAIL",
+      "baseLatencyMs": 380,
+      "candidateLatencyMs": 500,
+      "latencyDeltaMs": 120,
+      "assertionDiffs": [
+        {
+          "assertionPublicId": "77777777-7777-7777-7777-777777777777",
+          "fieldPath": "$.intent",
+          "baseStatus": "PASSED",
+          "candidateStatus": "FAILED",
+          "statusShift": "PASS_TO_FAIL",
+          "expectedValue": "shipping_fee",
+          "baseActualValue": "shipping_fee",
+          "candidateActualValue": "faq"
+        }
+      ],
+      "toolExpectationDiffs": []
+    }
+  ]
 }
 ```
 

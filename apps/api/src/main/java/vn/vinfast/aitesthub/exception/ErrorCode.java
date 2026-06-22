@@ -171,6 +171,14 @@ public enum ErrorCode {
       HttpStatus.NOT_FOUND.value(),
       "EVALUATION_RUN_NOT_FOUND",
       "No evaluation run found with the provided ID."),
+  RUN_COMPARISON_NOT_READY(
+      422,
+      "RUN_COMPARISON_NOT_READY",
+      "Both evaluation runs must be completed before comparison."),
+  RUN_COMPARISON_NOT_COMPARABLE(
+      422,
+      "RUN_COMPARISON_NOT_COMPARABLE",
+      "Evaluation runs must belong to the same dataset and scope before comparison."),
   JOB_NOT_FOUND(
       HttpStatus.NOT_FOUND.value(), "JOB_NOT_FOUND", "No job found with the provided ID."),
   EVALUATION_RESULT_NOT_FOUND(

@@ -181,6 +181,9 @@ Implemented API slices after auth:
 - `GET /api/v1/runs/{runId}/report`: get aggregate run report with final-status counts, pass rate, result details,
   assertion/tool breakdowns, and manual review state.
 - `GET /api/v1/runs/{runId}/results`: get only the result detail list for a run.
+- `GET /api/v1/runs/compare?baseRunId=&candidateRunId=`: compare two completed runs on the same dataset/scope and
+  return base/candidate run summaries, regressions, fixes, unchanged/status-changed counts, new/missing cases, pass-rate
+  delta, average latency delta, testcase diffs, assertion diffs, and tool expectation diffs.
 - `POST /api/v1/runs/{runId}/review`: submit batch manual review decisions for test results in a completed run.
 
 Manual review service state:
@@ -192,6 +195,9 @@ Manual review service state:
 - `ReportService.getRunReport(...)` returns run summary counts, pass rate, per-test result details, assertion/tool
   expectation breakdowns, and manual review state. Summary counts use `finalStatus`, so manual overrides affect pass
   rate.
+- `RunComparisonService.compareRuns(...)` is read-only and on-demand. It requires both runs to be `COMPLETED`, from the
+  same dataset, and using the same run mode/selected section/selected case IDs. It compares persisted auto result rows;
+  full A/B experiment/variant orchestration is not implemented yet.
 
 AI generation service state:
 
@@ -312,6 +318,8 @@ Focused tests:
 - Result/ManualReview controller focused verification on 2026-06-22:
   `rtk bash mvnw -Dtest=ResultControllerTest,ManualReviewControllerTest,ManualReviewServiceImplTest test`
   -> 7 tests, 0 failures/errors.
+- Run comparison focused verification on 2026-06-22:
+  `rtk bash mvnw -Dtest=RunComparisonServiceImplTest,ResultControllerTest test` -> 9 tests, 0 failures/errors.
 - AI testcase generator compile verification on 2026-06-22:
   `rtk bash mvnw compile` -> success.
 - AI assertion suggestion compile verification on 2026-06-22:

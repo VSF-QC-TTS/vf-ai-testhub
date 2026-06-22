@@ -37,6 +37,14 @@ public class GlobalException {
     return problemResponse(errorCode);
   }
 
+  @ExceptionHandler(BusinessException.class)
+  public ResponseEntity<ErrorResponse> handleBusinessException(
+      final BusinessException e, HttpServletRequest request) {
+    log.warn("Business exception occurred: {}", e.getMessage());
+    final var errorCode = e.getResponse().withInstance(request.getRequestURI());
+    return problemResponse(errorCode);
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
       MethodArgumentNotValidException ex, HttpServletRequest request) {
