@@ -18,8 +18,9 @@ import { useTarget, useCreateTarget, useUpdateTarget, useParseCurl } from "../ta
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { projectTargetsPath } from "../../projects/project.routes";
 import { ApiError } from "@/lib/api/errors";
+import { toast } from "sonner";
 
-const SELECT_CLASS = "flex h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 dark:border-zinc-800 dark:bg-zinc-950 dark:ring-offset-zinc-950 disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-500 dark:placeholder:text-zinc-400 dark:focus-visible:ring-zinc-300";
+const SELECT_CLASS = "flex h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 dark:border-zinc-800 dark:bg-zinc-950 dark:ring-offset-zinc-950 disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-500 dark:placeholder:text-zinc-400 dark:focus-visible:ring-zinc-300 transition-colors hover:border-zinc-400 dark:hover:border-zinc-600";
 
 function SectionHeader({ icon: Icon, title, className = "mb-4" }: { icon: React.ElementType; title: string; className?: string }) {
   return (
@@ -98,8 +99,10 @@ export function TargetConfigurationWorkbench() {
       if (parsed.headersTemplate) setHeadersJson(JSON.stringify(parsed.headersTemplate, null, 2));
       if (parsed.bodyTemplate) setBodyJson(JSON.stringify(parsed.bodyTemplate, null, 2));
       setCurlInput(""); // Clear after success
+      toast.success(t("common:success"));
     } catch (e) {
       console.error("Failed to parse cURL", e);
+      toast.error(t("common:error"));
     }
   };
 
@@ -131,11 +134,19 @@ export function TargetConfigurationWorkbench() {
 
     if (isNew) {
       createMutation.mutate(payload, {
-        onSuccess: () => navigate(listPath),
+        onSuccess: () => {
+          toast.success(t("common:success"));
+          navigate(listPath);
+        },
+        onError: () => toast.error(t("common:error"))
       });
     } else {
       updateMutation.mutate(payload, {
-        onSuccess: () => navigate(listPath),
+        onSuccess: () => {
+          toast.success(t("common:success"));
+          navigate(listPath);
+        },
+        onError: () => toast.error(t("common:error"))
       });
     }
   };

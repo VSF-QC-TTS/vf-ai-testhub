@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Toaster } from 'sonner'
 import './index.css'
 import App from './App.tsx'
 import { I18nProvider } from './app/providers/I18nProvider.tsx'
@@ -11,7 +12,7 @@ async function enableMocking() {
   }
 
   const { worker } = await import('./mocks/browser')
-  
+
   // `worker.start()` returns a Promise that resolves
   // once the Service Worker is up and ready to intercept requests.
   return worker.start({
@@ -24,6 +25,7 @@ enableMocking().then(() => {
     <StrictMode>
       <I18nProvider>
         <QueryProvider>
+          <Toaster position="top-right" richColors />
           <App />
         </QueryProvider>
       </I18nProvider>

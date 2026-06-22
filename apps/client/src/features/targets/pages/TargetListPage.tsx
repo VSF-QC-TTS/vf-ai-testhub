@@ -13,6 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { projectTargetsPath } from "../../projects/project.routes";
 import type { TargetResponse } from "../targets.types";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function TargetListPage() {
   const { t } = useTranslation();
@@ -45,7 +46,13 @@ export function TargetListPage() {
     }
 
     deleteMutation.mutate(targetPendingDelete.publicId, {
-      onSuccess: () => setTargetPendingDelete(null),
+      onSuccess: () => {
+        setTargetPendingDelete(null);
+        toast.success(t("common:success"));
+      },
+      onError: () => {
+        toast.error(t("common:error"));
+      }
     });
   };
 

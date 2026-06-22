@@ -13,6 +13,7 @@ import { getProjectSchema, type ProjectFormData } from "../projects.schemas";
 import { useProjectStore } from "../project.store";
 import { projectTargetsPath } from "../project.routes";
 import { useCreateProject } from "../projects.queries";
+import { toast } from "sonner";
 
 export function ProjectCreatePage() {
   const { t } = useTranslation();
@@ -32,8 +33,10 @@ export function ProjectCreatePage() {
     createMutation.mutate(data, {
       onSuccess: (project) => {
         setLastProject(project.id);
+        toast.success(t("common:success"));
         navigate(projectTargetsPath(project.id), { replace: true });
       },
+      onError: () => toast.error(t("common:error"))
     });
   };
 
