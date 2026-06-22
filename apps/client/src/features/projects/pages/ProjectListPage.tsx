@@ -14,6 +14,7 @@ import type { ProjectResponse } from "../projects.types";
 import { useProjectStore } from "../project.store";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { projectTargetsPath } from "../project.routes";
+import { toast } from "sonner";
 
 export function ProjectListPage() {
   const { t } = useTranslation();
@@ -62,7 +63,11 @@ export function ProjectListPage() {
     }
 
     archiveMutation.mutate(projectPendingArchive.id, {
-      onSuccess: () => setProjectPendingArchive(null),
+      onSuccess: () => {
+        setProjectPendingArchive(null);
+        toast.success(t("common:success"));
+      },
+      onError: () => toast.error(t("common:error"))
     });
   };
 

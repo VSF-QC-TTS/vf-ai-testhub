@@ -11,6 +11,7 @@ import { useCreateProject, useUpdateProject } from "../projects.queries";
 import type { ProjectResponse } from "../projects.types";
 import { motion } from "framer-motion";
 import { ApiError } from "@/lib/api/errors";
+import { toast } from "sonner";
 
 interface ProjectFormDialogProps {
   open: boolean;
@@ -56,14 +57,18 @@ export function ProjectFormDialog({ open, onOpenChange, project }: ProjectFormDi
     if (isEditing) {
       updateMutation.mutate(data, {
         onSuccess: () => {
+          toast.success(t("common:success"));
           onOpenChange(false);
         },
+        onError: () => toast.error(t("common:error"))
       });
     } else {
       createMutation.mutate(data, {
         onSuccess: () => {
+          toast.success(t("common:success"));
           onOpenChange(false);
         },
+        onError: () => toast.error(t("common:error"))
       });
     }
   };
