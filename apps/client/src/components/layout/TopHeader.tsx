@@ -7,6 +7,7 @@ import { useProjects } from "../../features/projects/projects.queries";
 import { useProjectStore } from "../../features/projects/project.store";
 import { findProject, getProjectSwitchPath, getRouteProjectId } from "../../features/projects/project.routes";
 import { ProjectSwitcher } from "./ProjectSwitcher";
+import { ThemeToggle } from "./ThemeToggle";
 
 // This would typically come from shadcn/ui but we'll mock it if it's not ready
 // and the user will run shadcn add later.
@@ -38,7 +39,7 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
   };
 
   return (
-    <header 
+    <header
       className={cn(
         "sticky top-0 z-10 flex h-14 lg:h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-md pl-14 pr-4 md:px-4 lg:px-6",
         className
@@ -88,12 +89,14 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
         </nav>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Languages className="h-5 w-5" />
-              <span className="sr-only">{t("common.navigation.toggleLanguage")}</span>
+              <span className="sr-only">{t("common:navigation.toggleLanguage", "Toggle language")}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -106,16 +109,16 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <User className="h-5 w-5" />
-              <span className="sr-only">{t("common.navigation.toggleUserMenu")}</span>
+              <span className="sr-only">{t("common:navigation.toggleUserMenu", "Toggle user menu")}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{t("common.navigation.myAccount")}</DropdownMenuLabel>
+            <DropdownMenuLabel>{t("common:navigation.myAccount", "My Account")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>{t("common.navigation.profile")}</DropdownMenuItem>
-            <DropdownMenuItem>{t("common.navigation.settings")}</DropdownMenuItem>
+            <DropdownMenuItem>{t("common:navigation.profile", "Profile")}</DropdownMenuItem>
+            <DropdownMenuItem>{t("common:navigation.settings", "Settings")}</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">{t("common.navigation.logout")}</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive">{t("common:navigation.logout", "Logout")}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
