@@ -25,10 +25,10 @@ const SELECT_CLASS = "flex h-10 w-full rounded-xl border border-zinc-200 bg-whit
 function SectionHeader({ icon: Icon, title, className = "mb-4" }: { icon: React.ElementType; title: string; className?: string }) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <div className="h-8 w-8 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
-        <Icon className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+      <div className="h-10 w-10 rounded-xl bg-zinc-100 dark:bg-zinc-800/80 flex items-center justify-center border border-transparent dark:border-zinc-700/50">
+        <Icon className="h-5 w-5 text-zinc-600 dark:text-zinc-300" />
       </div>
-      <h2 className="text-lg font-medium">{title}</h2>
+      <h2 className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{title}</h2>
     </div>
   );
 }
@@ -183,7 +183,8 @@ export function TargetConfigurationWorkbench() {
           {/* Main Configuration */}
           <div className="lg:col-span-2 space-y-8">
             {/* Quick cURL Import */}
-            <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-6 rounded-3xl shadow-sm">
+            <div className="relative overflow-hidden bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 dark:opacity-20 pointer-events-none" />
               <SectionHeader icon={Code} title={t("targets:workbench.quickImport.title")} />
               <div className="flex gap-3">
                 <Textarea
@@ -205,7 +206,7 @@ export function TargetConfigurationWorkbench() {
             </div>
 
             {/* HTTP Configuration */}
-            <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-6 rounded-3xl shadow-sm space-y-6">
+            <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm space-y-6 hover:shadow-md transition-shadow">
               <SectionHeader icon={Link2} title={t("targets:workbench.httpConfig.title")} className="mb-2" />
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -282,7 +283,7 @@ export function TargetConfigurationWorkbench() {
             </div>
 
             {/* Response Mapping */}
-            <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-6 rounded-3xl shadow-sm space-y-6">
+            <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm space-y-6 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <SectionHeader icon={Braces} title={t("targets:workbench.responseMapping.title")} className="mb-0" />
                 <div className="text-sm bg-zinc-100 dark:bg-zinc-900 px-3 py-1 rounded-full text-zinc-500 font-mono">
@@ -361,7 +362,7 @@ export function TargetConfigurationWorkbench() {
 
           {/* Sidebar / Metadata */}
           <div className="space-y-6">
-            <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-6 rounded-3xl shadow-sm space-y-6">
+            <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm space-y-6 hover:shadow-md transition-shadow">
               <SectionHeader icon={Settings2} title={t("targets:workbench.settings.title")} className="mb-2" />
 
               <FormField
