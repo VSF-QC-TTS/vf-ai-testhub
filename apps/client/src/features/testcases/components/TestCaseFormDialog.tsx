@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { AssertionList } from "../../assertions/components/AssertionList";
+import { ToolExpectationList } from "../../toolexpectations/components/ToolExpectationList";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/Input";
 import { Textarea } from "../../../components/ui/textarea";
@@ -178,6 +179,7 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
           <TabsList className="mx-6 mt-4 w-fit">
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="assertions" disabled={!isEditing}>Assertions</TabsTrigger>
+            <TabsTrigger value="toolexpectations" disabled={!isEditing}>Tool Expectations</TabsTrigger>
           </TabsList>
           <TabsContent value="details" className="m-0 border-none p-0 outline-none">
             <Form {...form}>
@@ -369,6 +371,9 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
         </TabsContent>
         <TabsContent value="assertions" className="m-0 border-none px-6 pb-6 pt-0 outline-none">
           {testCase && <AssertionList testCaseId={testCase.publicId} />}
+        </TabsContent>
+        <TabsContent value="toolexpectations" className="m-0 border-none px-6 pb-6 pt-0 outline-none">
+          {testCase && <ToolExpectationList testCaseId={testCase.publicId} />}
         </TabsContent>
         </Tabs>
       </DialogContent>

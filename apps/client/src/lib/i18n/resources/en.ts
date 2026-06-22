@@ -503,4 +503,65 @@ export const en = {
       }
     }
   },
+  toolexpectations: {
+    title: "Tool Expectations",
+    addExpectation: "Add Expectation",
+    emptyDesc: "No tool expectations configured for this test case.",
+    disabled: "Disabled",
+    types: {
+      TOOL_MUST_BE_CALLED: "Tool Must Be Called",
+      TOOL_MUST_NOT_BE_CALLED: "Tool Must Not Be Called",
+      TOOL_ARGS_MATCH: "Tool Args Match",
+      TOOL_SEQUENCE_MATCH: "Tool Sequence Match",
+      TOOL_CALL_COUNT: "Tool Call Count",
+      TOOL_OUTPUT_USED_IN_ANSWER: "Tool Output Used in Answer",
+      AGENT_EQUALS: "Agent Equals",
+      AGENT_NOT_EQUALS: "Agent Not Equals",
+      AGENT_STEP_CONTAINS: "Agent Step Contains"
+    },
+    delete: {
+      title: "Delete Expectation",
+      desc: "Are you sure you want to delete this tool expectation?",
+      deleting: "Deleting..."
+    },
+    form: {
+      createTitle: "Create Expectation",
+      editTitle: "Edit Expectation",
+      createDesc: "Add a tool or agent expectation.",
+      editDesc: "Modify the tool or agent expectation.",
+      expectationType: "Expectation Type",
+      targetSource: "Target Source",
+      toolName: "Tool Name",
+      toolNamePlaceholder: "e.g. search_product",
+      agentName: "Agent Name",
+      agentNamePlaceholder: "e.g. product_search_agent",
+      argumentAssertions: "Argument Assertions (JSON Array)",
+      formatJson: "Format JSON",
+      sequence: "Sequence (comma separated)",
+      sequencePlaceholder: "toolA, toolB, toolC",
+      sequenceHint: "List the exact sequence of tools expected to be called.",
+      minCalls: "Minimum Calls",
+      maxCalls: "Maximum Calls",
+      severity: "Severity",
+      required: "Required",
+      enabled: "Enabled",
+      validation: {
+        maxLength: "Must not exceed {{max}} characters",
+        invalidJsonArray: "Must be a valid JSON array of objects",
+        minCalls: "Must be at least 0",
+        maxCalls: "Must be at least 0",
+        minOrder: "Must be at least 0",
+        maxOrder: "Must not exceed 1000000"
+      },
+      messages: {
+        created: "Expectation created",
+        createFailed: "Failed to create expectation",
+        updated: "Expectation updated",
+        updateFailed: "Failed to update expectation",
+        deleted: "Expectation deleted",
+        deleteFailed: "Failed to delete expectation",
+        unsavedChanges: "You have unsaved changes. Close anyway?"
+      }
+    }
+  },
 };

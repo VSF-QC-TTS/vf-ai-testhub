@@ -503,4 +503,65 @@ export const vi = {
       }
     }
   },
+  toolexpectations: {
+    title: "Kỳ vọng Công cụ (Tool Expectations)",
+    addExpectation: "Thêm kỳ vọng",
+    emptyDesc: "Chưa cấu hình kỳ vọng công cụ nào cho kịch bản này.",
+    disabled: "Đã tắt",
+    types: {
+      TOOL_MUST_BE_CALLED: "Phải gọi công cụ",
+      TOOL_MUST_NOT_BE_CALLED: "Không được gọi công cụ",
+      TOOL_ARGS_MATCH: "Đối số công cụ khớp",
+      TOOL_SEQUENCE_MATCH: "Chuỗi công cụ khớp",
+      TOOL_CALL_COUNT: "Số lần gọi công cụ",
+      TOOL_OUTPUT_USED_IN_ANSWER: "Kết quả công cụ dùng trong câu trả lời",
+      AGENT_EQUALS: "Agent khớp",
+      AGENT_NOT_EQUALS: "Agent không khớp",
+      AGENT_STEP_CONTAINS: "Bước của Agent có chứa"
+    },
+    delete: {
+      title: "Xóa kỳ vọng",
+      desc: "Bạn có chắc chắn muốn xóa kỳ vọng công cụ này không?",
+      deleting: "Đang xóa..."
+    },
+    form: {
+      createTitle: "Tạo kỳ vọng",
+      editTitle: "Sửa kỳ vọng",
+      createDesc: "Thêm quy tắc kỳ vọng công cụ hoặc Agent.",
+      editDesc: "Chỉnh sửa quy tắc kỳ vọng.",
+      expectationType: "Loại kỳ vọng",
+      targetSource: "Nguồn mục tiêu",
+      toolName: "Tên công cụ",
+      toolNamePlaceholder: "VD: search_product",
+      agentName: "Tên Agent",
+      agentNamePlaceholder: "VD: product_search_agent",
+      argumentAssertions: "Kiểm tra đối số (JSON Array)",
+      formatJson: "Định dạng JSON",
+      sequence: "Chuỗi (ngăn cách bằng dấu phẩy)",
+      sequencePlaceholder: "toolA, toolB, toolC",
+      sequenceHint: "Liệt kê chính xác chuỗi các công cụ dự kiến sẽ được gọi.",
+      minCalls: "Số lần gọi tối thiểu",
+      maxCalls: "Số lần gọi tối đa",
+      severity: "Mức độ nghiêm trọng",
+      required: "Bắt buộc (Required)",
+      enabled: "Trạng thái bật",
+      validation: {
+        maxLength: "Không vượt quá {{max}} ký tự",
+        invalidJsonArray: "Phải là mảng JSON hợp lệ chứa các object",
+        minCalls: "Phải lớn hơn hoặc bằng 0",
+        maxCalls: "Phải lớn hơn hoặc bằng 0",
+        minOrder: "Tối thiểu là 0",
+        maxOrder: "Không vượt quá 1000000"
+      },
+      messages: {
+        created: "Đã tạo kỳ vọng",
+        createFailed: "Lỗi tạo kỳ vọng",
+        updated: "Đã cập nhật kỳ vọng",
+        updateFailed: "Lỗi cập nhật kỳ vọng",
+        deleted: "Đã xóa kỳ vọng",
+        deleteFailed: "Lỗi xóa kỳ vọng",
+        unsavedChanges: "Bạn có thay đổi chưa lưu. Vẫn đóng?"
+      }
+    }
+  },
 };
