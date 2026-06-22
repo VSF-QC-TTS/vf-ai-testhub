@@ -25,6 +25,12 @@ export const en = {
     navigation: {
       toggleMenu: "Toggle menu",
       menu: "Navigation menu",
+      toggleLanguage: "Toggle language",
+      toggleUserMenu: "Toggle user menu",
+      myAccount: "My Account",
+      profile: "Profile",
+      settings: "Settings",
+      logout: "Logout",
     },
     comingSoon: {
       title: "Feature coming soon",

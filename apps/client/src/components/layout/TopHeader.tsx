@@ -24,7 +24,7 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
   const location = useLocation();
   const navigate = useNavigate();
   const paths = location.pathname.split("/").filter(Boolean);
-  const { t, i18n } = useTranslation("common");
+  const { t, i18n } = useTranslation();
   const { data } = useProjects();
   const lastProjectId = useProjectStore((state) => state.lastProjectId);
   const setLastProject = useProjectStore((state) => state.setLastProject);
@@ -54,12 +54,27 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
           className="w-[min(58vw,240px)] md:hidden"
         />
         <nav aria-label="Breadcrumb" className="hidden items-center text-sm text-muted-foreground whitespace-nowrap md:flex">
-          <Link to="/" className="hover:text-foreground transition-colors">{t("home")}</Link>
+          <Link to="/" className="hover:text-foreground transition-colors">{t("common.home")}</Link>
           {paths.map((path, index) => {
             const routeTo = `/${paths.slice(0, index + 1).join("/")}`;
             const isLast = index === paths.length - 1;
-            const name = path.charAt(0).toUpperCase() + path.slice(1);
-            
+
+            let name = path;
+            const translationKey = `nav.${path}`;
+            const translated = t(translationKey);
+
+            // Check if it's translated, else if it's the current project ID, else format it
+            if (translated !== translationKey && translated !== path && translated !== `nav.${path}`) {
+              name = translated;
+            } else if (currentProject && path === currentProject.id) {
+              name = currentProject.name;
+            } else if (path.length > 20 && path.includes("-")) {
+              // Likely a UUID for a target/dataset, truncate for readability
+              name = `${path.substring(0, 8)}...`;
+            } else {
+              name = path.charAt(0).toUpperCase() + path.slice(1);
+            }
+
             return (
               <div key={path} className="flex items-center">
                 <ChevronRight className="mx-1 h-4 w-4 shrink-0" />
@@ -79,7 +94,7 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Languages className="h-5 w-5" />
-              <span className="sr-only">Toggle language</span>
+              <span className="sr-only">{t("common.navigation.toggleLanguage")}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -87,21 +102,21 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
             <DropdownMenuItem onClick={() => i18n.changeLanguage("vi")}>Tiếng Việt</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <User className="h-5 w-5" />
-              <span className="sr-only">Toggle user menu</span>
+              <span className="sr-only">{t("common.navigation.toggleUserMenu")}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{t("common.navigation.myAccount")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>{t("common.navigation.profile")}</DropdownMenuItem>
+            <DropdownMenuItem>{t("common.navigation.settings")}</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Logout</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive">{t("common.navigation.logout")}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

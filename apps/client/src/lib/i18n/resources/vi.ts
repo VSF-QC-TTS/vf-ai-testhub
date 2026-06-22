@@ -25,6 +25,12 @@ export const vi = {
     navigation: {
       toggleMenu: "Mở menu",
       menu: "Menu điều hướng",
+      toggleLanguage: "Chuyển ngôn ngữ",
+      toggleUserMenu: "Mở menu người dùng",
+      myAccount: "Tài khoản của tôi",
+      profile: "Hồ sơ cá nhân",
+      settings: "Cài đặt",
+      logout: "Đăng xuất",
     },
     comingSoon: {
       title: "Tính năng sắp ra mắt",
