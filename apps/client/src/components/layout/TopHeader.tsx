@@ -54,7 +54,6 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
           className="w-[min(58vw,240px)] md:hidden"
         />
         <nav aria-label="Breadcrumb" className="hidden items-center text-sm text-muted-foreground whitespace-nowrap md:flex">
-          <Link to="/" className="hover:text-foreground transition-colors">{t("common.home")}</Link>
           {paths.map((path, index) => {
             const routeTo = `/${paths.slice(0, index + 1).join("/")}`;
             const isLast = index === paths.length - 1;
@@ -77,7 +76,7 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
 
             return (
               <div key={path} className="flex items-center">
-                <ChevronRight className="mx-1 h-4 w-4 shrink-0" />
+                {index > 0 && <ChevronRight className="mx-1 h-4 w-4 shrink-0" />}
                 {isLast ? (
                   <span className="font-medium text-foreground" aria-current="page">{name}</span>
                 ) : (
