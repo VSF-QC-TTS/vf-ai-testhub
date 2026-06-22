@@ -145,6 +145,28 @@ export const vi = {
       targetCount_one: "{{count}} mục tiêu",
       targetCount_other: "{{count}} mục tiêu",
       notConfigured: "Chưa cấu hình",
+      settings: "Cài đặt dự án",
+      resources: "Tài nguyên dự án",
+      setup: {
+        target: {
+          title: "Cấu hình mục tiêu đầu tiên",
+          description: "Bắt đầu bằng cách kết nối với một API endpoint hoặc môi trường mà bạn muốn kiểm thử."
+        },
+        dataset: {
+          title: "Nhập dữ liệu",
+          description: "Bạn đã có mục tiêu. Bây giờ hãy nhập ca kiểm thử hoặc bộ dữ liệu để bắt đầu chạy.",
+          action: "Nhập dữ liệu"
+        },
+        run: {
+          title: "Chạy kiểm thử đầu tiên",
+          description: "Môi trường và dữ liệu đã sẵn sàng. Thực thi kiểm thử để xem kết quả.",
+          action: "Chạy dữ liệu"
+        },
+        dashboard: {
+          title: "Dashboard đang được xây dựng",
+          description: "Khi có dữ liệu chạy kiểm thử, khu vực này sẽ hiển thị các chỉ số, biểu đồ xu hướng và các lượt chạy gần đây."
+        }
+      }
     },
     list: {
       desc: "Quản lý các không gian làm việc và môi trường kiểm thử API của bạn.",

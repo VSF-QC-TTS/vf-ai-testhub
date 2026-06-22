@@ -37,9 +37,9 @@ export function ProjectOverviewPage() {
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
             <Target className="h-8 w-8 text-zinc-400" />
           </div>
-          <h2 className="text-xl font-medium mb-2">Configure your first Target</h2>
+          <h2 className="text-xl font-medium mb-2">{t("projects:overview.setup.target.title")}</h2>
           <p className="max-w-sm text-zinc-500 mb-8">
-            Start by connecting an API endpoint or environment that you want to evaluate.
+            {t("projects:overview.setup.target.description")}
           </p>
           <Button asChild size="lg" className="gap-2">
             <Link to={`${projectTargetsPath(projectId)}/new`}>
@@ -57,14 +57,14 @@ export function ProjectOverviewPage() {
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
             <Database className="h-8 w-8 text-zinc-400" />
           </div>
-          <h2 className="text-xl font-medium mb-2">Import a Dataset</h2>
+          <h2 className="text-xl font-medium mb-2">{t("projects:overview.setup.dataset.title")}</h2>
           <p className="max-w-sm text-zinc-500 mb-8">
-            You have a target ready. Now import test cases or a dataset to run against it.
+            {t("projects:overview.setup.dataset.description")}
           </p>
           <Button asChild size="lg" className="gap-2">
             <Link to={projectModulePath(projectId, "datasets")}>
               <Database className="h-4 w-4" />
-              Import Dataset
+              {t("projects:overview.setup.dataset.action")}
             </Link>
           </Button>
         </div>
@@ -77,14 +77,14 @@ export function ProjectOverviewPage() {
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
             <PlayCircle className="h-8 w-8 text-zinc-400" />
           </div>
-          <h2 className="text-xl font-medium mb-2">Start your first Run</h2>
+          <h2 className="text-xl font-medium mb-2">{t("projects:overview.setup.run.title")}</h2>
           <p className="max-w-sm text-zinc-500 mb-8">
-            Your environment and data are ready. Execute the tests to see the results.
+            {t("projects:overview.setup.run.description")}
           </p>
           <Button asChild size="lg" className="gap-2">
             <Link to={projectModulePath(projectId, "runs")}>
               <PlayCircle className="h-4 w-4" />
-              Run Dataset
+              {t("projects:overview.setup.run.action")}
             </Link>
           </Button>
         </div>
@@ -97,9 +97,9 @@ export function ProjectOverviewPage() {
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
           <BarChart3 className="h-8 w-8 text-zinc-400" />
         </div>
-        <h2 className="text-xl font-medium mb-2">Dashboard metrics placeholder</h2>
+        <h2 className="text-xl font-medium mb-2">{t("projects:overview.setup.dashboard.title")}</h2>
         <p className="max-w-sm text-zinc-500">
-          Once runs exist, this area will show top metric cards, pass-rate trends, and recent runs.
+          {t("projects:overview.setup.dashboard.description")}
         </p>
       </div>
     );
@@ -117,7 +117,7 @@ export function ProjectOverviewPage() {
         </div>
         <Button asChild variant="outline">
           <Link to={projectModulePath(projectId, "settings")}>
-            Project Settings
+            {t("projects:overview.settings")}
           </Link>
         </Button>
       </div>
@@ -125,7 +125,7 @@ export function ProjectOverviewPage() {
       {renderSetupState()}
 
       <div>
-        <h3 className="text-lg font-medium tracking-tight mb-4">Project Resources</h3>
+        <h3 className="text-lg font-medium tracking-tight mb-4">{t("projects:overview.resources")}</h3>
         <div className="grid gap-4 md:grid-cols-4">
           <SetupCard
             icon={<Target className="h-5 w-5" />}

@@ -145,6 +145,28 @@ export const en = {
       targetCount_one: "{{count}} target",
       targetCount_other: "{{count}} targets",
       notConfigured: "Not configured",
+      settings: "Project Settings",
+      resources: "Project Resources",
+      setup: {
+        target: {
+          title: "Configure your first Target",
+          description: "Start by connecting an API endpoint or environment that you want to evaluate."
+        },
+        dataset: {
+          title: "Import a Dataset",
+          description: "You have a target ready. Now import test cases or a dataset to run against it.",
+          action: "Import Dataset"
+        },
+        run: {
+          title: "Start your first Run",
+          description: "Your environment and data are ready. Execute the tests to see the results.",
+          action: "Run Dataset"
+        },
+        dashboard: {
+          title: "Dashboard metrics placeholder",
+          description: "Once runs exist, this area will show top metric cards, pass-rate trends, and recent runs."
+        }
+      }
     },
     list: {
       desc: "Manage your workspaces and API testing environments.",
