@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from "sonner";
 import { AssertionFormDialog } from "./AssertionFormDialog";
 import type { AssertionResponse } from "../assertions.types";
+import { buildAssertionSummary, getAssertionGroup, getAssertionGroupLabel, getAssertionTypeLabel } from "../assertions.ui";
 
 interface AssertionListProps {
   testCaseId: string;
@@ -52,10 +53,13 @@ export function AssertionList({ testCaseId }: AssertionListProps) {
         <div className="space-y-3">
           {assertions.map(assertion => (
             <div key={assertion.publicId} className="flex items-center justify-between p-4 border rounded-lg bg-white dark:bg-zinc-950 group">
-              <div>
+              <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-sm">{assertion.type}</span>
+                  <span className="font-semibold text-sm">{getAssertionTypeLabel(t, assertion.type)}</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                    {getAssertionGroupLabel(t, getAssertionGroup(assertion.type))}
+                  </span>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
                     {assertion.scope}
                   </span>
                   {!assertion.enabled && (
@@ -64,10 +68,8 @@ export function AssertionList({ testCaseId }: AssertionListProps) {
                     </span>
                   )}
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {assertion.scope === "FIELD" && <span className="mr-2 font-mono text-xs bg-zinc-100 dark:bg-zinc-800 px-1 rounded">{assertion.fieldPath}</span>}
-                  {assertion.expectedValue !== undefined && assertion.expectedValue !== null && <span>Expected: <span className="font-mono text-xs">{String(typeof assertion.expectedValue === "object" ? JSON.stringify(assertion.expectedValue) : assertion.expectedValue)}</span></span>}
-                  {assertion.type === "llm_rubric" && <span>Rubric: {assertion.rubricPublicId || "Override provided"} (Threshold: {assertion.threshold})</span>}
+                <div className="text-sm text-muted-foreground break-words">
+                  {buildAssertionSummary(t, assertion)}
                 </div>
               </div>
               

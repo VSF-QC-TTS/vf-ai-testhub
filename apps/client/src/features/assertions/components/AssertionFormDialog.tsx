@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -20,7 +20,21 @@ import type { AssertionResponse, AssertionScope, AssertionType } from "../assert
 import { motion } from "framer-motion";
 import { ApiError } from "@/lib/api/errors";
 import { toast } from "sonner";
-import { Check } from "lucide-react";
+import { CheckCircle2, CircleDot, Info } from "lucide-react";
+import {
+  ASSERTION_GROUPS,
+  ASSERTION_TYPE_META,
+  buildAssertionSummary,
+  extractBetweenRange,
+  getAssertionGroup,
+  getAssertionTypesForGroup,
+  inferArrayValueMode,
+  parseAssertionExpectedValue,
+  stringifyEditableExpectedValue,
+  type AssertionGroup,
+  type ArrayValueMode,
+} from "../assertions.ui";
+import { cn } from "@/lib/utils";
 
 interface AssertionFormDialogProps {
   open: boolean;
@@ -29,30 +43,69 @@ interface AssertionFormDialogProps {
   testCaseId: string;
 }
 
-const SCOPE_OPTIONS: { label: string; value: AssertionScope }[] = [
-  { label: "Whole Response", value: "WHOLE_RESPONSE" },
-  { label: "Field", value: "FIELD" },
-  { label: "Multi-Field", value: "MULTI_FIELD" },
-  { label: "Component", value: "COMPONENT" },
+const SCOPE_OPTIONS: readonly {
+  labelKey: string;
+  fallbackLabel: string;
+  descriptionKey: string;
+  fallbackDescription: string;
+  value: AssertionScope;
+}[] = [
+  {
+    labelKey: "assertions:scopes.WHOLE_RESPONSE",
+    fallbackLabel: "Whole response",
+    descriptionKey: "assertions:scopeDescriptions.WHOLE_RESPONSE",
+    fallbackDescription: "Check the whole raw response.",
+    value: "WHOLE_RESPONSE",
+  },
+  {
+    labelKey: "assertions:scopes.FIELD",
+    fallbackLabel: "Field path",
+    descriptionKey: "assertions:scopeDescriptions.FIELD",
+    fallbackDescription: "Check one JSONPath field, e.g. $.data.answer.",
+    value: "FIELD",
+  },
+  {
+    labelKey: "assertions:scopes.COMPONENT",
+    fallbackLabel: "Component",
+    descriptionKey: "assertions:scopeDescriptions.COMPONENT",
+    fallbackDescription: "Check an extracted component such as answer or intent.",
+    value: "COMPONENT",
+  },
+  {
+    labelKey: "assertions:scopes.MULTI_FIELD",
+    fallbackLabel: "Multi-field",
+    descriptionKey: "assertions:scopeDescriptions.MULTI_FIELD",
+    fallbackDescription: "Use several fields together, mostly for LLM rubric checks.",
+    value: "MULTI_FIELD",
+  },
 ];
 
-const TYPE_OPTIONS: { label: string; value: AssertionType }[] = [
-  { label: "Equals", value: "equals" },
-  { label: "Not Equals", value: "not_equals" },
-  { label: "Contains", value: "contains" },
-  { label: "Not Contains", value: "not_contains" },
-  { label: "Regex", value: "regex" },
-  { label: "Greater Than", value: "greater_than" },
-  { label: "Less Than", value: "less_than" },
-  { label: "Between", value: "between" },
-  { label: "Is True", value: "is_true" },
-  { label: "Is False", value: "is_false" },
-  { label: "Field Exists", value: "field_exists" },
-  { label: "Field Not Exists", value: "field_not_exists" },
-  { label: "Array Contains", value: "array_contains" },
-  { label: "Array Length >", value: "array_length_greater_than" },
-  { label: "LLM Rubric", value: "llm_rubric" },
+const ARRAY_VALUE_MODES: readonly { value: ArrayValueMode; labelKey: string; fallbackLabel: string }[] = [
+  { value: "text", labelKey: "assertions:arrayValueModes.text", fallbackLabel: "Text" },
+  { value: "number", labelKey: "assertions:arrayValueModes.number", fallbackLabel: "Number" },
+  { value: "boolean", labelKey: "assertions:arrayValueModes.boolean", fallbackLabel: "True / false" },
+  { value: "json", labelKey: "assertions:arrayValueModes.json", fallbackLabel: "JSON object / array" },
 ];
+
+const defaultValues: AssertionFormData = {
+  scope: "FIELD",
+  type: "contains",
+  targetComponent: "",
+  fieldPath: "",
+  fieldPathsString: "",
+  expectedValueString: "",
+  expectedNumber: undefined,
+  betweenMin: undefined,
+  betweenMax: undefined,
+  arrayValueMode: "text",
+  rubricId: "",
+  rubricOverride: "",
+  threshold: 0.8,
+  weight: 1.0,
+  severity: "MAJOR",
+  enabled: true,
+  sortOrder: 0,
+};
 
 export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId }: AssertionFormDialogProps) {
   const { t } = useTranslation();
@@ -64,69 +117,52 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
   const mutationError = createMutation.error ?? updateMutation.error;
   const errorCode = mutationError instanceof ApiError ? mutationError.code : undefined;
 
-  const [isValidatingJson, setIsValidatingJson] = useState(false);
-
   const form = useForm<AssertionFormData>({
     resolver: zodResolver(getAssertionSchema(t)) as Resolver<AssertionFormData>,
-    defaultValues: {
-      scope: "WHOLE_RESPONSE",
-      type: "contains",
-      targetComponent: "",
-      fieldPath: "",
-      fieldPathsString: "",
-      expectedValueString: "",
-      rubricId: "",
-      rubricOverride: "",
-      threshold: 0.8,
-      weight: 1.0,
-      severity: "MAJOR",
-      enabled: true,
-      sortOrder: 0,
-    },
+    defaultValues,
   });
 
   const watchScope = useWatch({ control: form.control, name: "scope" });
   const watchType = useWatch({ control: form.control, name: "type" });
+  const watchArrayValueMode = useWatch({ control: form.control, name: "arrayValueMode" });
+  const selectedGroup = getAssertionGroup(watchType);
+  const availableTypes = getAssertionTypesForGroup(selectedGroup);
+  const selectedTypeMeta = ASSERTION_TYPE_META[watchType];
 
   useEffect(() => {
-    if (open) {
-      if (assertion) {
-        form.reset({
-          scope: assertion.scope,
-          type: assertion.type,
-          targetComponent: assertion.targetComponent || "",
-          fieldPath: assertion.fieldPath || "",
-          fieldPathsString: assertion.fieldPaths ? assertion.fieldPaths.join(", ") : "",
-          expectedValueString: typeof assertion.expectedValue === "object" ? JSON.stringify(assertion.expectedValue, null, 2) : String(assertion.expectedValue || ""),
-          rubricId: assertion.rubricPublicId || "",
-          rubricOverride: assertion.rubricOverride || "",
-          threshold: assertion.threshold || 0.8,
-          weight: assertion.weight || 1.0,
-          severity: assertion.severity || "MAJOR",
-          enabled: assertion.enabled,
-          sortOrder: assertion.sortOrder || 0,
-        });
-      } else {
-        form.reset({
-          scope: "WHOLE_RESPONSE",
-          type: "contains",
-          targetComponent: "",
-          fieldPath: "",
-          fieldPathsString: "",
-          expectedValueString: "",
-          rubricId: "",
-          rubricOverride: "",
-          threshold: 0.8,
-          weight: 1.0,
-          severity: "MAJOR",
-          enabled: true,
-          sortOrder: 0,
-        });
-      }
+    if (!open) {
+      return;
     }
+
+    if (assertion) {
+      const range = extractBetweenRange(assertion.expectedValue);
+      const expectedNumber = numericExpectedValue(assertion);
+      form.reset({
+        scope: assertion.scope,
+        type: assertion.type,
+        targetComponent: assertion.targetComponent || "",
+        fieldPath: assertion.fieldPath || "",
+        fieldPathsString: assertion.fieldPaths ? assertion.fieldPaths.join(", ") : "",
+        expectedValueString: stringifyEditableExpectedValue(assertion.expectedValue),
+        expectedNumber,
+        betweenMin: range.min,
+        betweenMax: range.max,
+        arrayValueMode: assertion.type === "array_contains" ? inferArrayValueMode(assertion.expectedValue) : "text",
+        rubricId: assertion.rubricPublicId || "",
+        rubricOverride: assertion.rubricOverride || "",
+        threshold: assertion.threshold || 0.8,
+        weight: assertion.weight || 1.0,
+        severity: assertion.severity || "MAJOR",
+        enabled: assertion.enabled,
+        sortOrder: assertion.sortOrder || 0,
+      });
+      return;
+    }
+
+    form.reset(defaultValues);
   }, [open, assertion, form]);
 
-  const handleClose = (newOpen: boolean) => {
+  const handleClose = (newOpen: boolean): void => {
     if (!newOpen && form.formState.isDirty) {
       if (!window.confirm(t("assertions:form.messages.unsavedChanges"))) {
         return;
@@ -135,45 +171,30 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
     onOpenChange(newOpen);
   };
 
-  const handleFormatExpectedJson = () => {
-    const val = form.getValues("expectedValueString");
-    if (!val) return;
-    try {
-      const parsed = JSON.parse(val);
-      form.setValue("expectedValueString", JSON.stringify(parsed, null, 2), { shouldValidate: true });
-      setIsValidatingJson(true);
-      setTimeout(() => setIsValidatingJson(false), 2000);
-    } catch {
-      // It might just be a normal string, ignore.
+  const handleScopeChange = (scope: AssertionScope): void => {
+    form.setValue("scope", scope, { shouldDirty: true, shouldValidate: true });
+  };
+
+  const handleGroupChange = (group: AssertionGroup): void => {
+    const [firstType] = getAssertionTypesForGroup(group);
+    if (firstType) {
+      form.setValue("type", firstType, { shouldDirty: true, shouldValidate: true });
     }
   };
 
-  const onSubmit = (data: AssertionFormData) => {
-    let expectedValue: unknown = data.expectedValueString;
-    if (data.expectedValueString && (data.expectedValueString.startsWith("{") || data.expectedValueString.startsWith("["))) {
-      try {
-        expectedValue = JSON.parse(data.expectedValueString);
-      } catch {
-        // Fallback to string if parsing fails, or we could throw an error.
-      }
-    }
-    // Parse boolean if applicable
-    if (data.expectedValueString === "true") expectedValue = true;
-    if (data.expectedValueString === "false") expectedValue = false;
-    // Parse number if applicable
-    if (data.expectedValueString && !isNaN(Number(data.expectedValueString))) {
-      expectedValue = Number(data.expectedValueString);
-    }
-
+  const onSubmit = (data: AssertionFormData): void => {
+    const expectedValue = parseAssertionExpectedValue(data);
     const payload = {
       scope: data.scope,
       type: data.type,
-      targetComponent: data.targetComponent || undefined,
-      fieldPath: data.scope === "FIELD" ? data.fieldPath : undefined,
-      fieldPaths: data.scope === "MULTI_FIELD" && data.fieldPathsString ? data.fieldPathsString.split(",").map(s => s.trim()).filter(Boolean) : undefined,
+      targetComponent: data.scope === "COMPONENT" ? data.targetComponent?.trim() || undefined : undefined,
+      fieldPath: data.scope === "FIELD" ? data.fieldPath?.trim() || undefined : undefined,
+      fieldPaths: data.scope === "MULTI_FIELD" && data.fieldPathsString
+        ? data.fieldPathsString.split(",").map(path => path.trim()).filter(Boolean)
+        : undefined,
       expectedValue,
-      rubricId: data.type === "llm_rubric" ? data.rubricId : undefined,
-      rubricOverride: data.type === "llm_rubric" ? data.rubricOverride : undefined,
+      rubricId: data.type === "llm_rubric" ? data.rubricId?.trim() || undefined : undefined,
+      rubricOverride: data.type === "llm_rubric" ? data.rubricOverride?.trim() || undefined : undefined,
       threshold: data.type === "llm_rubric" ? data.threshold : undefined,
       weight: data.weight,
       severity: data.severity,
@@ -190,21 +211,22 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
         },
         onError: () => toast.error(t("assertions:form.messages.updateFailed"))
       });
-    } else {
-      createMutation.mutate(payload, {
-        onSuccess: () => {
-          toast.success(t("assertions:form.messages.created"));
-          form.reset({}, { keepValues: true });
-          onOpenChange(false);
-        },
-        onError: () => toast.error(t("assertions:form.messages.createFailed"))
-      });
+      return;
     }
+
+    createMutation.mutate(payload, {
+      onSuccess: () => {
+        toast.success(t("assertions:form.messages.created"));
+        form.reset({}, { keepValues: true });
+        onOpenChange(false);
+      },
+      onError: () => toast.error(t("assertions:form.messages.createFailed"))
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[780px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditing ? t("assertions:form.editTitle") : t("assertions:form.createTitle")}</DialogTitle>
           <DialogDescription>
@@ -214,59 +236,42 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="scope"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("assertions:form.scope")}</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {SCOPE_OPTIONS.map(opt => (
-                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <section className="space-y-3">
+              <StepTitle number="1" title={t("assertions:form.steps.scope", "Choose where to check")} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {SCOPE_OPTIONS.map((option) => {
+                  const isSelected = watchScope === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => handleScopeChange(option.value)}
+                      className={cn(
+                        "min-h-[92px] rounded-lg border p-4 text-left transition-colors",
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                          : "border-border bg-background hover:bg-muted/40"
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        {isSelected ? <CheckCircle2 className="mt-0.5 h-4 w-4 text-primary" /> : <CircleDot className="mt-0.5 h-4 w-4 text-muted-foreground" />}
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium">{t(option.labelKey, option.fallbackLabel)}</div>
+                          <div className="mt-1 text-xs leading-5 text-muted-foreground">{t(option.descriptionKey, option.fallbackDescription)}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
 
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("assertions:form.type")}</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {TYPE_OPTIONS.map(opt => (
-                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {watchScope === "FIELD" && (
+              {watchScope === "FIELD" ? (
                 <FormField
                   control={form.control}
                   name="fieldPath"
                   render={({ field }) => (
-                    <FormItem className="md:col-span-2">
+                    <FormItem>
                       <FormLabel>{t("assertions:form.fieldPath")}</FormLabel>
                       <FormControl>
                         <Input placeholder={t("assertions:form.fieldPathPlaceholder")} disabled={isPending} {...field} />
@@ -276,14 +281,14 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
                     </FormItem>
                   )}
                 />
-              )}
+              ) : null}
 
-              {watchScope === "MULTI_FIELD" && (
+              {watchScope === "MULTI_FIELD" ? (
                 <FormField
                   control={form.control}
                   name="fieldPathsString"
                   render={({ field }) => (
-                    <FormItem className="md:col-span-2">
+                    <FormItem>
                       <FormLabel>{t("assertions:form.fieldPaths")}</FormLabel>
                       <FormControl>
                         <Input placeholder={t("assertions:form.fieldPathsPlaceholder")} disabled={isPending} {...field} />
@@ -292,14 +297,14 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
                     </FormItem>
                   )}
                 />
-              )}
+              ) : null}
 
-              {watchScope === "COMPONENT" && (
+              {watchScope === "COMPONENT" ? (
                 <FormField
                   control={form.control}
                   name="targetComponent"
                   render={({ field }) => (
-                    <FormItem className="md:col-span-2">
+                    <FormItem>
                       <FormLabel>{t("assertions:form.targetComponent")}</FormLabel>
                       <FormControl>
                         <Input placeholder={t("assertions:form.targetComponentPlaceholder")} disabled={isPending} {...field} />
@@ -308,133 +313,157 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
                     </FormItem>
                   )}
                 />
-              )}
+              ) : null}
+            </section>
 
-              {watchType !== "llm_rubric" && watchType !== "field_exists" && watchType !== "field_not_exists" && watchType !== "is_true" && watchType !== "is_false" && (
+            <section className="space-y-3">
+              <StepTitle number="2" title={t("assertions:form.steps.condition", "Choose the condition")} />
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+                {ASSERTION_GROUPS.map((group) => {
+                  const isSelected = selectedGroup === group.value;
+                  return (
+                    <button
+                      key={group.value}
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => handleGroupChange(group.value)}
+                      className={cn(
+                        "rounded-lg border px-3 py-3 text-left text-sm transition-colors",
+                        isSelected
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "border-border bg-background hover:bg-muted/40"
+                      )}
+                    >
+                      <span className="font-medium">{t(group.labelKey, group.fallbackLabel)}</span>
+                      <span className="mt-1 block text-xs leading-4 text-muted-foreground">
+                        {t(group.descriptionKey, group.fallbackDescription)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="expectedValueString"
+                  name="type"
                   render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <div className="flex items-center justify-between">
-                        <FormLabel>{t("assertions:form.expectedValue")}</FormLabel>
-                        <Button type="button" variant="ghost" size="sm" onClick={handleFormatExpectedJson} className="h-6 text-xs px-2">
-                          {isValidatingJson ? <Check className="w-3 h-3 mr-1 text-green-500" /> : null}
-                          {t("assertions:form.formatJson")}
-                        </Button>
-                      </div>
+                    <FormItem>
+                      <FormLabel>{t("assertions:form.type")}</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {availableTypes.map(type => {
+                            const meta = ASSERTION_TYPE_META[type];
+                            return (
+                              <SelectItem key={type} value={type}>
+                                {t(meta.labelKey, meta.fallbackLabel)}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="rounded-lg border bg-muted/30 p-3 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 font-medium text-foreground">
+                    <Info className="h-4 w-4" />
+                    {t(selectedTypeMeta.labelKey, selectedTypeMeta.fallbackLabel)}
+                  </div>
+                  <p className="mt-1 text-xs leading-5">
+                    {t(selectedTypeMeta.descriptionKey, selectedTypeMeta.fallbackDescription)}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className="space-y-3">
+              <StepTitle number="3" title={t("assertions:form.steps.expected", "Enter the expected value")} />
+              <ExpectedValueFields
+                control={form.control}
+                isPending={isPending}
+                type={watchType}
+                arrayValueMode={watchArrayValueMode}
+              />
+            </section>
+
+            <section className="space-y-3 rounded-lg border bg-muted/20 p-4">
+              <div className="text-sm font-medium">{t("assertions:form.scoringTitle", "Priority and scoring")}</div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="severity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("assertions:form.severity")}</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="CRITICAL">CRITICAL</SelectItem>
+                          <SelectItem value="MAJOR">MAJOR</SelectItem>
+                          <SelectItem value="MINOR">MINOR</SelectItem>
+                          <SelectItem value="INFO">INFO</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="weight"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("assertions:form.weight")}</FormLabel>
                       <FormControl>
-                        <Textarea placeholder={t("assertions:form.expectedValuePlaceholder")} className="min-h-[80px] font-mono text-sm" disabled={isPending} {...field} />
+                        <Input type="number" step="0.1" min="0.0001" disabled={isPending} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
 
-              {watchType === "llm_rubric" && (
-                <>
-                  <FormField
-                    control={form.control}
-                    name="rubricId"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>{t("assertions:form.rubricId")}</FormLabel>
-                        <FormControl>
-                          <Input placeholder={t("assertions:form.rubricIdPlaceholder")} disabled={isPending} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="rubricOverride"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>{t("assertions:form.rubricOverride")}</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder={t("assertions:form.rubricOverridePlaceholder")} className="min-h-[80px]" disabled={isPending} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="threshold"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("assertions:form.threshold")}</FormLabel>
-                        <FormControl>
-                          <Input type="number" step="0.1" min="0" max="1" disabled={isPending} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
-
-              <FormField
-                control={form.control}
-                name="severity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("assertions:form.severity")}</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                <FormField
+                  control={form.control}
+                  name="enabled"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center gap-2 space-y-0 pt-8">
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                          disabled={isPending}
+                          checked={field.value}
+                          onChange={field.onChange}
+                        />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="CRITICAL">CRITICAL</SelectItem>
-                        <SelectItem value="MAJOR">MAJOR</SelectItem>
-                        <SelectItem value="MINOR">MINOR</SelectItem>
-                        <SelectItem value="INFO">INFO</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormLabel className="font-normal mb-0">{t("assertions:form.enabled")}</FormLabel>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </section>
 
-              <FormField
-                control={form.control}
-                name="weight"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("assertions:form.weight")}</FormLabel>
-                    <FormControl>
-                      <Input type="number" step="0.1" min="0.0001" disabled={isPending} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {assertion ? (
+              <div className="rounded-lg border bg-background p-3 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">{t("assertions:form.currentSummary", "Current summary")}:</span>{" "}
+                {buildAssertionSummary(t, assertion)}
+              </div>
+            ) : null}
 
-              <FormField
-                control={form.control}
-                name="enabled"
-                render={({ field }) => (
-                  <FormItem className="flex items-center gap-2 space-y-0 pt-8">
-                    <FormControl>
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                        disabled={isPending}
-                        checked={field.value}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormLabel className="font-normal mb-0">{t("assertions:form.enabled")}</FormLabel>
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {mutationError && (
+            {mutationError ? (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -442,7 +471,7 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
               >
                 {errorCode ? t(`api:${errorCode}`, { defaultValue: t("errors:unknown") }) : t("errors:unknown")}
               </motion.div>
-            )}
+            ) : null}
 
             <DialogFooter className="pt-4 border-t">
               <Button type="button" variant="outline" onClick={() => handleClose(false)} disabled={isPending}>
@@ -457,4 +486,230 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
       </DialogContent>
     </Dialog>
   );
+}
+
+function StepTitle({ number, title }: { number: string; title: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+        {number}
+      </span>
+      <h3 className="text-sm font-semibold">{title}</h3>
+    </div>
+  );
+}
+
+function ExpectedValueFields({
+  control,
+  isPending,
+  type,
+  arrayValueMode,
+}: {
+  control: ReturnType<typeof useForm<AssertionFormData>>["control"];
+  isPending: boolean;
+  type: AssertionType;
+  arrayValueMode: ArrayValueMode | undefined;
+}) {
+  const { t } = useTranslation();
+
+  if (type === "llm_rubric") {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={control}
+          name="rubricId"
+          render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>{t("assertions:form.rubricId")}</FormLabel>
+              <FormControl>
+                <Input placeholder={t("assertions:form.rubricIdPlaceholder")} disabled={isPending} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="rubricOverride"
+          render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>{t("assertions:form.rubricOverride")}</FormLabel>
+              <FormControl>
+                <Textarea placeholder={t("assertions:form.rubricOverridePlaceholder")} className="min-h-[90px]" disabled={isPending} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="threshold"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("assertions:form.threshold")}</FormLabel>
+              <FormControl>
+                <Input type="number" step="0.1" min="0" max="1" disabled={isPending} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+    );
+  }
+
+  if (type === "is_true" || type === "is_false" || type === "field_exists" || type === "field_not_exists") {
+    return (
+      <div className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
+        {t("assertions:form.noExpectedValueNeeded", "No expected value is needed for this condition. The runner checks the selected target directly.")}
+      </div>
+    );
+  }
+
+  if (type === "greater_than" || type === "less_than" || type === "array_length_greater_than") {
+    return (
+      <FormField
+        control={control}
+        name="expectedNumber"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t("assertions:form.expectedNumber", "Expected number")}</FormLabel>
+            <FormControl>
+              <Input type="number" step="any" placeholder="80" disabled={isPending} {...field} value={field.value ?? ""} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    );
+  }
+
+  if (type === "between") {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={control}
+          name="betweenMin"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("assertions:form.minValue", "Minimum value")}</FormLabel>
+              <FormControl>
+                <Input type="number" step="any" placeholder="0" disabled={isPending} {...field} value={field.value ?? ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="betweenMax"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("assertions:form.maxValue", "Maximum value")}</FormLabel>
+              <FormControl>
+                <Input type="number" step="any" placeholder="100" disabled={isPending} {...field} value={field.value ?? ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+    );
+  }
+
+  if (type === "array_contains") {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4">
+        <FormField
+          control={control}
+          name="arrayValueMode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("assertions:form.arrayValueMode", "Item type")}</FormLabel>
+              <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {ARRAY_VALUE_MODES.map(mode => (
+                    <SelectItem key={mode.value} value={mode.value}>
+                      {t(mode.labelKey, mode.fallbackLabel)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <ExpectedStringField
+          control={control}
+          disabled={isPending}
+          label={t("assertions:form.arrayExpectedItem", "Expected item")}
+          multiline={arrayValueMode === "json"}
+          placeholder={arrayValueMode === "json" ? '{"name":"VF 8"}' : "VF 8"}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <ExpectedStringField
+      control={control}
+      disabled={isPending}
+      label={t("assertions:form.expectedValue")}
+      multiline={type === "regex"}
+      placeholder={type === "regex" ? "^VF\\s+8" : t("assertions:form.expectedValuePlaceholder")}
+    />
+  );
+}
+
+function ExpectedStringField({
+  control,
+  disabled,
+  label,
+  placeholder,
+  multiline = true,
+}: {
+  control: ReturnType<typeof useForm<AssertionFormData>>["control"];
+  disabled: boolean;
+  label: string;
+  placeholder: string;
+  multiline?: boolean;
+}) {
+  return (
+    <FormField
+      control={control}
+      name="expectedValueString"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            {multiline ? (
+              <Textarea placeholder={placeholder} className="min-h-[80px] font-mono text-sm" disabled={disabled} {...field} />
+            ) : (
+              <Input placeholder={placeholder} disabled={disabled} {...field} />
+            )}
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
+
+function numericExpectedValue(assertion: AssertionResponse): number | undefined {
+  if (
+    assertion.type !== "greater_than"
+    && assertion.type !== "less_than"
+    && assertion.type !== "array_length_greater_than"
+  ) {
+    return undefined;
+  }
+  const parsed = typeof assertion.expectedValue === "number"
+    ? assertion.expectedValue
+    : Number(assertion.expectedValue);
+  return Number.isFinite(parsed) ? parsed : undefined;
 }

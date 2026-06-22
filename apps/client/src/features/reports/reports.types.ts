@@ -26,7 +26,11 @@ export interface AssertionResultResponse {
   reason: string | null;
   score: number | null;
   severity: SeverityLevel;
-  metadata: Record<string, unknown> | null;
+  metadata: {
+    type?: string;
+    scope?: string;
+    [key: string]: unknown;
+  } | null;
   createdAt: string;
 }
 
