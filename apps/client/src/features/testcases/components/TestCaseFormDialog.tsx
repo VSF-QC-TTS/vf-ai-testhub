@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { AssertionList } from "../../assertions/components/AssertionList";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/Input";
 import { Textarea } from "../../../components/ui/textarea";
@@ -36,7 +38,7 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
   const [isValidatingJson, setIsValidatingJson] = useState(false);
 
   const form = useForm<TestCaseFormData>({
-    resolver: zodResolver(getTestCaseSchema(t)),
+    resolver: zodResolver(getTestCaseSchema(t)) as any,
     defaultValues: {
       externalId: "",
       sectionName: "",
@@ -164,16 +166,22 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col p-0 overflow-y-auto">
+        <DialogHeader className="px-6 pt-6 pb-2">
           <DialogTitle>{isEditing ? t("testcases:form.editTitle") : t("testcases:form.createTitle")}</DialogTitle>
           <DialogDescription>
             {isEditing ? t("testcases:form.editDesc") : t("testcases:form.createDesc")}
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="mx-6 mt-4 w-fit">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="assertions" disabled={!isEditing}>Assertions</TabsTrigger>
+          </TabsList>
+          <TabsContent value="details" className="m-0 border-none p-0 outline-none">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 px-6 pt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -348,7 +356,7 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
               </motion.div>
             )}
 
-            <div className="flex justify-end gap-3 pt-4 border-t">
+            <div className="flex justify-end gap-3 pt-4 pb-6 border-t">
               <Button type="button" variant="outline" onClick={() => handleClose(false)} disabled={isPending}>
                 {t("common:actions.cancel")}
               </Button>
@@ -358,6 +366,11 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
             </div>
           </form>
         </Form>
+        </TabsContent>
+        <TabsContent value="assertions" className="m-0 border-none px-6 pb-6 pt-0 outline-none">
+          {testCase && <AssertionList testCaseId={testCase.publicId} />}
+        </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

@@ -446,4 +446,61 @@ export const vi = {
       }
     }
   },
+  assertions: {
+    title: "Xác thực (Assertions)",
+    addAssertion: "Thêm xác thực",
+    emptyDesc: "Chưa cấu hình quy tắc xác thực nào cho kịch bản này.",
+    disabled: "Đã tắt",
+    delete: {
+      title: "Xóa xác thực",
+      desc: "Bạn có chắc chắn muốn xóa xác thực này không?",
+      deleting: "Đang xóa..."
+    },
+    form: {
+      createTitle: "Tạo xác thực",
+      editTitle: "Sửa xác thực",
+      createDesc: "Thêm quy tắc kiểm tra kết quả.",
+      editDesc: "Chỉnh sửa quy tắc kiểm tra.",
+      scope: "Phạm vi",
+      type: "Loại xác thực",
+      targetComponent: "Thành phần mục tiêu",
+      targetComponentPlaceholder: "VD: answer",
+      fieldPath: "Đường dẫn trường",
+      fieldPathPlaceholder: "VD: $.data.id",
+      fieldPathHint: "Biểu thức JSONPath để chọn một trường cụ thể.",
+      fieldPaths: "Nhiều đường dẫn (ngăn cách bằng dấu phẩy)",
+      fieldPathsPlaceholder: "$.data.id, $.data.name",
+      expectedValue: "Giá trị kỳ vọng",
+      expectedValuePlaceholder: "Văn bản hoặc chuỗi JSON",
+      formatJson: "Định dạng JSON",
+      rubricId: "ID Tiêu chí (Rubric)",
+      rubricIdPlaceholder: "Chọn tiêu chí đánh giá...",
+      rubricOverride: "Ghi đè Tiêu chí",
+      rubricOverridePlaceholder: "Hướng dẫn cụ thể cho giám khảo LLM",
+      threshold: "Ngưỡng vượt qua (0-1)",
+      weight: "Trọng số",
+      severity: "Mức độ nghiêm trọng",
+      enabled: "Trạng thái bật",
+      validation: {
+        maxComponentLength: "Không vượt quá 100 ký tự",
+        maxPathLength: "Không vượt quá 500 ký tự",
+        minThreshold: "Tối thiểu là 0",
+        maxThreshold: "Tối đa là 1",
+        minWeight: "Phải lớn hơn 0",
+        minOrder: "Tối thiểu là 0",
+        maxOrder: "Không vượt quá 1000000",
+        fieldPathRequired: "Đường dẫn trường là bắt buộc khi chọn phạm vi FIELD",
+        rubricRequired: "Cần chọn Tiêu chí hoặc điền nội dung Ghi đè cho loại LLM Rubric"
+      },
+      messages: {
+        created: "Đã tạo xác thực",
+        createFailed: "Lỗi tạo xác thực",
+        updated: "Đã cập nhật xác thực",
+        updateFailed: "Lỗi cập nhật xác thực",
+        deleted: "Đã xóa xác thực",
+        deleteFailed: "Lỗi xóa xác thực",
+        unsavedChanges: "Bạn có thay đổi chưa lưu. Vẫn đóng?"
+      }
+    }
+  },
 };

@@ -446,4 +446,61 @@ export const en = {
       }
     }
   },
+  assertions: {
+    title: "Assertions",
+    addAssertion: "Add Assertion",
+    emptyDesc: "No assertions configured for this test case.",
+    disabled: "Disabled",
+    delete: {
+      title: "Delete Assertion",
+      desc: "Are you sure you want to delete this assertion?",
+      deleting: "Deleting..."
+    },
+    form: {
+      createTitle: "Create Assertion",
+      editTitle: "Edit Assertion",
+      createDesc: "Add a verification rule.",
+      editDesc: "Modify the verification rule.",
+      scope: "Scope",
+      type: "Type",
+      targetComponent: "Target Component",
+      targetComponentPlaceholder: "e.g. answer",
+      fieldPath: "Field Path",
+      fieldPathPlaceholder: "e.g. $.data.id",
+      fieldPathHint: "JSONPath expression to select a specific field.",
+      fieldPaths: "Field Paths (comma separated)",
+      fieldPathsPlaceholder: "$.data.id, $.data.name",
+      expectedValue: "Expected Value",
+      expectedValuePlaceholder: "Text or JSON string",
+      formatJson: "Format JSON",
+      rubricId: "Rubric ID",
+      rubricIdPlaceholder: "Select a rubric...",
+      rubricOverride: "Rubric Override",
+      rubricOverridePlaceholder: "Specific instructions for LLM judge",
+      threshold: "Pass Threshold (0-1)",
+      weight: "Weight",
+      severity: "Severity",
+      enabled: "Enabled",
+      validation: {
+        maxComponentLength: "Must not exceed 100 characters",
+        maxPathLength: "Must not exceed 500 characters",
+        minThreshold: "Must be at least 0",
+        maxThreshold: "Must not exceed 1",
+        minWeight: "Must be positive",
+        minOrder: "Must be at least 0",
+        maxOrder: "Must not exceed 1000000",
+        fieldPathRequired: "Field Path is required when Scope is FIELD",
+        rubricRequired: "Rubric ID or Override is required for LLM Rubric type"
+      },
+      messages: {
+        created: "Assertion created",
+        createFailed: "Failed to create assertion",
+        updated: "Assertion updated",
+        updateFailed: "Failed to update assertion",
+        deleted: "Assertion deleted",
+        deleteFailed: "Failed to delete assertion",
+        unsavedChanges: "You have unsaved changes. Close anyway?"
+      }
+    }
+  },
 };
