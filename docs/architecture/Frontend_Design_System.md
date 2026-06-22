@@ -39,10 +39,11 @@ After login, the app must not drop users into an empty dashboard that depends on
 
 Route behavior:
 
-- If the user has no active projects, route to `/projects/new` or `/projects?empty=1`, not `/projects/:projectId/dashboard`.
-- If the user has projects but no selected/deep-linked project, route to `/projects` with a compact project picker.
+- If the user has no active projects, route to `/projects/new`, not a modal auto-open or fake dashboard.
+- If the user has projects but no deep-linked project, route to `/projects/:projectId/targets`, using the last project only as a redirect hint.
 - If the user opens a stale project URL and receives `404` or forbidden, show a recovery state with links to project list and create project.
 - App shell may render in no-project mode, but project-scoped nav items must be disabled or hidden until a project exists.
+- Project context is URL-owned: project-scoped screens use `/projects/:projectId/...`; Zustand may store `lastProjectId` only.
 
 First-run screen requirements:
 
@@ -117,6 +118,7 @@ Rules:
 Desktop:
 
 - Sidebar: fixed, `w-64`, full height.
+- Project switcher sits at the top of the sidebar and is labelled as current project/workspace, not as a primary nav module.
 - Header: sticky top, height `56px` or `64px`.
 - Main: `flex-1`, width constrained by content type.
 - Breadcrumbs: always visible in header for nested pages.
@@ -129,8 +131,9 @@ Tablet:
 Mobile:
 
 - Sidebar hidden.
-- Header includes menu button.
-- Navigation opens in drawer.
+- Header includes menu button and compact current project selector.
+- Navigation opens in a focus-managed drawer/dialog.
+- Drawer closes from route-change effects, not by setting state during render.
 - Dialog-heavy flows convert to bottom sheets where appropriate.
 
 ### 3.2 Page Layouts

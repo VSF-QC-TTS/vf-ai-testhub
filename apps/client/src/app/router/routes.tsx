@@ -1,12 +1,12 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
-import { lazy, Suspense } from "react";
-import { useTranslation } from "react-i18next";
+import { Suspense } from "react";
 import { AppShell } from "../../components/layout/AppShell";
 import { PageTransition } from "../../components/layout/PageTransition";
 import { ProtectedRoute, GuestRoute } from "./ProtectedRoute";
 import { AuthLayout } from "../layouts/AuthLayout";
 import { AuthBootstrap } from "../providers/AuthBootstrap";
 import { FirstRunProjectGate } from "./FirstRunProjectGate";
+import { ErrorBoundary, PlaceholderPage } from "./RouteFallbacks";
 
 // Auth Pages
 import { LoginPage } from "../../features/auth/pages/LoginPage";
@@ -17,47 +17,12 @@ import { VerifyEmailPage } from "../../features/auth/pages/VerifyEmailPage";
 
 // Project Pages
 import { ProjectListPage } from "../../features/projects/pages/ProjectListPage";
+import { ProjectCreatePage } from "../../features/projects/pages/ProjectCreatePage";
+import { ProjectOverviewPage } from "../../features/projects/pages/ProjectOverviewPage";
 
 // Target Pages
 import { TargetListPage } from "../../features/targets/pages/TargetListPage";
 import { TargetConfigurationWorkbench } from "../../features/targets/pages/TargetConfigurationWorkbench";
-
-// Lazy-loaded placeholder pages
-const Home = lazy(() => Promise.resolve({ 
-  default: () => {
-    // Need to avoid require. We can't easily use hooks inside a dynamically resolved component without importing them at the top.
-    // Instead of inline require, we should just use a normal component that imports useTranslation.
-    return <DashboardPlaceholder />;
-  }
-}));
-
-function DashboardPlaceholder() {
-  const { t } = useTranslation();
-  return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-3xl font-bold tracking-tight">{t("common:dashboardTitle", "Dashboard")}</h1>
-      <p className="text-muted-foreground">{t("common:dashboardDesc", "Welcome to VinFast AI TestHub. Select a project to get started.")}</p>
-    </div>
-  );
-}
-
-const PlaceholderPage = lazy(() => Promise.resolve({
-  default: () => (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-3xl font-bold tracking-tight">Feature Coming Soon</h1>
-      <p className="text-muted-foreground">This page is under construction.</p>
-    </div>
-  )
-}));
-
-function ErrorBoundary() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-center">
-      <h1 className="text-4xl font-bold text-destructive">Oops!</h1>
-      <p className="text-muted-foreground">Sorry, an unexpected error has occurred.</p>
-    </div>
-  );
-}
 
 export const router = createBrowserRouter([
   {
@@ -115,19 +80,27 @@ export const router = createBrowserRouter([
               {
                 element: <FirstRunProjectGate />,
                 children: [
-                  { index: true, element: <Suspense fallback={null}><Home /></Suspense> },
-                  { path: "targets", element: <TargetListPage /> },
-                  { path: "targets/:id", element: <TargetConfigurationWorkbench /> },
-                  { path: "datasets", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
-                  { path: "test-cases", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
-                  { path: "runs", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
-                  { path: "reports", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
-                  { path: "settings", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                  { index: true, element: null },
+                  {
+                    path: "projects/:projectId",
+                    children: [
+                      { index: true, element: <ProjectOverviewPage /> },
+                      { path: "targets", element: <TargetListPage /> },
+                      { path: "targets/new", element: <TargetConfigurationWorkbench /> },
+                      { path: "targets/:targetId", element: <TargetConfigurationWorkbench /> },
+                      { path: "datasets", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                      { path: "test-cases", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                      { path: "runs", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                      { path: "reports", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                      { path: "settings", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                    ],
+                  },
                 ]
               },
               
               // Project management pages (not guarded by project selection)
               { path: "projects", element: <ProjectListPage /> },
+              { path: "projects/new", element: <ProjectCreatePage /> },
               
               {
                 path: "*",

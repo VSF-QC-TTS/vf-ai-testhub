@@ -1,12 +1,13 @@
 import { http, HttpResponse, delay } from 'msw';
 import { initialAuthData } from './auth.data';
+import type { LoginRequest } from '../features/auth/auth.types';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 export const authHandlers = [
   // Mock POST /auth/login
   http.post(`${API_BASE_URL}/auth/login`, async ({ request }) => {
-    const body = await request.json() as any;
+    const body = await request.json() as LoginRequest;
     
     // Simulate server delay
     await delay(1000);

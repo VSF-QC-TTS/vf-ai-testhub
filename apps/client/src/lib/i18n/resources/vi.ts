@@ -22,6 +22,14 @@ export const vi = {
     loading: "Đang tải...",
     home: "Trang chủ",
     settings: "Cài đặt",
+    navigation: {
+      toggleMenu: "Mở menu",
+      menu: "Menu điều hướng",
+    },
+    comingSoon: {
+      title: "Tính năng sắp ra mắt",
+      desc: "Trang này đang được xây dựng.",
+    },
     validation: {
       required: "Trường này là bắt buộc",
       invalidEmail: "Địa chỉ email không hợp lệ",
@@ -33,6 +41,7 @@ export const vi = {
       max: "Phải nhỏ hơn hoặc bằng {{max}}"
     },
     actions: {
+      cancel: "Hủy",
       deleteConfirm: "Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác."
     }
   },
@@ -103,6 +112,27 @@ export const vi = {
       desc: "Tạo dự án đầu tiên của bạn để bắt đầu cấu hình API và chạy test.",
       cta: "Tạo dự án mới",
     },
+    gate: {
+      errorTitle: "Không tải được danh sách dự án",
+      errorDesc: "Hãy tải lại trang hoặc mở phần quản lý dự án để khôi phục không gian làm việc.",
+      staleTitle: "Không tìm thấy dự án",
+      staleDesc: "Dự án trong URL này không còn tồn tại hoặc bạn không còn quyền truy cập.",
+      manageCta: "Xem dự án",
+    },
+    create: {
+      back: "Quay lại danh sách dự án",
+      title: "Tạo dự án đầu tiên",
+      desc: "Dự án gom target, dữ liệu, lượt chạy và báo cáo vào cùng một ngữ cảnh làm việc.",
+      submit: "Tạo dự án",
+    },
+    overview: {
+      eyebrow: "Không gian làm việc",
+      createTarget: "Tạo mục tiêu",
+      manageTargets: "Quản lý mục tiêu",
+      targetCount_one: "{{count}} mục tiêu",
+      targetCount_other: "{{count}} mục tiêu",
+      notConfigured: "Chưa cấu hình",
+    },
     list: {
       desc: "Quản lý các không gian làm việc và môi trường kiểm thử API của bạn.",
       noDescription: "Không có mô tả.",
@@ -133,9 +163,11 @@ export const vi = {
       desc: "Bạn có chắc chắn muốn xóa dự án này? Hành động này không thể hoàn tác.",
       confirm: "Xóa",
       cancel: "Hủy",
+      archiving: "Đang xóa...",
     },
     switcher: {
       select: "Chọn dự án",
+      current: "Dự án hiện tại",
       title: "Dự án",
       create: "Tạo dự án",
       manage: "Quản lý dự án",
@@ -143,6 +175,14 @@ export const vi = {
   },
   targets: {
     title: "Mục tiêu",
+    missingProject: "Vui lòng chọn dự án trước khi quản lý mục tiêu.",
+    notFound: "Không tìm thấy mục tiêu yêu cầu.",
+    delete: {
+      title: "Xóa mục tiêu",
+      desc: "Mục tiêu này sẽ bị xóa khỏi dự án hiện tại. Lịch sử các lượt chạy không thay đổi.",
+      confirm: "Xóa",
+      deleting: "Đang xóa...",
+    },
   },
   datasets: {
     title: "Tập dữ liệu",
@@ -161,6 +201,8 @@ export const vi = {
   },
   errors: {
     unknown: "Lỗi không xác định",
+    boundaryTitle: "Đã xảy ra lỗi",
+    boundaryDesc: "Ứng dụng gặp lỗi ngoài dự kiến.",
   },
   status: {
     active: "Hoạt động",

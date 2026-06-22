@@ -18,11 +18,11 @@ export interface ResponseMappingRequest {
   toolCallsPath?: string | null;
   traceIdPath?: string | null;
   latencyPath?: string | null;
-  customComponents?: any[] | null;
+  customComponents?: Record<string, unknown>[] | null;
   missingFieldBehavior?: MissingFieldBehavior | null;
 }
 
-export interface ResponseMappingResponse extends ResponseMappingRequest {}
+export type ResponseMappingResponse = ResponseMappingRequest;
 
 export interface TargetRequest {
   projectId: UUID;

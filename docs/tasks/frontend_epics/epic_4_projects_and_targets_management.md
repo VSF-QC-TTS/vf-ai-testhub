@@ -64,6 +64,7 @@ Acceptance:
 - Loading, empty, error, and success states exist.
 - Row actions are keyboard accessible.
 - Pagination survives reload through URL state.
+- Selecting a project navigates to `/projects/:projectId/targets` and records `lastProjectId`.
 
 ## Task 4.3: Project Form Dialog
 
@@ -87,7 +88,6 @@ Acceptance:
 Routes:
 
 - `/projects/new`
-- `/projects?empty=1`
 
 Steps:
 
@@ -132,11 +132,12 @@ Acceptance:
 Routes:
 
 - `/projects/:projectId/targets`
-- `/targets/:targetId`
+- `/projects/:projectId/targets/new`
+- `/projects/:projectId/targets/:targetId`
 
 Steps:
 
-1. Show targets for selected project.
+1. Show targets for the route project id.
 2. Include target type, method, URL, environment, timeout, default status.
 3. Add create/edit/delete actions.
 4. Add "Test target configuration" placeholder only if backend supports it; otherwise do not invent an endpoint.
@@ -146,6 +147,7 @@ Acceptance:
 
 - Long URLs truncate with tooltip and copy.
 - Delete requires confirmation.
+- Target create/edit never reads selected project from a global store; save payloads use the route `projectId`.
 
 ## Task 4.6: Target Form
 

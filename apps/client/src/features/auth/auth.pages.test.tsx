@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { ReactNode } from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -7,6 +8,7 @@ import { authApi } from "./auth.api";
 import { useAuthStore } from "./auth.store";
 import { I18nextProvider } from "react-i18next";
 import i18n from "../../lib/i18n";
+import type { UserResponse } from "./auth.types";
 
 vi.mock("./auth.api", () => ({
   authApi: {
@@ -18,7 +20,7 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false } },
 });
 
-const renderWithProviders = (component: React.ReactNode) => {
+const renderWithProviders = (component: ReactNode) => {
   return render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
@@ -31,8 +33,9 @@ const renderWithProviders = (component: React.ReactNode) => {
 };
 
 describe("Auth Pages", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    await i18n.changeLanguage("en");
     useAuthStore.getState().clearSession();
   });
 
@@ -44,14 +47,14 @@ describe("Auth Pages", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Invalid email address/i)).toBeInTheDocument();
-      expect(screen.getByText(/Password must be at least 8 characters/i)).toBeInTheDocument();
+      expect(screen.getByText(/at least 8 character/i)).toBeInTheDocument();
     });
     
     expect(authApi.login).not.toHaveBeenCalled();
   });
 
   it("calls login API on valid submission and sets session", async () => {
-    const mockUser = {
+    const mockUser: UserResponse = {
       publicId: "1",
       email: "test@example.com",
       displayName: "Test User",
@@ -65,7 +68,7 @@ describe("Auth Pages", () => {
       accessToken: "mock-token",
       tokenType: "Bearer",
       expiresInSeconds: 900,
-      user: mockUser as any,
+      user: mockUser,
     });
 
     renderWithProviders(<LoginPage />);

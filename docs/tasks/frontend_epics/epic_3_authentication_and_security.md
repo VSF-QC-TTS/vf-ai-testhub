@@ -116,7 +116,7 @@ Steps:
 3. Render skeleton while auth bootstrap is checking.
 4. Redirect authenticated users away from login/register.
 5. After auth succeeds, load active projects before routing to project-scoped pages.
-6. If there are no projects, route to `/projects/new` or `/projects?empty=1`.
+6. If there are no projects, route to `/projects/new`.
 7. If projects exist but no project is selected, route to `/projects`.
 8. If the intended route is project-scoped, allow it only when the project exists and is accessible.
 

@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { type ComponentProps } from "react";
 
@@ -7,17 +7,26 @@ import { useTranslation } from "react-i18next";
 import { navItems } from "./config";
 import { useProjects } from "../../features/projects/projects.queries";
 import { useProjectStore } from "../../features/projects/project.store";
+import { findProject, getProjectNavPath, getProjectSwitchPath, getRouteProjectId } from "../../features/projects/project.routes";
 import { BrandLogo } from "../ui/Logo";
 
 export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const { data } = useProjects();
-  const activeProjectId = useProjectStore((s) => s.activeProjectId);
-  const setActiveProject = useProjectStore((s) => s.setActiveProject);
+  const lastProjectId = useProjectStore((state) => state.lastProjectId);
+  const setLastProject = useProjectStore((state) => state.setLastProject);
   
-  const projects = data?.content || [];
-  const currentProject = projects.find(p => p.id === activeProjectId);
+  const projects = data?.content ?? [];
+  const routeProjectId = getRouteProjectId(location.pathname);
+  const currentProjectId = routeProjectId ?? lastProjectId;
+  const currentProject = findProject(projects, currentProjectId);
+
+  const handleProjectSelect = (project: { id: string }) => {
+    setLastProject(project.id);
+    navigate(getProjectSwitchPath(location.pathname, project.id));
+  };
 
   return (
     <aside 
@@ -36,13 +45,13 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
       <ProjectSwitcher 
         projects={projects} 
         currentProject={currentProject}
-        onProjectSelect={(p) => setActiveProject(p.id)}
+        onProjectSelect={handleProjectSelect}
         className="hidden lg:block"
       />
       <ProjectSwitcher 
         projects={projects} 
         currentProject={currentProject}
-        onProjectSelect={(p) => setActiveProject(p.id)}
+        onProjectSelect={handleProjectSelect}
         className="md:block lg:hidden"
         isCollapsed
       />
@@ -50,27 +59,46 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
       <nav className="flex-1 overflow-y-auto py-2">
         <ul className="grid gap-1 px-2 lg:px-4">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.to || (item.to !== "/" && location.pathname.startsWith(item.to));
-            const isDisabled = item.projectScoped && !activeProjectId;
+            const to = getProjectNavPath(routeProjectId, item.module);
+            const isActive = to
+              ? item.module
+                ? location.pathname === to || location.pathname.startsWith(`${to}/`)
+                : location.pathname === to
+              : false;
+            const label = t(item.i18nKey);
             
             return (
-              <li key={item.to}>
-                <Link
-                  to={isDisabled ? "#" : item.to}
+              <li key={item.module ?? "overview"}>
+                {to ? (
+                  <Link
+                    to={to}
+                    className={cn(
+                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-elevated hover:text-foreground",
+                      "md:justify-center lg:justify-start"
+                    )}
+                    title={label}
+                  >
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    <span className="hidden lg:inline-block truncate">{label}</span>
+                  </Link>
+                ) : (
+                <button
+                  type="button"
+                  disabled
                   className={cn(
                     "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    isActive && !isDisabled
-                      ? "bg-primary text-primary-foreground" 
-                      : "text-muted-foreground hover:bg-elevated hover:text-foreground",
-                    isDisabled && "opacity-50 pointer-events-none cursor-not-allowed",
+                    "w-full cursor-not-allowed text-muted-foreground opacity-50",
                     "md:justify-center lg:justify-start"
                   )}
-                  title={t(item.i18nKey as any)}
-                  aria-disabled={isDisabled}
+                  title={label}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
-                  <span className="hidden lg:inline-block truncate">{t(item.i18nKey as any)}</span>
-                </Link>
+                  <span className="hidden lg:inline-block truncate">{label}</span>
+                </button>
+                )}
               </li>
             );
           })}

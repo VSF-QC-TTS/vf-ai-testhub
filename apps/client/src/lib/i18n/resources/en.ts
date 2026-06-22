@@ -22,6 +22,14 @@ export const en = {
     loading: "Loading...",
     home: "Home",
     settings: "Settings",
+    navigation: {
+      toggleMenu: "Toggle menu",
+      menu: "Navigation menu",
+    },
+    comingSoon: {
+      title: "Feature coming soon",
+      desc: "This page is under construction.",
+    },
     validation: {
       required: "This field is required",
       invalidEmail: "Invalid email address",
@@ -33,6 +41,7 @@ export const en = {
       max: "Must be at most {{max}}"
     },
     actions: {
+      cancel: "Cancel",
       deleteConfirm: "Are you sure you want to delete this item? This action cannot be undone."
     }
   },
@@ -103,6 +112,27 @@ export const en = {
       desc: "Create your first project to start configuring APIs and running tests.",
       cta: "Create new project",
     },
+    gate: {
+      errorTitle: "Projects could not be loaded",
+      errorDesc: "Refresh the page or open project management to recover your workspace.",
+      staleTitle: "Project not found",
+      staleDesc: "The project in this URL no longer exists or you no longer have access to it.",
+      manageCta: "Review projects",
+    },
+    create: {
+      back: "Back to projects",
+      title: "Create your first project",
+      desc: "Projects group targets, datasets, runs, and reports into one working context.",
+      submit: "Create project",
+    },
+    overview: {
+      eyebrow: "Project workspace",
+      createTarget: "Create target",
+      manageTargets: "Manage targets",
+      targetCount_one: "{{count}} target",
+      targetCount_other: "{{count}} targets",
+      notConfigured: "Not configured",
+    },
     list: {
       desc: "Manage your workspaces and API testing environments.",
       noDescription: "No description provided.",
@@ -133,9 +163,11 @@ export const en = {
       desc: "Are you sure you want to delete this project? This action cannot be undone.",
       confirm: "Delete",
       cancel: "Cancel",
+      archiving: "Deleting...",
     },
     switcher: {
       select: "Select Project",
+      current: "Current project",
       title: "Projects",
       create: "Create Project",
       manage: "Manage Projects",
@@ -143,6 +175,14 @@ export const en = {
   },
   targets: {
     title: "Targets",
+    missingProject: "Select a project before managing targets.",
+    notFound: "The requested target could not be found.",
+    delete: {
+      title: "Delete target",
+      desc: "This target will be removed from the current project. Existing run history is not changed.",
+      confirm: "Delete",
+      deleting: "Deleting...",
+    },
   },
   datasets: {
     title: "Datasets",
@@ -161,6 +201,8 @@ export const en = {
   },
   errors: {
     unknown: "Unknown Error",
+    boundaryTitle: "Oops!",
+    boundaryDesc: "Sorry, an unexpected error has occurred.",
   },
   status: {
     active: "Active",

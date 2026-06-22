@@ -1,8 +1,12 @@
 import { ChevronRight, User, Languages } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useProjects } from "../../features/projects/projects.queries";
+import { useProjectStore } from "../../features/projects/project.store";
+import { findProject, getProjectSwitchPath, getRouteProjectId } from "../../features/projects/project.routes";
+import { ProjectSwitcher } from "./ProjectSwitcher";
 
 // This would typically come from shadcn/ui but we'll mock it if it's not ready
 // and the user will run shadcn add later.
@@ -18,8 +22,20 @@ import { Button } from "@/components/ui/button";
 
 export function TopHeader({ className, ...props }: ComponentProps<"header">) {
   const location = useLocation();
+  const navigate = useNavigate();
   const paths = location.pathname.split("/").filter(Boolean);
-  const { i18n } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const { data } = useProjects();
+  const lastProjectId = useProjectStore((state) => state.lastProjectId);
+  const setLastProject = useProjectStore((state) => state.setLastProject);
+  const projects = data?.content ?? [];
+  const routeProjectId = getRouteProjectId(location.pathname);
+  const currentProject = findProject(projects, routeProjectId ?? lastProjectId);
+
+  const handleProjectSelect = (project: { id: string }) => {
+    setLastProject(project.id);
+    navigate(getProjectSwitchPath(location.pathname, project.id));
+  };
 
   return (
     <header 
@@ -29,9 +45,16 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
       )}
       {...props}
     >
-      <div className="flex-1 overflow-x-auto scrollbar-hide">
-        <nav aria-label="Breadcrumb" className="flex items-center text-sm text-muted-foreground whitespace-nowrap">
-          <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+      <div className="min-w-0 flex-1 overflow-x-auto scrollbar-hide">
+        <ProjectSwitcher
+          compact
+          projects={projects}
+          currentProject={currentProject}
+          onProjectSelect={handleProjectSelect}
+          className="w-[min(58vw,240px)] md:hidden"
+        />
+        <nav aria-label="Breadcrumb" className="hidden items-center text-sm text-muted-foreground whitespace-nowrap md:flex">
+          <Link to="/" className="hover:text-foreground transition-colors">{t("home")}</Link>
           {paths.map((path, index) => {
             const routeTo = `/${paths.slice(0, index + 1).join("/")}`;
             const isLast = index === paths.length - 1;

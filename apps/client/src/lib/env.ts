@@ -13,7 +13,7 @@ try {
 } catch (error) {
   if (error instanceof z.ZodError) {
     console.error("❌ Invalid environment variables:", error.flatten().fieldErrors);
-    throw new Error("Invalid environment variables");
+    throw new Error("Invalid environment variables", { cause: error });
   }
   throw error;
 }

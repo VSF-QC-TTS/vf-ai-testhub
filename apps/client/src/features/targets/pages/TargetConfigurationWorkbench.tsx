@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import type { ChangeEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -14,29 +15,31 @@ import { Input } from "../../../components/ui/Input";
 import { Textarea } from "../../../components/ui/textarea";
 import { getTargetSchema, type TargetFormData } from "../targets.schemas";
 import { useTarget, useCreateTarget, useUpdateTarget, useParseCurl } from "../targets.queries";
-import { useProjectStore } from "../../projects/project.store";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
+import { projectTargetsPath } from "../../projects/project.routes";
+import { ApiError } from "@/lib/api/errors";
 
 export function TargetConfigurationWorkbench() {
-  const { id } = useParams();
-  const isNew = id === "new";
+  const { projectId = "", targetId } = useParams();
+  const isNew = !targetId;
   const navigate = useNavigate();
   const { t } = useTranslation();
-  
-  const activeProjectId = useProjectStore((s) => s.activeProjectId);
-  const { data: target, isLoading: isLoadingTarget } = useTarget(isNew ? "" : id!);
+  const listPath = projectTargetsPath(projectId);
+  const { data: target, isLoading: isLoadingTarget } = useTarget(targetId ?? "");
   
   const createMutation = useCreateTarget();
-  const updateMutation = useUpdateTarget(isNew ? "" : id!);
+  const updateMutation = useUpdateTarget(targetId ?? "");
   const parseCurlMutation = useParseCurl();
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const mutationError = createMutation.error ?? updateMutation.error;
+  const errorCode = mutationError instanceof ApiError ? mutationError.code : undefined;
 
   const [curlInput, setCurlInput] = useState("");
 
   const form = useForm<TargetFormData>({
     resolver: zodResolver(getTargetSchema(t)),
     defaultValues: {
-      projectId: activeProjectId || "",
+      projectId,
       name: "",
       environment: "dev",
       targetType: "HTTP",
@@ -45,6 +48,8 @@ export function TargetConfigurationWorkbench() {
       isDefault: false,
     },
   });
+  const headersTemplate = useWatch({ control: form.control, name: "headersTemplate" });
+  const bodyTemplate = useWatch({ control: form.control, name: "bodyTemplate" });
 
   useEffect(() => {
     if (target && !isNew) {
@@ -62,6 +67,12 @@ export function TargetConfigurationWorkbench() {
     }
   }, [target, isNew, form]);
 
+  useEffect(() => {
+    if (isNew) {
+      form.setValue("projectId", projectId);
+    }
+  }, [form, isNew, projectId]);
+
   const handleParseCurl = async () => {
     if (!curlInput.trim()) return;
     try {
@@ -77,25 +88,28 @@ export function TargetConfigurationWorkbench() {
   };
 
   const onSubmit = (data: TargetFormData) => {
+    const payload = { ...data, projectId };
     if (isNew) {
-      createMutation.mutate(data, {
-        onSuccess: () => navigate("/targets"),
+      createMutation.mutate(payload, {
+        onSuccess: () => navigate(listPath),
       });
     } else {
-      updateMutation.mutate(data, {
-        onSuccess: () => navigate("/targets"),
+      updateMutation.mutate(payload, {
+        onSuccess: () => navigate(listPath),
       });
     }
   };
 
+  if (!projectId) return <div className="p-8 text-center text-muted-foreground">{t("targets:missingProject")}</div>;
   if (isLoadingTarget && !isNew) return <div className="p-8">Loading...</div>;
+  if (!isNew && !target) return <div className="p-8 text-center text-muted-foreground">{t("targets:notFound")}</div>;
 
   return (
     <div className="flex flex-col h-full w-full max-w-7xl mx-auto px-4 md:px-0 pb-12">
       {/* Header */}
       <div className="flex items-center justify-between mt-8 mb-6">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/targets")} className="rounded-full">
+          <Button variant="ghost" size="icon" onClick={() => navigate(listPath)} className="rounded-full">
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
@@ -104,7 +118,7 @@ export function TargetConfigurationWorkbench() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => navigate("/targets")}>Cancel</Button>
+          <Button variant="outline" onClick={() => navigate(listPath)}>Cancel</Button>
           <Button onClick={form.handleSubmit(onSubmit)} disabled={isPending} className="gap-2">
             <Save className="h-4 w-4" />
             {isNew ? "Create Target" : "Save Changes"}
@@ -129,7 +143,7 @@ export function TargetConfigurationWorkbench() {
                 <Textarea 
                   placeholder="Paste your cURL command here to auto-fill the configuration below..."
                   value={curlInput}
-                  onChange={(e: any) => setCurlInput(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setCurlInput(e.target.value)}
                   className="font-mono text-sm min-h-[100px]"
                 />
                 <Button 
@@ -205,14 +219,13 @@ export function TargetConfigurationWorkbench() {
                     placeholder='{\n  "Content-Type": "application/json",\n  "X-Custom-Header": "{{my_var}}"\n}' 
                     className="font-mono text-sm min-h-[150px]"
                     {...form.register("headersTemplate")}
-                    value={typeof form.watch("headersTemplate") === 'object' ? JSON.stringify(form.watch("headersTemplate"), null, 2) : form.watch("headersTemplate") as any || ""}
-                    onChange={(e: any) => {
+                    value={formatTemplateValue(headersTemplate)}
+                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
                       try {
                         const parsed = JSON.parse(e.target.value);
                         form.setValue("headersTemplate", parsed);
-                      } catch (err) {
-                        // Keep as string if invalid JSON while typing
-                        form.setValue("headersTemplate", e.target.value as any);
+                      } catch {
+                        form.setValue("headersTemplate", e.target.value as unknown as Record<string, unknown>);
                       }
                     }}
                   />
@@ -223,13 +236,13 @@ export function TargetConfigurationWorkbench() {
                     placeholder='{\n  "query": "{{input}}",\n  "session_id": "{{session_id}}"\n}' 
                     className="font-mono text-sm min-h-[200px]"
                     {...form.register("bodyTemplate")}
-                    value={typeof form.watch("bodyTemplate") === 'object' ? JSON.stringify(form.watch("bodyTemplate"), null, 2) : form.watch("bodyTemplate") as any || ""}
-                    onChange={(e: any) => {
+                    value={formatTemplateValue(bodyTemplate)}
+                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
                       try {
                         const parsed = JSON.parse(e.target.value);
                         form.setValue("bodyTemplate", parsed);
-                      } catch (err) {
-                        form.setValue("bodyTemplate", e.target.value as any);
+                      } catch {
+                        form.setValue("bodyTemplate", e.target.value as unknown as Record<string, unknown>);
                       }
                     }}
                   />
@@ -399,19 +412,13 @@ export function TargetConfigurationWorkbench() {
                 </Button>
               </div>
 
-              {(createMutation.error || updateMutation.error) && (
+              {mutationError && (
                 <motion.div 
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20 mt-4"
                 >
-                  {(() => {
-                    const err = createMutation.error || updateMutation.error;
-                    if (err && (err as any).code) {
-                      return t(`api:${(err as any).code}`, { defaultValue: t("errors:unknown") as string });
-                    }
-                    return t("errors:unknown");
-                  })()}
+                  {errorCode ? t(`api:${errorCode}`, { defaultValue: t("errors:unknown") }) : t("errors:unknown")}
                 </motion.div>
               )}
             </div>
@@ -420,4 +427,12 @@ export function TargetConfigurationWorkbench() {
       </Form>
     </div>
   );
+}
+
+function formatTemplateValue(value: Record<string, unknown> | string | null | undefined): string {
+  if (!value) {
+    return "";
+  }
+
+  return typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
 }

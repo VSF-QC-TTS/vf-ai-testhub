@@ -11,15 +11,16 @@ export function VerifyEmailPage() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
+  const hasToken = token.length > 0;
   
-  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
-  const [errorMessage, setErrorMessage] = useState("");
+  const [status, setStatus] = useState<'verifying' | 'success' | 'error'>(() => hasToken ? "verifying" : "error");
+  const [errorMessage, setErrorMessage] = useState(() =>
+    hasToken ? "" : t("auth:verifyEmail.invalidToken", "Invalid or missing verification token.")
+  );
   const { mutate: verifyEmail } = useVerifyEmail();
 
   useEffect(() => {
     if (!token) {
-      setStatus('error');
-      setErrorMessage(t("auth:verifyEmail.invalidToken", "Invalid or missing verification token."));
       return;
     }
 

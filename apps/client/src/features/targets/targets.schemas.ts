@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { TFunction } from "i18next";
 
 
-export const getResponseMappingSchema = (_t: TFunction) => z.object({
+export const getResponseMappingSchema = () => z.object({
   answerPath: z.string().max(500).optional().nullable(),
   suggestionsPath: z.string().max(500).optional().nullable(),
   intentPath: z.string().max(500).optional().nullable(),
@@ -26,13 +26,13 @@ export const getTargetSchema = (t: TFunction) => z.object({
   targetType: z.enum(["HTTP"] as const),
   method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"] as const).optional().nullable(),
   url: z.string().url(t("common:validation.invalidUrl")).optional().nullable().or(z.literal("")),
-  queryParamsTemplate: z.record(z.string(), z.any()).optional().nullable(),
-  headersTemplate: z.record(z.string(), z.any()).optional().nullable(),
-  bodyTemplate: z.record(z.string(), z.any()).optional().nullable(),
-  authConfig: z.record(z.string(), z.any()).optional().nullable(),
+  queryParamsTemplate: z.record(z.string(), z.unknown()).optional().nullable(),
+  headersTemplate: z.record(z.string(), z.unknown()).optional().nullable(),
+  bodyTemplate: z.record(z.string(), z.unknown()).optional().nullable(),
+  authConfig: z.record(z.string(), z.unknown()).optional().nullable(),
   timeoutMs: z.number().min(1000, t("common:validation.min", { min: 1000 })).max(300000, t("common:validation.max", { max: 300000 })).optional().nullable(),
   isDefault: z.boolean().optional().nullable(),
-  responseMapping: getResponseMappingSchema(t).optional().nullable(),
+  responseMapping: getResponseMappingSchema().optional().nullable(),
 });
 
 export type TargetFormData = z.infer<ReturnType<typeof getTargetSchema>>;

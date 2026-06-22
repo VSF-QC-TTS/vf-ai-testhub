@@ -89,17 +89,19 @@ The mentor prototype implies these production components. Implement them as type
 
 - Lives in the app shell.
 - Accepts the current project, project list, loading state, and `onProjectChange`.
+- Treats the URL project id (`/projects/:projectId/...`) as the selected project source of truth.
+- When changing project, preserves the current project-scoped module when possible, for example `/projects/a/targets` -> `/projects/b/targets`.
 - Supports keyboard search/selection when project count grows.
-- Does not fetch projects directly; it receives data from a layout/container query.
+- Does not own project selection state; layout containers may fetch projects and pass data down.
 - Supports no-project state by rendering a create-project action instead of an empty menu.
 
 `FirstRunProjectGate`:
 
 - Runs after auth bootstrap and project list load.
-- Receives project list state, current location, and navigation callbacks.
-- Routes users without projects to the create/project list flow.
-- Routes users with projects but no selected project to project selection.
-- Must not call project APIs directly; it composes project query state from the route/layout container.
+- Routes users without projects to `/projects/new`.
+- Routes users with projects but no route project to `/projects/:projectId/targets`, using persisted `lastProjectId` only as a redirect hint.
+- Shows a recovery state when `/projects/:projectId/...` references a missing or inaccessible project.
+- Must not rely on Zustand `activeProjectId`; the URL is authoritative for project context.
 
 `DashboardMetricCard` and `TrendPanel`:
 

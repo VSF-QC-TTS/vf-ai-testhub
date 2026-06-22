@@ -1,96 +1,124 @@
-import { Menu, X } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { Menu } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 import { useTranslation } from "react-i18next";
 import { navItems } from "./config";
 import { ProjectSwitcher } from "./ProjectSwitcher";
 import { useProjects } from "../../features/projects/projects.queries";
 import { useProjectStore } from "../../features/projects/project.store";
+import { findProject, getProjectNavPath, getProjectSwitchPath, getRouteProjectId } from "../../features/projects/project.routes";
 import { BrandLogo } from "../ui/Logo";
 
 export function MobileDrawer() {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const previousPathname = useRef(location.pathname);
+  const navigate = useNavigate();
   const { data } = useProjects();
-  const activeProjectId = useProjectStore((s) => s.activeProjectId);
-  const setActiveProject = useProjectStore((s) => s.setActiveProject);
+  const lastProjectId = useProjectStore((state) => state.lastProjectId);
+  const setLastProject = useProjectStore((state) => state.setLastProject);
 
-  const projects = data?.content || [];
-  const currentProject = projects.find(p => p.id === activeProjectId);
+  const projects = data?.content ?? [];
+  const routeProjectId = getRouteProjectId(location.pathname);
+  const currentProjectId = routeProjectId ?? lastProjectId;
+  const currentProject = findProject(projects, currentProjectId);
 
-  const [prevPathname, setPrevPathname] = useState(location.pathname);
-  if (location.pathname !== prevPathname) {
-    setPrevPathname(location.pathname);
-    setIsOpen(false);
-  }
+  useEffect(() => {
+    if (previousPathname.current === location.pathname) {
+      return undefined;
+    }
+
+    previousPathname.current = location.pathname;
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setIsOpen(false), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [isOpen, location.pathname]);
+
+  const handleProjectSelect = (project: { id: string }) => {
+    setLastProject(project.id);
+    navigate(getProjectSwitchPath(location.pathname, project.id));
+  };
 
   return (
-    <div className="md:hidden">
-      <div className="fixed top-0 left-0 z-20 flex h-14 items-center px-4">
-        <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)} className="mr-2">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <div className="fixed top-0 left-0 z-20 flex h-14 items-center px-4 md:hidden">
+        <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="mr-2">
           <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle Menu</span>
+          <span className="sr-only">{t("common:navigation.toggleMenu")}</span>
         </Button>
+        </DialogTrigger>
       </div>
 
-      {isOpen && (
-        <>
-          <div 
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
-          <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-surface shadow-xl flex flex-col animate-in slide-in-from-left">
-            <div className="flex h-14 items-center justify-between border-b px-4">
+      <DialogContent className="left-0 top-0 h-dvh w-72 max-w-[85vw] translate-x-0 translate-y-0 gap-0 rounded-none p-0 sm:rounded-none">
+        <DialogTitle className="sr-only">{t("common:navigation.menu")}</DialogTitle>
+        <aside className="flex h-full flex-col bg-surface shadow-xl">
+            <div className="flex h-14 items-center border-b px-4">
               <Link to="/" className="flex items-center">
                 <BrandLogo hideTextOnMobile={false} textClassName="text-sm" />
               </Link>
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
-                <X className="h-5 w-5" />
-                <span className="sr-only">Close Menu</span>
-              </Button>
             </div>
             
             <ProjectSwitcher 
               projects={projects} 
               currentProject={currentProject}
-              onProjectSelect={(p) => setActiveProject(p.id)}
+              onProjectSelect={handleProjectSelect}
             />
 
             <nav className="flex-1 overflow-y-auto py-2">
               <ul className="grid gap-1 px-2">
                 {navItems.map((item) => {
-                  const isActive = location.pathname === item.to || (item.to !== "/" && location.pathname.startsWith(item.to));
-                  const isDisabled = item.projectScoped && !activeProjectId;
+                  const to = getProjectNavPath(routeProjectId, item.module);
+                  const isActive = to
+                    ? item.module
+                      ? location.pathname === to || location.pathname.startsWith(`${to}/`)
+                      : location.pathname === to
+                    : false;
+                  const label = t(item.i18nKey);
 
                   return (
-                    <li key={item.to}>
-                      <Link
-                        to={isDisabled ? "#" : item.to}
+                    <li key={item.module ?? "overview"}>
+                      {to ? (
+                        <Link
+                          to={to}
+                          className={cn(
+                            "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                            isActive
+                              ? "bg-primary text-primary-foreground"
+                              : "text-muted-foreground hover:bg-elevated hover:text-foreground"
+                          )}
+                        >
+                          <item.icon className="h-5 w-5 shrink-0" />
+                          <span>{label}</span>
+                        </Link>
+                      ) : (
+                      <button
+                        type="button"
+                        disabled
                         className={cn(
                           "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                          isActive && !isDisabled
-                            ? "bg-primary text-primary-foreground" 
-                            : "text-muted-foreground hover:bg-elevated hover:text-foreground",
-                          isDisabled && "opacity-50 pointer-events-none cursor-not-allowed"
+                          "w-full cursor-not-allowed text-muted-foreground opacity-50"
                         )}
-                        aria-disabled={isDisabled}
                       >
                         <item.icon className="h-5 w-5 shrink-0" />
-                        <span>{t(item.i18nKey as any)}</span>
-                      </Link>
+                        <span>{label}</span>
+                      </button>
+                      )}
                     </li>
                   );
                 })}
               </ul>
             </nav>
           </aside>
-        </>
-      )}
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { useAuthStore } from "../../features/auth/auth.store";
 import { authApi } from "../../features/auth/auth.api";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-export function AuthBootstrap({ children }: { children: React.ReactNode }) {
+export function AuthBootstrap({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const [isBootstrapping, setIsBootstrapping] = useState(true);
   const setSession = useAuthStore((state) => state.setSession);
@@ -23,7 +24,7 @@ export function AuthBootstrap({ children }: { children: React.ReactNode }) {
           // which in our API it does (LoginResponse includes UserResponse).
           setSession(data.accessToken, data.user);
         }
-      } catch (e) {
+      } catch {
         // Refresh failed (no cookie, expired cookie, etc)
         if (mounted) {
           clearSession();

@@ -31,7 +31,7 @@ export function useCreateTarget() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: targetsApi.create,
-    onSuccess: (_, _variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: targetKeys.lists() });
     },
   });

@@ -10,6 +10,7 @@ import { getProjectSchema, type ProjectFormData } from "../projects.schemas";
 import { useCreateProject, useUpdateProject } from "../projects.queries";
 import type { ProjectResponse } from "../projects.types";
 import { motion } from "framer-motion";
+import { ApiError } from "@/lib/api/errors";
 
 interface ProjectFormDialogProps {
   open: boolean;
@@ -24,6 +25,8 @@ export function ProjectFormDialog({ open, onOpenChange, project }: ProjectFormDi
   const createMutation = useCreateProject();
   const updateMutation = useUpdateProject(project?.id ?? "");
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const mutationError = createMutation.error ?? updateMutation.error;
+  const errorCode = mutationError instanceof ApiError ? mutationError.code : undefined;
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(getProjectSchema(t)),
@@ -107,19 +110,13 @@ export function ProjectFormDialog({ open, onOpenChange, project }: ProjectFormDi
               />
             </div>
 
-            {(createMutation.error || updateMutation.error) && (
+            {mutationError && (
               <motion.div 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20"
               >
-                {(() => {
-                  const err = createMutation.error || updateMutation.error;
-                  if (err && (err as any).code) {
-                    return t(`api:${(err as any).code}`, { defaultValue: t("errors:unknown") as string });
-                  }
-                  return t("errors:unknown");
-                })()}
+                {errorCode ? t(`api:${errorCode}`, { defaultValue: t("errors:unknown") }) : t("errors:unknown")}
               </motion.div>
             )}
 
