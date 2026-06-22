@@ -285,6 +285,39 @@ export const en = {
   },
   datasets: {
     title: "Datasets",
+    description: "Manage datasets and test cases for evaluation.",
+    missingProject: "Select a project before managing datasets.",
+    create: "Create Dataset",
+    empty: {
+      title: "No Datasets Yet",
+      description: "Import test cases or create a new dataset to start building your evaluation suite."
+    },
+    emptySearch: "No datasets found matching your search.",
+    searchPlaceholder: "Search datasets...",
+    fields: {
+      name: "Dataset Name",
+      category: "Category",
+      tags: "Tags",
+      testCaseCount: "Cases",
+      updatedAt: "Updated At"
+    },
+    form: {
+      createTitle: "Create Dataset",
+      editTitle: "Edit Dataset",
+      createDesc: "Group your test cases into manageable datasets.",
+      name: "Name *",
+      namePlaceholder: "e.g. Helpdesk QA Set",
+      category: "Category",
+      categoryPlaceholder: "e.g. Classification",
+      description: "Description",
+      descPlaceholder: "Describe the purpose of this dataset..."
+    },
+    delete: {
+      title: "Delete dataset",
+      desc: "Are you sure you want to delete this dataset? This will also remove all associated test cases.",
+      confirm: "Delete",
+      deleting: "Deleting..."
+    }
   },
   testCases: {
     title: "Test Cases",

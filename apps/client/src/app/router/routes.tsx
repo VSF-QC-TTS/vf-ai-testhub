@@ -24,6 +24,9 @@ import { ProjectOverviewPage } from "../../features/projects/pages/ProjectOvervi
 import { TargetListPage } from "../../features/targets/pages/TargetListPage";
 import { TargetConfigurationWorkbench } from "../../features/targets/pages/TargetConfigurationWorkbench";
 
+// Dataset Pages
+import { DatasetListPage } from "../../features/datasets/pages/DatasetListPage";
+
 export const router = createBrowserRouter([
   {
     element: (
@@ -88,7 +91,7 @@ export const router = createBrowserRouter([
                       { path: "targets", element: <TargetListPage /> },
                       { path: "targets/new", element: <TargetConfigurationWorkbench /> },
                       { path: "targets/:targetId", element: <TargetConfigurationWorkbench /> },
-                      { path: "datasets", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                      { path: "datasets", element: <DatasetListPage /> },
                       { path: "test-cases", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
                       { path: "runs", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
                       { path: "reports", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },

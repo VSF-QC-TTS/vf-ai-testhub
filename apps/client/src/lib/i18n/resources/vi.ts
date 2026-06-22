@@ -285,6 +285,39 @@ export const vi = {
   },
   datasets: {
     title: "Tập dữ liệu",
+    description: "Quản lý tập dữ liệu và các ca kiểm thử.",
+    missingProject: "Vui lòng chọn dự án trước khi quản lý dữ liệu.",
+    create: "Tạo tập dữ liệu",
+    empty: {
+      title: "Chưa có tập dữ liệu",
+      description: "Nhập dữ liệu hoặc tạo tập dữ liệu mới để bắt đầu đánh giá AI."
+    },
+    emptySearch: "Không tìm thấy tập dữ liệu nào phù hợp.",
+    searchPlaceholder: "Tìm kiếm tập dữ liệu...",
+    fields: {
+      name: "Tên tập dữ liệu",
+      category: "Danh mục",
+      tags: "Nhãn",
+      testCaseCount: "Test cases",
+      updatedAt: "Ngày cập nhật"
+    },
+    form: {
+      createTitle: "Tạo tập dữ liệu",
+      editTitle: "Chỉnh sửa tập dữ liệu",
+      createDesc: "Gom nhóm các ca kiểm thử thành những tập dữ liệu dễ quản lý.",
+      name: "Tên tập dữ liệu *",
+      namePlaceholder: "VD: Dữ liệu QA Chatbot",
+      category: "Danh mục",
+      categoryPlaceholder: "VD: Phân loại ý định",
+      description: "Mô tả",
+      descPlaceholder: "Mô tả mục đích của tập dữ liệu này..."
+    },
+    delete: {
+      title: "Xóa tập dữ liệu",
+      desc: "Bạn có chắc chắn muốn xóa tập dữ liệu này? Toàn bộ ca kiểm thử bên trong cũng sẽ bị xóa.",
+      confirm: "Xóa",
+      deleting: "Đang xóa..."
+    }
   },
   testCases: {
     title: "Ca kiểm thử",

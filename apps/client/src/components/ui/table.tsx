@@ -1,0 +1,125 @@
+import { type ComponentProps } from "react"
+import { cn } from "@/lib/utils"
+
+export type TableProps = ComponentProps<"table">
+
+function Table({ className, ref, ...props }: TableProps) {
+  return (
+    <div className="relative w-full overflow-auto">
+      <table
+        ref={ref}
+        className={cn("w-full caption-bottom text-sm", className)}
+        {...props}
+      />
+    </div>
+  )
+}
+Table.displayName = "Table"
+
+export type TableHeaderProps = ComponentProps<"thead">
+
+function TableHeader({ className, ref, ...props }: TableHeaderProps) {
+  return <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+}
+TableHeader.displayName = "TableHeader"
+
+export type TableBodyProps = ComponentProps<"tbody">
+
+function TableBody({ className, ref, ...props }: TableBodyProps) {
+  return (
+    <tbody
+      ref={ref}
+      className={cn("[&_tr:last-child]:border-0", className)}
+      {...props}
+    />
+  )
+}
+TableBody.displayName = "TableBody"
+
+export type TableFooterProps = ComponentProps<"tfoot">
+
+function TableFooter({ className, ref, ...props }: TableFooterProps) {
+  return (
+    <tfoot
+      ref={ref}
+      className={cn(
+        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+TableFooter.displayName = "TableFooter"
+
+export type TableRowProps = ComponentProps<"tr">
+
+function TableRow({ className, ref, ...props }: TableRowProps) {
+  return (
+    <tr
+      ref={ref}
+      className={cn(
+        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+TableRow.displayName = "TableRow"
+
+export type TableHeadProps = ComponentProps<"th">
+
+function TableHead({ className, ref, ...props }: TableHeadProps) {
+  return (
+    <th
+      ref={ref}
+      className={cn(
+        "h-10 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+TableHead.displayName = "TableHead"
+
+export type TableCellProps = ComponentProps<"td">
+
+function TableCell({ className, ref, ...props }: TableCellProps) {
+  return (
+    <td
+      ref={ref}
+      className={cn(
+        "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+TableCell.displayName = "TableCell"
+
+export type TableCaptionProps = ComponentProps<"caption">
+
+function TableCaption({ className, ref, ...props }: TableCaptionProps) {
+  return (
+    <caption
+      ref={ref}
+      className={cn("mt-4 text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  )
+}
+TableCaption.displayName = "TableCaption"
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+}
