@@ -2,7 +2,7 @@ import type { ProjectResponse } from "./projects.types";
 
 export const PROJECT_ROUTE_PREFIX = "/projects";
 
-const PROJECT_MODULES = ["targets", "datasets", "test-cases", "runs", "reports", "settings"] as const;
+const PROJECT_MODULES = ["dashboard", "targets", "rubrics", "datasets", "test-cases", "runs", "experiments", "reports", "settings"] as const;
 
 export type ProjectModule = (typeof PROJECT_MODULES)[number];
 
@@ -20,7 +20,7 @@ export function isProjectModule(value: string | undefined): value is ProjectModu
 }
 
 export function projectOverviewPath(projectId: string): string {
-  return `${PROJECT_ROUTE_PREFIX}/${projectId}`;
+  return `${PROJECT_ROUTE_PREFIX}/${projectId}/dashboard`;
 }
 
 export function projectTargetsPath(projectId: string): string {

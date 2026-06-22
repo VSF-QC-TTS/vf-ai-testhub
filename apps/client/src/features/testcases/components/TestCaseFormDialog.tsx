@@ -24,7 +24,8 @@ import { motion } from "framer-motion";
 import { ApiError } from "@/lib/api/errors";
 import { toast } from "sonner";
 import { useParams } from "react-router-dom";
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
+import { SuggestionReviewDialog } from "../../ai/components/SuggestionReviewDialog";
 
 interface TestCaseFormDialogProps {
   open: boolean;
@@ -44,6 +45,7 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
   const errorCode = mutationError instanceof ApiError ? mutationError.code : undefined;
 
   const [isValidatingJson, setIsValidatingJson] = useState(false);
+  const [isSuggestOpen, setIsSuggestOpen] = useState(false);
 
   const form = useForm<TestCaseFormData>({
     resolver: zodResolver(getTestCaseSchema(t)) as Resolver<TestCaseFormData>,
@@ -378,7 +380,33 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
         </Form>
         </TabsContent>
         <TabsContent value="assertions" className="m-0 border-none px-6 pb-6 pt-0 outline-none">
-          {testCase && <AssertionList testCaseId={testCase.publicId} />}
+          {testCase && (
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="gap-2 text-indigo-600 hover:text-indigo-700 border-indigo-200 bg-indigo-50/30 hover:bg-indigo-50"
+                  onClick={() => setIsSuggestOpen(true)}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Suggest Assertions
+                </Button>
+              </div>
+              <AssertionList testCaseId={testCase.publicId} />
+              
+              <SuggestionReviewDialog
+                open={isSuggestOpen}
+                onOpenChange={setIsSuggestOpen}
+                testCaseId={testCase.publicId}
+                requestPayload={{
+                  input: form.getValues("input") || testCase.input || "",
+                  expectedBehavior: form.getValues("expectedBehavior") || testCase.expectedBehavior || "",
+                  referenceAnswer: form.getValues("referenceAnswer") || testCase.referenceAnswer
+                }}
+              />
+            </div>
+          )}
         </TabsContent>
         <TabsContent value="toolexpectations" className="m-0 border-none px-6 pb-6 pt-0 outline-none">
           {testCase && <ToolExpectationList testCaseId={testCase.publicId} />}

@@ -33,13 +33,13 @@ export const targetHandlers = [
     return HttpResponse.json(t);
   }),
 
-  http.post(`${API_BASE_URL}/targets`, async ({ request }) => {
+  http.post(`${API_BASE_URL}/projects/:projectId/targets`, async ({ request, params }) => {
     await delay(500);
     const body = await request.json() as TargetRequest;
     const newTarget: MockTarget = {
       ...body,
       publicId: `t-${Math.random().toString(36).substring(7)}`,
-      projectId: body.projectId,
+      projectId: params.projectId as string,
       name: body.name,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -69,7 +69,7 @@ export const targetHandlers = [
     return HttpResponse.json({ success: true });
   }),
 
-  http.post(`${API_BASE_URL}/targets/parse-curl`, async () => {
+  http.post(`${API_BASE_URL}/projects/:projectId/targets/parse-curl`, async () => {
     await delay(500);
     return HttpResponse.json({
       method: "POST",

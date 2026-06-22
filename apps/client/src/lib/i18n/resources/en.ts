@@ -54,7 +54,14 @@ export const en = {
       deleteConfirm: "Are you sure you want to delete this item? This action cannot be undone."
     },
     optional: "Optional",
-    description: "Description"
+    description: "Description",
+    roles: {
+      QC_MEMBER: "Member",
+      QC_LEAD: "Lead",
+      QC_MANAGER: "Manager",
+      ADMIN: "Administrator",
+      USER: "User"
+    }
   },
   home: {
     title: "AI TestHub",
@@ -167,12 +174,21 @@ export const en = {
           title: "Start your first Run",
           description: "Your environment and data are ready. Execute the tests to see the results.",
           action: "Run Dataset"
-        },
-        dashboard: {
-          title: "Dashboard metrics placeholder",
-          description: "Once runs exist, this area will show top metric cards, pass-rate trends, and recent runs."
         }
-      }
+      },
+      metrics: {
+        totalTestCases: "Total Test Cases",
+        activeTargets: "Active Targets",
+        datasets: "Datasets",
+        rubrics: "Rubrics"
+      },
+      recentRuns: "Recent Runs",
+      recentRunsUnavailable: "Recent runs overview will be available when backend supports project-level aggregation.",
+      viewAllRuns: "View All Runs",
+      configSummary: "Configuration",
+      targetsConfigured: "Targets Configured",
+      datasetsImported: "Datasets Imported",
+      rubricsDefined: "Rubrics Defined"
     },
     list: {
       desc: "Manage your workspaces and API testing environments.",
@@ -348,24 +364,186 @@ export const en = {
       descPlaceholder: "Describe the purpose of this dataset..."
     },
     delete: {
-      title: "Delete dataset",
-      desc: "Are you sure you want to delete this dataset? This will also remove all associated test cases.",
+      step3Title: "Create Dataset",
+      step3Desc: "Give your new dataset a name so we can save these tests.",
+      step3Placeholder: "e.g., Auth Regression Tests",
+      submit: "Import & Create",
+      importing: "Importing...",
+      success: "Successfully imported test cases."
+    }
+  },
+  rubrics: {
+    title: "Evaluation Rubrics",
+    description: "Manage instructions for the LLM Judge to evaluate your test cases.",
+    create: "Create Rubric",
+    edit: "Edit Rubric",
+    searchPlaceholder: "Search rubrics...",
+    empty: {
+      title: "No rubrics found",
+      description: "You haven't created any evaluation rubrics yet."
+    },
+    fields: {
+      name: "Name",
+      category: "Category",
+      scope: "Scope",
+      language: "Language",
+      content: "Instructions (Prompt)",
+      threshold: "Pass Threshold"
+    },
+    categories: {
+      ANSWER_QUALITY: "Answer Quality",
+      POLICY_COMPLIANCE: "Policy Compliance",
+      NO_HALLUCINATION: "No Hallucination",
+      SAFETY_REFUSAL: "Safety Refusal",
+      RAG_FAITHFULNESS: "Faithfulness (RAG)",
+      TOOL_OUTPUT_USAGE: "Tool Output Usage",
+      SUGGESTION_RELEVANCE: "Suggestion Relevance",
+      VIETNAMESE_TONE: "Vietnamese Tone",
+      CLARIFYING_QUESTION: "Clarifying Question",
+      BUSINESS_ACCEPTANCE: "Business Acceptance"
+    },
+    form: {
+      createTitle: "Create New Rubric",
+      createDesc: "Define instructions for the LLM judge.",
+      editTitle: "Edit Rubric",
+      editDesc: "Update rubric instructions.",
+      name: "Name",
+      namePlaceholder: "e.g., Tone and Politeness",
+      description: "Description",
+      descPlaceholder: "Optional brief description",
+      category: "Category",
+      categoryPlaceholder: "Select a category...",
+      language: "Language",
+      threshold: "Pass Threshold",
+      content: "Instructions (Prompt)",
+      contentPlaceholder: "e.g., The response must be polite and use professional language...",
+      messages: {
+        created: "Rubric created successfully",
+        updated: "Rubric updated successfully",
+        createFailed: "Failed to create rubric",
+        updateFailed: "Failed to update rubric"
+      }
+    },
+    delete: {
+      title: "Delete Rubric",
+      desc: "Are you sure you want to delete this rubric? Tests using it will fall back to their defaults.",
       confirm: "Delete",
       deleting: "Deleting..."
+    },
+    archive: {
+      title: "Archive Rubric",
+      desc: "Are you sure you want to archive this rubric? It will no longer be available for new evaluations.",
+      confirm: "Archive",
+      archiving: "Archiving..."
     }
+  },
+  ai: {
+    generateTitle: "Generate Test Cases",
+    generateDesc: "Use AI to automatically draft test cases based on your feature requirements.",
+    featureName: "Feature Name",
+    featureNamePlaceholder: "e.g., Forgot Password Flow",
+    businessRequirement: "Business Requirements",
+    businessRequirementPlaceholder: "Describe how the feature should behave, inputs, outputs, and edge cases...",
+    generateBtn: "Generate Drafts",
+    generating: "Analyzing requirements...",
+    reviewTitle: "Review Drafts",
+    discardAll: "Discard All",
+    saveSelected: "Save Selected",
+    noDrafts: "No drafts could be generated. Try adjusting your requirements."
   },
   testCases: {
     title: "Test Cases",
   },
   runs: {
     title: "Runs",
+    history: {
+      title: "Run History",
+      description: "View the history of test executions for this dataset.",
+      noRuns: "No Runs Found",
+      noRunsDesc: "There are no test runs available yet.",
+      runId: "Run ID",
+      status: "Status",
+      mode: "Mode",
+      cases: "Total Cases",
+      passed: "Passed",
+      failed: "Failed",
+      date: "Date",
+      viewReport: "View Report"
+    },
+    status: {
+      COMPLETED: "Completed",
+      FAILED: "Failed",
+      CANCELLED: "Cancelled",
+      RUNNING: "Running",
+      PENDING: "Pending",
+      UNCERTAIN: "Uncertain",
+      ERROR: "Error"
+    },
+    modes: {
+      FULL: "Full",
+      SMOKE: "Smoke"
+    }
   },
   reports: {
     title: "Reports",
   },
-  rubrics: {
-    title: "Rubrics",
+  experiments: {
+    title: "A/B Experiments",
+    empty: {
+      title: "No experiments yet",
+      description: "Start an A/B experiment to compare different targets, models, or configurations."
+    },
+    create: "Create Experiment",
+    fields: {
+      name: "Experiment Name",
+      status: "Status",
+      createdAt: "Created At"
+    },
+    form: {
+      createTitle: "Create A/B Experiment",
+      createDesc: "Define variants to compare performance.",
+      name: "Name",
+      namePlaceholder: "e.g. Prompt Optimization Test",
+      datasetId: "Dataset",
+      datasetIdPlaceholder: "Select dataset...",
+      variants: "Variants",
+      addVariant: "Add Variant",
+      variantName: "Variant Name",
+      variantNamePlaceholder: "e.g. Base, Candidate",
+      targetId: "Target",
+      targetIdPlaceholder: "Select target...",
+      startDesc: "Estimated calls: {{calls}}. Proceed?",
+      startBtn: "Start Experiment",
+      starting: "Starting..."
+    },
+    detail: {
+      progress: "Progress",
+      winner: "Recommendation / Winner",
+      noWinnerYet: "Waiting for results to determine a winner.",
+    }
   },
+  compare: {
+    title: "Run Compare",
+    selectRuns: "Select Runs to Compare",
+    baseRun: "Base Run",
+    candidateRun: "Candidate Run",
+    compareBtn: "Compare",
+    metrics: {
+      regressions: "Regressions",
+      fixes: "Fixes",
+      unchanged: "Unchanged",
+      passRateDelta: "Pass Rate Delta",
+      latencyDelta: "Latency Delta",
+      costDelta: "Cost Delta"
+    },
+    diff: {
+      expected: "Expected",
+      actualBase: "Actual (Base)",
+      actualCandidate: "Actual (Candidate)"
+    },
+    incompatible: "Runs are incompatible. They must use the same dataset."
+  },
+
   errors: {
     unknown: "Unknown Error",
     boundaryTitle: "Oops!",

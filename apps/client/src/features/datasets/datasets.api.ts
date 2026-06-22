@@ -20,7 +20,8 @@ export const fetchDatasets = async (projectId: string, params?: PageParams): Pro
 };
 
 export const fetchDataset = async (projectId: string, id: string): Promise<DatasetResponse> => {
-  const { data } = await apiClient.get<DatasetResponse>(`${BASE_PATH}/${projectId}/datasets/${id}`);
+  void projectId;
+  const { data } = await apiClient.get<DatasetResponse>(`/api/v1/datasets/${id}`);
   return data;
 };
 
@@ -31,10 +32,12 @@ export const createDataset = async (request: DatasetCreateRequest): Promise<Data
 };
 
 export const updateDataset = async (projectId: string, id: string, request: DatasetUpdateRequest): Promise<DatasetResponse> => {
-  const { data } = await apiClient.put<DatasetResponse>(`${BASE_PATH}/${projectId}/datasets/${id}`, request);
+  void projectId;
+  const { data } = await apiClient.put<DatasetResponse>(`/api/v1/datasets/${id}`, request);
   return data;
 };
 
 export const deleteDataset = async (projectId: string, id: string): Promise<void> => {
-  await apiClient.delete(`${BASE_PATH}/${projectId}/datasets/${id}`);
+  void projectId;
+  await apiClient.delete(`/api/v1/datasets/${id}`);
 };

@@ -72,7 +72,7 @@ React 19 contract constraints:
 | 4 | `frontend_epics/epic_4_projects_and_targets_management.md` | IN_PROGRESS | Project and target CRUD, cURL parse, response mapping |
 | 5 | `frontend_epics/epic_5_datasets_testcases_editor.md` | PENDING | Dataset CRUD, testcase table/editor, CSV/Excel import, assertions/tools |
 | 6 | `frontend_epics/epic_6_execution_runner_feedback.md` | PENDING | Trigger runs, status polling, run history |
-| 7 | `frontend_epics/epic_7_results_reporting_review.md` | PENDING | Run report, result details, raw JSON, manual review |
+| 7 | `frontend_epics/epic_7_results_reporting_review.md` | DONE | Run report, result details, raw JSON, manual review |
 | 8 | `frontend_epics/epic_8_rubrics_ai_generation.md` | PENDING | Rubrics, AI testcase generation, assertion suggestions |
 | 9 | `frontend_epics/epic_9_dashboard_overview.md` | PENDING | Project dashboard, metrics, trends, recent runs, comparison summaries |
 | 10 | `frontend_epics/epic_10_run_comparison_experiments.md` | PENDING | Run comparison UI and basic A/B experiment UI; version promotion remains blocked |

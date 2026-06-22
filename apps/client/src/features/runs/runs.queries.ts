@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { runKeys, fetchRuns, fetchRun, triggerRun } from "./runs.api";
+import { runKeys, fetchRuns, fetchRun, triggerRun, compareRuns } from "./runs.api";
 import type { TriggerRunRequest, RunFilterParams } from "./runs.types";
 
 export const useRuns = (datasetId: string, params?: RunFilterParams) => {
@@ -41,5 +41,13 @@ export const useTriggerRun = (datasetId: string) => {
       queryClient.setQueryData(runKeys.detail(data.publicId), data);
       queryClient.invalidateQueries({ queryKey: runKeys.lists() });
     },
+  });
+};
+
+export const useCompareRuns = (baseRunId?: string | null, candidateRunId?: string | null) => {
+  return useQuery({
+    queryKey: runKeys.compare(baseRunId!, candidateRunId!),
+    queryFn: () => compareRuns(baseRunId!, candidateRunId!),
+    enabled: !!baseRunId && !!candidateRunId,
   });
 };

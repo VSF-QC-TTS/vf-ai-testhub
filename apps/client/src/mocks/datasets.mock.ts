@@ -3,10 +3,11 @@ import { datasets } from "./datasets.data";
 import { v4 as uuidv4 } from "uuid";
 import type { DatasetCreateRequest, DatasetUpdateRequest } from "../features/datasets/datasets.types";
 
-const BASE_URL = "/api/v1/projects/:projectId/datasets";
+const PROJECT_DATASETS_URL = "/api/v1/projects/:projectId/datasets";
+const DATASET_URL = "/api/v1/datasets/:id";
 
 export const datasetHandlers = [
-  http.get(BASE_URL, ({ params }) => {
+  http.get(PROJECT_DATASETS_URL, ({ params }) => {
     const { projectId } = params;
     const projectDatasets = datasets.filter(d => d.projectId === projectId);
 
@@ -19,8 +20,8 @@ export const datasetHandlers = [
     });
   }),
 
-  http.get(`${BASE_URL}/:id`, ({ params }) => {
-    const dataset = datasets.find(d => d.publicId === params.id && d.projectId === params.projectId);
+  http.get(DATASET_URL, ({ params }) => {
+    const dataset = datasets.find(d => d.publicId === params.id);
 
     if (!dataset) {
       return HttpResponse.json({ message: "Dataset not found" }, { status: 404 });
@@ -29,7 +30,7 @@ export const datasetHandlers = [
     return HttpResponse.json(dataset);
   }),
 
-  http.post(BASE_URL, async ({ request, params }) => {
+  http.post(PROJECT_DATASETS_URL, async ({ request, params }) => {
     const { projectId } = params;
     const body = await request.json() as DatasetCreateRequest;
 
@@ -51,11 +52,11 @@ export const datasetHandlers = [
     return HttpResponse.json(newDataset, { status: 201 });
   }),
 
-  http.put(`${BASE_URL}/:id`, async ({ request, params }) => {
-    const { id, projectId } = params;
+  http.put(DATASET_URL, async ({ request, params }) => {
+    const { id } = params;
     const body = await request.json() as DatasetUpdateRequest;
 
-    const index = datasets.findIndex(d => d.publicId === id && d.projectId === projectId);
+    const index = datasets.findIndex(d => d.publicId === id);
     if (index === -1) {
       return HttpResponse.json({ message: "Dataset not found" }, { status: 404 });
     }
@@ -71,9 +72,9 @@ export const datasetHandlers = [
     return HttpResponse.json(updated);
   }),
 
-  http.delete(`${BASE_URL}/:id`, ({ params }) => {
-    const { id, projectId } = params;
-    const index = datasets.findIndex(d => d.publicId === id && d.projectId === projectId);
+  http.delete(DATASET_URL, ({ params }) => {
+    const { id } = params;
+    const index = datasets.findIndex(d => d.publicId === id);
 
     if (index !== -1) {
       datasets.splice(index, 1);

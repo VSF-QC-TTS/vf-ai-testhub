@@ -54,7 +54,14 @@ export const vi = {
       deleteConfirm: "Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác."
     },
     optional: "Tùy chọn",
-    description: "Mô tả"
+    description: "Mô tả",
+    roles: {
+      QC_MEMBER: "Thành viên",
+      QC_LEAD: "Trưởng nhóm",
+      QC_MANAGER: "Quản lý",
+      ADMIN: "Quản trị viên",
+      USER: "Người dùng"
+    }
   },
   home: {
     title: "AI TestHub",
@@ -167,12 +174,21 @@ export const vi = {
           title: "Chạy kiểm thử đầu tiên",
           description: "Môi trường và dữ liệu đã sẵn sàng. Thực thi kiểm thử để xem kết quả.",
           action: "Chạy dữ liệu"
-        },
-        dashboard: {
-          title: "Dashboard đang được xây dựng",
-          description: "Khi có dữ liệu chạy kiểm thử, khu vực này sẽ hiển thị các chỉ số, biểu đồ xu hướng và các lượt chạy gần đây."
         }
-      }
+      },
+      metrics: {
+        totalTestCases: "Tổng số Test Case",
+        activeTargets: "Mục tiêu hoạt động",
+        datasets: "Bộ dữ liệu",
+        rubrics: "Tiêu chí đánh giá"
+      },
+      recentRuns: "Các lượt chạy gần đây",
+      recentRunsUnavailable: "Danh sách lượt chạy gần đây sẽ hiển thị khi hệ thống hỗ trợ API tổng hợp cấp độ dự án.",
+      viewAllRuns: "Xem tất cả",
+      configSummary: "Tóm tắt cấu hình",
+      targetsConfigured: "Mục tiêu đã cấu hình",
+      datasetsImported: "Bộ dữ liệu đã nhập",
+      rubricsDefined: "Tiêu chí đã tạo"
     },
     list: {
       desc: "Quản lý các không gian làm việc và môi trường kiểm thử API của bạn.",
@@ -348,24 +364,186 @@ export const vi = {
       descPlaceholder: "Mô tả mục đích của tập dữ liệu này..."
     },
     delete: {
-      title: "Xóa tập dữ liệu",
-      desc: "Bạn có chắc chắn muốn xóa tập dữ liệu này? Toàn bộ ca kiểm thử bên trong cũng sẽ bị xóa.",
+      step3Title: "Tạo tập dữ liệu",
+      step3Desc: "Đặt tên cho tập dữ liệu mới để lưu bài kiểm tra.",
+      step3Placeholder: "VD: Test hồi quy đăng nhập",
+      submit: "Nhập & Tạo",
+      importing: "Đang nhập...",
+      success: "Nhập test case thành công."
+    }
+  },
+  rubrics: {
+    title: "Rubric",
+    description: "Quản lý hướng dẫn cho LLM Judge để đánh giá test case.",
+    create: "Tạo Rubric",
+    edit: "Sửa Rubric",
+    searchPlaceholder: "Tìm kiếm rubric...",
+    empty: {
+      title: "Chưa có Rubric nào",
+      description: "Bạn chưa tạo rubric đánh giá nào cho dự án này."
+    },
+    fields: {
+      name: "Tên",
+      category: "Danh mục",
+      scope: "Phạm vi",
+      language: "Ngôn ngữ",
+      content: "Prompt",
+      threshold: "Ngưỡng đạt"
+    },
+    categories: {
+      ANSWER_QUALITY: "Chất lượng câu trả lời",
+      POLICY_COMPLIANCE: "Tuân thủ chính sách",
+      NO_HALLUCINATION: "Không ảo giác",
+      SAFETY_REFUSAL: "Từ chối an toàn",
+      RAG_FAITHFULNESS: "Tính trung thực (RAG)",
+      TOOL_OUTPUT_USAGE: "Sử dụng kết quả công cụ",
+      SUGGESTION_RELEVANCE: "Gợi ý phù hợp",
+      VIETNAMESE_TONE: "Giọng điệu Tiếng Việt",
+      CLARIFYING_QUESTION: "Câu hỏi làm rõ",
+      BUSINESS_ACCEPTANCE: "Đáp ứng nghiệp vụ"
+    },
+    form: {
+      createTitle: "Tạo Rubric Mới",
+      createDesc: "Định nghĩa hướng dẫn cho LLM Judge.",
+      editTitle: "Sửa Rubric",
+      editDesc: "Cập nhật nội dung hướng dẫn.",
+      name: "Tên",
+      namePlaceholder: "VD: Giọng điệu lịch sự",
+      description: "Mô tả",
+      descPlaceholder: "Mô tả ngắn gọn (tùy chọn)",
+      category: "Danh mục",
+      categoryPlaceholder: "Chọn danh mục...",
+      language: "Ngôn ngữ",
+      threshold: "Ngưỡng đạt",
+      content: "Prompt",
+      contentPlaceholder: "VD: Câu trả lời phải giữ thái độ lịch sự, chuyên nghiệp...",
+      messages: {
+        created: "Tạo rubric thành công",
+        updated: "Cập nhật rubric thành công",
+        createFailed: "Tạo rubric thất bại",
+        updateFailed: "Cập nhật rubric thất bại"
+      }
+    },
+    delete: {
+      title: "Xóa Rubric",
+      desc: "Bạn có chắc chắn muốn xóa rubric này? Các bài test đang dùng nó sẽ quay về mặc định.",
       confirm: "Xóa",
       deleting: "Đang xóa..."
+    },
+    archive: {
+      title: "Lưu trữ Rubric",
+      desc: "Bạn có chắc chắn muốn lưu trữ rubric này? Nó sẽ không còn dùng được cho các đánh giá mới.",
+      confirm: "Lưu trữ",
+      archiving: "Đang lưu trữ..."
     }
+  },
+  ai: {
+    generateTitle: "Tự động tạo Test Case",
+    generateDesc: "Sử dụng AI để tự động tạo nháp các test case dựa trên yêu cầu nghiệp vụ.",
+    featureName: "Tên tính năng",
+    featureNamePlaceholder: "VD: Luồng Quên Mật Khẩu",
+    businessRequirement: "Yêu cầu Nghiệp vụ",
+    businessRequirementPlaceholder: "Mô tả hành vi của tính năng, đầu vào, đầu ra, và các trường hợp ngoại lệ...",
+    generateBtn: "Tạo Nháp",
+    generating: "Đang phân tích...",
+    reviewTitle: "Xem xét bản nháp",
+    discardAll: "Hủy tất cả",
+    saveSelected: "Lưu mục đã chọn",
+    noDrafts: "Không thể tạo bản nháp. Thử điều chỉnh lại yêu cầu của bạn."
   },
   testCases: {
     title: "Ca kiểm thử",
   },
   runs: {
     title: "Lượt chạy",
+    history: {
+      title: "Lịch sử chạy",
+      description: "Xem lại lịch sử các lần chạy kiểm thử cho tập dữ liệu này.",
+      noRuns: "Chưa có lượt chạy nào",
+      noRunsDesc: "Hiện tại chưa có dữ liệu về các lượt chạy kiểm thử.",
+      runId: "Mã lượt chạy",
+      status: "Trạng thái",
+      mode: "Chế độ",
+      cases: "Tổng số ca",
+      passed: "Thành công",
+      failed: "Thất bại",
+      date: "Ngày chạy",
+      viewReport: "Xem báo cáo"
+    },
+    status: {
+      COMPLETED: "Hoàn thành",
+      FAILED: "Thất bại",
+      CANCELLED: "Đã hủy",
+      RUNNING: "Đang chạy",
+      PENDING: "Chờ xử lý",
+      UNCERTAIN: "Không chắc chắn",
+      ERROR: "Lỗi"
+    },
+    modes: {
+      FULL: "Đầy đủ",
+      SMOKE: "Nhanh (Smoke)"
+    }
   },
   reports: {
     title: "Báo cáo",
   },
-  rubrics: {
-    title: "Tiêu chí",
+  experiments: {
+    title: "Thử nghiệm A/B",
+    empty: {
+      title: "Chưa có thử nghiệm nào",
+      description: "Bắt đầu thử nghiệm A/B để so sánh các mục tiêu, mô hình hoặc cấu hình khác nhau."
+    },
+    create: "Tạo thử nghiệm",
+    fields: {
+      name: "Tên thử nghiệm",
+      status: "Trạng thái",
+      createdAt: "Ngày tạo"
+    },
+    form: {
+      createTitle: "Tạo thử nghiệm A/B",
+      createDesc: "Xác định các biến thể để so sánh hiệu suất.",
+      name: "Tên",
+      namePlaceholder: "VD: Kiểm tra tối ưu prompt",
+      datasetId: "Tập dữ liệu",
+      datasetIdPlaceholder: "Chọn tập dữ liệu...",
+      variants: "Các biến thể",
+      addVariant: "Thêm biến thể",
+      variantName: "Tên biến thể",
+      variantNamePlaceholder: "VD: Gốc, Mới",
+      targetId: "Mục tiêu",
+      targetIdPlaceholder: "Chọn mục tiêu...",
+      startDesc: "Ước tính số cuộc gọi: {{calls}}. Tiếp tục?",
+      startBtn: "Bắt đầu thử nghiệm",
+      starting: "Đang bắt đầu..."
+    },
+    detail: {
+      progress: "Tiến độ",
+      winner: "Khuyến nghị / Người chiến thắng",
+      noWinnerYet: "Đang chờ kết quả để xác định người chiến thắng.",
+    }
   },
+  compare: {
+    title: "So sánh lượt chạy",
+    selectRuns: "Chọn lượt chạy để so sánh",
+    baseRun: "Lượt chạy gốc",
+    candidateRun: "Lượt chạy so sánh",
+    compareBtn: "So sánh",
+    metrics: {
+      regressions: "Lỗi mới",
+      fixes: "Đã sửa",
+      unchanged: "Không đổi",
+      passRateDelta: "Chênh lệch tỷ lệ đạt",
+      latencyDelta: "Chênh lệch độ trễ",
+      costDelta: "Chênh lệch chi phí"
+    },
+    diff: {
+      expected: "Kỳ vọng",
+      actualBase: "Thực tế (Gốc)",
+      actualCandidate: "Thực tế (Mới)"
+    },
+    incompatible: "Các lượt chạy không tương thích. Chúng phải sử dụng cùng một tập dữ liệu."
+  },
+
   errors: {
     unknown: "Lỗi không xác định",
     boundaryTitle: "Đã xảy ra lỗi",
@@ -447,9 +625,9 @@ export const vi = {
     }
   },
   assertions: {
-    title: "Xác thực (Assertions)",
-    addAssertion: "Thêm xác thực",
-    emptyDesc: "Chưa cấu hình quy tắc xác thực nào cho kịch bản này.",
+    title: "Assertion",
+    addAssertion: "Thêm Assertion",
+    emptyDesc: "Chưa cấu hình assertion nào cho kịch bản này.",
     disabled: "Đã tắt",
     delete: {
       title: "Xóa xác thực",
@@ -473,10 +651,10 @@ export const vi = {
       expectedValue: "Giá trị kỳ vọng",
       expectedValuePlaceholder: "Văn bản hoặc chuỗi JSON",
       formatJson: "Định dạng JSON",
-      rubricId: "ID Tiêu chí (Rubric)",
-      rubricIdPlaceholder: "Chọn tiêu chí đánh giá...",
-      rubricOverride: "Ghi đè Tiêu chí",
-      rubricOverridePlaceholder: "Hướng dẫn cụ thể cho giám khảo LLM",
+      rubricId: "ID Rubric",
+      rubricIdPlaceholder: "Chọn rubric...",
+      rubricOverride: "Ghi đè Rubric",
+      rubricOverridePlaceholder: "Prompt cụ thể cho LLM Judge",
       threshold: "Ngưỡng vượt qua (0-1)",
       weight: "Trọng số",
       severity: "Mức độ nghiêm trọng",
@@ -504,9 +682,9 @@ export const vi = {
     }
   },
   toolexpectations: {
-    title: "Kỳ vọng Công cụ (Tool Expectations)",
-    addExpectation: "Thêm kỳ vọng",
-    emptyDesc: "Chưa cấu hình kỳ vọng công cụ nào cho kịch bản này.",
+    title: "Tool Expectation",
+    addExpectation: "Thêm Tool Expectation",
+    emptyDesc: "Chưa cấu hình Tool Expectation nào cho kịch bản này.",
     disabled: "Đã tắt",
     types: {
       TOOL_MUST_BE_CALLED: "Phải gọi công cụ",
@@ -543,7 +721,7 @@ export const vi = {
       minCalls: "Số lần gọi tối thiểu",
       maxCalls: "Số lần gọi tối đa",
       severity: "Mức độ nghiêm trọng",
-      required: "Bắt buộc (Required)",
+      required: "Bắt buộc",
       enabled: "Trạng thái bật",
       validation: {
         maxLength: "Không vượt quá {{max}} ký tự",

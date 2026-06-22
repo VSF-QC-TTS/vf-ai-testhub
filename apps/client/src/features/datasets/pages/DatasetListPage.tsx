@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { ChangeEvent, MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Database, Search, MoreVertical, Trash2, Edit2 } from "lucide-react";
+import { Plus, Database, Search, MoreVertical, Trash2, Edit2, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDatasets, useDeleteDataset } from "../datasets.queries";
 import { DatasetFormDialog } from "../components/DatasetFormDialog";
+import { GenerateTestCasesDialog } from "../../ai/components/GenerateTestCasesDialog";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/Input";
 import { Skeleton } from "../../../components/ui/skeleton";
@@ -35,6 +36,7 @@ export function DatasetListPage() {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingDataset, setEditingDataset] = useState<DatasetResponse | null>(null);
+  const [generationDataset, setGenerationDataset] = useState<DatasetResponse | null>(null);
   const [datasetPendingDelete, setDatasetPendingDelete] = useState<DatasetResponse | null>(null);
 
   const datasets = data?.content || [];
@@ -64,6 +66,11 @@ export function DatasetListPage() {
   const handleDeleteRequest = (dataset: DatasetResponse, e: MouseEvent) => {
     e.stopPropagation();
     setDatasetPendingDelete(dataset);
+  };
+
+  const handleGenerateRequest = (dataset: DatasetResponse, e: MouseEvent) => {
+    e.stopPropagation();
+    setGenerationDataset(dataset);
   };
 
   const handleDeleteConfirm = () => {
@@ -216,6 +223,10 @@ export function DatasetListPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-[160px]">
+                              <DropdownMenuItem onClick={(e) => handleGenerateRequest(dataset, e)}>
+                                <Sparkles className="h-4 w-4 mr-2" />
+                                {t("ai:generate.menuItem", "Generate test cases")}
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={(e) => handleEdit(dataset, e)}>
                                 <Edit2 className="h-4 w-4 mr-2" />
                                 {t("common:actions.edit")}
@@ -242,6 +253,18 @@ export function DatasetListPage() {
         onOpenChange={setIsFormOpen}
         dataset={editingDataset}
       />
+
+      {generationDataset && (
+        <GenerateTestCasesDialog
+          open={!!generationDataset}
+          onOpenChange={(open) => {
+            if (!open) {
+              setGenerationDataset(null);
+            }
+          }}
+          datasetId={generationDataset.publicId}
+        />
+      )}
 
       <Dialog open={!!datasetPendingDelete} onOpenChange={(open) => !open && setDatasetPendingDelete(null)}>
         <DialogContent>

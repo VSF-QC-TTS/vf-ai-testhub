@@ -48,7 +48,7 @@ export function TargetConfigurationWorkbench() {
   
   const createMutation = useCreateTarget();
   const updateMutation = useUpdateTarget(targetId ?? "");
-  const parseCurlMutation = useParseCurl();
+  const parseCurlMutation = useParseCurl(projectId || null);
   const isPending = createMutation.isPending || updateMutation.isPending;
   const mutationError = createMutation.error ?? updateMutation.error;
   const errorCode = mutationError instanceof ApiError ? mutationError.code : undefined;

@@ -52,7 +52,7 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
   };
 
   const displayName = user?.displayName || user?.email || t("common:navigation.myAccount", "My Account");
-  const userSubtitle = user?.role || user?.email || t("common:navigation.profile", "Profile");
+  const userSubtitle = (user?.role ? t(`common:roles.${user.role}`, user.role) : user?.email) || t("common:navigation.profile", "Profile");
   const initials = getInitials(displayName);
 
   return (

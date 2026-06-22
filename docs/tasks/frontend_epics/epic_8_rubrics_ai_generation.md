@@ -63,6 +63,7 @@ Acceptance:
 ## Task 8.3a: LLM Judge Configuration Surface
 
 Goal: expose judge provider/model/runtime settings only if backend has a persisted contract for them.
+*Note: As of current sprint, the backend lacks a persisted contract for these settings. Following the acceptance criteria, this UI is disabled/added to the roadmap instead of adding local-only storage.*
 
 Steps:
 

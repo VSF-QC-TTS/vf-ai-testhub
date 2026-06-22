@@ -1,6 +1,6 @@
 # ============================================================
 # VF AI TestHub - Local Docker Compose
-# Backend (Spring Boot) + Runner (Node.js) + DB + Redis + mock target
+# Client (Nginx) + Backend (Spring Boot) + Runner (Node.js) + DB + Redis + mock target
 # All ports bound to 127.0.0.1 only
 # ============================================================
 
@@ -68,9 +68,28 @@ services:
       REDIS_PORT: 6379
 
       RUNNER_TOKEN: ${RUNNER_TOKEN:-local-runner-token}
+      WEB_BASE_URL: ${CLIENT_PUBLIC_URL:-http://localhost:3000}
+      SERVER_BASE_URL: ${API_PUBLIC_URL:-http://localhost:8080}
     volumes:
       - app-logs:/app/logs
       - app-exports:/app/exports
+
+  # ---------------------------------------------------------
+  # Client UI (Nginx + Vite static assets)
+  # ---------------------------------------------------------
+  client:
+    build:
+      context: ./apps/client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${CLIENT_API_BASE_URL:-/}
+    restart: unless-stopped
+    init: true
+    ports:
+      - "127.0.0.1:${CLIENT_PORT:-3000}:80"
+    depends_on:
+      api:
+        condition: service_started
 
   # ---------------------------------------------------------
   # Runner Worker (Node.js)

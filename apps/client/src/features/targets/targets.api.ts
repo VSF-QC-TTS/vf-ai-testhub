@@ -4,7 +4,7 @@ import type { TargetRequest, TargetResponse } from "./targets.types";
 
 export const targetsApi = {
   create: async (data: TargetRequest): Promise<TargetResponse> => {
-    const res = await apiClient.post<TargetResponse>("/api/v1/targets", data);
+    const res = await apiClient.post<TargetResponse>(`/api/v1/projects/${data.projectId}/targets`, data);
     return res.data;
   },
 
@@ -27,8 +27,8 @@ export const targetsApi = {
     await apiClient.delete(`/api/v1/targets/${id}`);
   },
 
-  parseCurl: async (curlCommand: string): Promise<Partial<TargetRequest>> => {
-    const res = await apiClient.post<Partial<TargetRequest>>("/api/v1/targets/parse-curl", { curlCommand });
+  parseCurl: async (projectId: UUID, curlCommand: string): Promise<Partial<TargetRequest>> => {
+    const res = await apiClient.post<Partial<TargetRequest>>(`/api/v1/projects/${projectId}/targets/parse-curl`, { curlCommand });
     return res.data;
   }
 };

@@ -59,8 +59,8 @@ export function useDeleteTarget() {
   });
 }
 
-export function useParseCurl() {
+export function useParseCurl(projectId: UUID | null) {
   return useMutation({
-    mutationFn: targetsApi.parseCurl,
+    mutationFn: (curlCommand: string) => targetsApi.parseCurl(projectId!, curlCommand),
   });
 }

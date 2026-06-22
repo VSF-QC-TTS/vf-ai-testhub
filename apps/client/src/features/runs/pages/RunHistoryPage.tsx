@@ -19,7 +19,7 @@ export function RunHistoryPage() {
   const { t } = useTranslation();
   const { projectId = "", datasetId = "" } = useParams();
 
-  const { data, isLoading } = useRuns(datasetId);
+  const { data, isLoading } = useRuns(datasetId || "all");
 
   const runs = data?.content || [];
   const isEmpty = !isLoading && runs.length === 0;
@@ -41,9 +41,6 @@ export function RunHistoryPage() {
     }
   };
 
-  if (!datasetId) {
-    return <div className="p-8 text-center text-muted-foreground">Missing dataset ID</div>;
-  }
 
   return (
     <div className="flex flex-col gap-8 w-full pb-12">
@@ -116,7 +113,7 @@ export function RunHistoryPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <Button asChild variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Link to={`/projects/${projectId}/reports/${run.publicId}`}>
+                      <Link to={`/projects/${projectId}/runs/${run.publicId}/report`}>
                         {t("runs:history.viewReport")}
                       </Link>
                     </Button>

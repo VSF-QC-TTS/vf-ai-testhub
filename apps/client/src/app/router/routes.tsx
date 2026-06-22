@@ -18,16 +18,25 @@ import { VerifyEmailPage } from "../../features/auth/pages/VerifyEmailPage";
 // Project Pages
 import { ProjectListPage } from "../../features/projects/pages/ProjectListPage";
 import { ProjectCreatePage } from "../../features/projects/pages/ProjectCreatePage";
-import { ProjectOverviewPage } from "../../features/projects/pages/ProjectOverviewPage";
+import { ProjectDashboardPage } from "../../features/projects/pages/ProjectDashboardPage";
 
 // Target Pages
 import { TargetListPage } from "../../features/targets/pages/TargetListPage";
 import { TargetConfigurationWorkbench } from "../../features/targets/pages/TargetConfigurationWorkbench";
 
+// Rubric Pages
+import { RubricListPage } from "../../features/rubrics/pages/RubricListPage";
+
 // Dataset Pages
 import { TestCaseListPage } from "../../features/testcases/pages/TestCaseListPage";
 import { DatasetListPage } from "../../features/datasets/pages/DatasetListPage";
 import { RunHistoryPage } from "../../features/runs/pages/RunHistoryPage";
+import { RunReportDashboard } from "../../features/reports/pages/RunReportDashboard";
+import { RunComparePage } from "../../features/runs/pages/RunComparePage";
+
+// Experiment Pages
+import { ExperimentListPage } from "../../features/experiments/pages/ExperimentListPage";
+import { ExperimentDetailPage } from "../../features/experiments/pages/ExperimentDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -89,15 +98,22 @@ export const router = createBrowserRouter([
                   {
                     path: "projects/:projectId",
                     children: [
-                      { index: true, element: <ProjectOverviewPage /> },
+                      { index: true, element: <Navigate to="dashboard" replace /> },
+                      { path: "dashboard", element: <ProjectDashboardPage /> },
                       { path: "targets", element: <TargetListPage /> },
                       { path: "targets/new", element: <TargetConfigurationWorkbench /> },
                       { path: "targets/:targetId", element: <TargetConfigurationWorkbench /> },
+                      { path: "rubrics", element: <RubricListPage /> },
                       { path: "datasets", element: <DatasetListPage /> },
                       { path: "datasets/:datasetId/test-cases", element: <TestCaseListPage /> },
                       { path: "test-cases", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
                       { path: "datasets/:datasetId/runs", element: <RunHistoryPage /> },
-                      { path: "runs", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                      { path: "runs", element: <RunHistoryPage /> },
+                      { path: "runs/compare", element: <RunComparePage /> },
+                      { path: "runs/:runId/report", element: <RunReportDashboard /> },
+                      { path: "experiments", element: <ExperimentListPage /> },
+                      { path: "experiments/new", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
+                      { path: "experiments/:experimentId", element: <ExperimentDetailPage /> },
                       { path: "reports", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
                       { path: "settings", element: <Suspense fallback={null}><PlaceholderPage /></Suspense> },
                     ],

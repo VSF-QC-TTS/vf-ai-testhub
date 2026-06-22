@@ -1,7 +1,15 @@
 import { z } from "zod";
 
+const apiBaseUrlSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .refine((value) => value.startsWith("/") || URL.canParse(value), {
+    message: "Must be an absolute URL or a same-origin path",
+  });
+
 const envSchema = z.object({
-  VITE_API_BASE_URL: z.string().url().default("http://localhost:8080"),
+  VITE_API_BASE_URL: apiBaseUrlSchema.default("/"),
 });
 
 let _env: z.infer<typeof envSchema>;
