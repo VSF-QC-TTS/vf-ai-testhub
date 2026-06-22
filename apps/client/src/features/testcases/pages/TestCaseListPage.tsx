@@ -19,7 +19,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
 import { TestCaseFormDialog } from "../components/TestCaseFormDialog";
 import { TestCaseImportDialog } from "../components/TestCaseImportDialog";
-import { UploadCloud } from "lucide-react";
+import { TriggerRunDialog } from "../../runs/components/TriggerRunDialog";
+import { RunProgressPanel } from "../../runs/components/RunProgressPanel";
+import { UploadCloud, Play, History } from "lucide-react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import type { TestCaseResponse, TestCaseSource, TestPriority } from "../testcases.types";
 import { useDataset } from "../../datasets/datasets.queries";
@@ -38,6 +41,8 @@ export function TestCaseListPage() {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isTriggerOpen, setIsTriggerOpen] = useState(false);
+  const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const [editingTestCase, setEditingTestCase] = useState<TestCaseResponse | null>(null);
   const [testCasePendingDelete, setTestCasePendingDelete] = useState<TestCaseResponse | null>(null);
   
@@ -81,6 +86,16 @@ export function TestCaseListPage() {
           <p className="text-muted-foreground mt-1">{t("testcases:description")}</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button asChild variant="outline" className="gap-2 shrink-0">
+            <Link to={`/projects/${projectId}/datasets/${datasetId}/runs`}>
+              <History className="h-4 w-4" />
+              History
+            </Link>
+          </Button>
+          <Button onClick={() => setIsTriggerOpen(true)} className="gap-2 shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Play className="h-4 w-4" />
+            Run
+          </Button>
           <Button onClick={() => setIsImportOpen(true)} variant="outline" className="gap-2 shrink-0">
             <UploadCloud className="h-4 w-4" />
             {t("testcases:import.title")}
@@ -92,6 +107,7 @@ export function TestCaseListPage() {
         </div>
       </div>
 
+      {activeRunId && <RunProgressPanel runId={activeRunId} />}
       {isLoading ? (
         <div className="space-y-4">
           <Skeleton className="h-10 w-[250px]" />
@@ -281,6 +297,12 @@ export function TestCaseListPage() {
         </div>
       )}
 
+      <TriggerRunDialog
+        open={isTriggerOpen}
+        onOpenChange={setIsTriggerOpen}
+        datasetId={datasetId}
+        onRunStarted={setActiveRunId}
+      />
       <TestCaseImportDialog
         open={isImportOpen}
         onOpenChange={setIsImportOpen}
