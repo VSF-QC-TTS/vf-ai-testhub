@@ -41,7 +41,7 @@ export function getProjectSwitchPath(pathname: string, nextProjectId: string): s
     return projectModulePath(nextProjectId, module);
   }
 
-  return projectTargetsPath(nextProjectId);
+  return projectOverviewPath(nextProjectId);
 }
 
 export function findProject(projects: readonly ProjectResponse[], projectId: string | null): ProjectResponse | undefined {

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProjectStore } from "../../features/projects/project.store";
 import { useProjects } from "../../features/projects/projects.queries";
-import { findProject, projectTargetsPath } from "../../features/projects/project.routes";
+import { findProject, projectOverviewPath } from "../../features/projects/project.routes";
 
 export function FirstRunProjectGate() {
   const { t } = useTranslation();
@@ -45,7 +45,7 @@ export function FirstRunProjectGate() {
 
   if (!projectId) {
     const fallbackProject = findProject(projects, lastProjectId) ?? projects[0];
-    return <Navigate to={projectTargetsPath(fallbackProject.id)} replace />;
+    return <Navigate to={projectOverviewPath(fallbackProject.id)} replace />;
   }
 
   const currentProject = findProject(projects, projectId);
