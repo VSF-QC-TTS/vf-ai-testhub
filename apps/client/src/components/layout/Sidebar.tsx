@@ -10,8 +10,20 @@ import { useProjectStore } from "../../features/projects/project.store";
 import { findProject, getProjectNavPath, getProjectSwitchPath, getRouteProjectId } from "../../features/projects/project.routes";
 import { BrandLogo } from "../ui/Logo";
 
+import { ThemeToggle } from "./ThemeToggle";
+import { User, Languages } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+
 export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { data } = useProjects();
@@ -104,6 +116,40 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
           })}
         </ul>
       </nav>
+
+      <div className="flex flex-col gap-2 border-t p-2">
+        <ThemeToggle />
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-full flex justify-center h-10 rounded-md">
+              <Languages className="h-5 w-5 shrink-0" />
+              <span className="sr-only">{t("common:navigation.toggleLanguage", "Toggle language")}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="right">
+            <DropdownMenuItem onClick={() => i18n.changeLanguage("en")}>English</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => i18n.changeLanguage("vi")}>Tiếng Việt</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="w-full flex justify-center h-10 rounded-md">
+              <User className="h-5 w-5 shrink-0" />
+              <span className="sr-only">{t("common:navigation.toggleUserMenu", "Toggle user menu")}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="right">
+            <DropdownMenuLabel>{t("common:navigation.myAccount", "My Account")}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>{t("common:navigation.profile", "Profile")}</DropdownMenuItem>
+            <DropdownMenuItem>{t("common:navigation.settings", "Settings")}</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-destructive">{t("common:navigation.logout", "Logout")}</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </aside>
   );
 }

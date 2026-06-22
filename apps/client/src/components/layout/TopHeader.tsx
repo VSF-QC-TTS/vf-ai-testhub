@@ -1,5 +1,5 @@
-import { ChevronRight, User, Languages } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { User, Languages } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { type ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -24,7 +24,6 @@ import { Button } from "@/components/ui/button";
 export function TopHeader({ className, ...props }: ComponentProps<"header">) {
   const location = useLocation();
   const navigate = useNavigate();
-  const paths = location.pathname.split("/").filter(Boolean);
   const { t, i18n } = useTranslation();
   const { data } = useProjects();
   const lastProjectId = useProjectStore((state) => state.lastProjectId);
@@ -41,52 +40,18 @@ export function TopHeader({ className, ...props }: ComponentProps<"header">) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-10 flex h-14 lg:h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-md pl-14 pr-4 md:px-4 lg:px-6",
+        "sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-md px-4 md:hidden",
         className
       )}
       {...props}
     >
-      <div className="min-w-0 flex-1 overflow-x-auto scrollbar-hide">
+      <div className="min-w-0 flex-1 overflow-x-auto scrollbar-hide pl-10">
         <ProjectSwitcher
           compact
           projects={projects}
           currentProject={currentProject}
           onProjectSelect={handleProjectSelect}
-          className="w-[min(58vw,240px)] md:hidden"
         />
-        <nav aria-label="Breadcrumb" className="hidden items-center text-sm text-muted-foreground whitespace-nowrap md:flex">
-          {paths.map((path, index) => {
-            const routeTo = `/${paths.slice(0, index + 1).join("/")}`;
-            const isLast = index === paths.length - 1;
-
-            let name = path;
-            const translationKey = `nav.${path}`;
-            const translated = t(translationKey);
-
-            // Check if it's translated, else if it's the current project ID, else format it
-            if (translated !== translationKey && translated !== path && translated !== `nav.${path}`) {
-              name = translated;
-            } else if (currentProject && path === currentProject.id) {
-              name = currentProject.name;
-            } else if (path.length > 20 && path.includes("-")) {
-              // Likely a UUID for a target/dataset, truncate for readability
-              name = `${path.substring(0, 8)}...`;
-            } else {
-              name = path.charAt(0).toUpperCase() + path.slice(1);
-            }
-
-            return (
-              <div key={path} className="flex items-center">
-                {index > 0 && <ChevronRight className="mx-1 h-4 w-4 shrink-0" />}
-                {isLast ? (
-                  <span className="font-medium text-foreground" aria-current="page">{name}</span>
-                ) : (
-                  <Link to={routeTo} className="hover:text-foreground transition-colors">{name}</Link>
-                )}
-              </div>
-            );
-          })}
-        </nav>
       </div>
 
       <div className="flex items-center gap-2">
