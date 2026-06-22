@@ -106,7 +106,7 @@ export function RunHistoryPage() {
                     {run.totalCases}
                   </TableCell>
                   <TableCell className="text-sm text-green-600 font-medium">
-                    {run.totalCases - run.failedCases - run.errorCases - run.uncertainCases - run.skippedCases}
+                    {(run.totalCases || 0) - (run.failedCases || 0) - (run.errorCases || 0) - (run.uncertainCases || 0) - (run.skippedCases || 0)}
                   </TableCell>
                   <TableCell className="text-sm text-red-600 font-medium">
                     {run.failedCases + run.errorCases}

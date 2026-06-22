@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRunPolling } from "../runs.queries";
 import { CheckCircle2, XCircle, AlertTriangle, Loader2, RotateCw } from "lucide-react";
@@ -12,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import type { ReviewStatus } from "@/lib/api/types";
 
@@ -23,15 +22,8 @@ interface RunProgressPanelProps {
 export function RunProgressPanel({ runId }: RunProgressPanelProps) {
   const { t } = useTranslation();
   const { projectId = "" } = useParams();
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  
-  const { data, isLoading, isError, refetch, dataUpdatedAt } = useRunPolling(runId, undefined);
-
-  useEffect(() => {
-    if (dataUpdatedAt) {
-      setLastUpdated(new Date(dataUpdatedAt));
-    }
-  }, [dataUpdatedAt]);
+  const { data, isLoading, isError, refetch, dataUpdatedAt } = useRunPolling(runId);
+  const lastUpdated = dataUpdatedAt ? new Date(dataUpdatedAt) : new Date();
 
   if (isLoading && !data) {
     return (
@@ -135,7 +127,7 @@ export function RunProgressPanel({ runId }: RunProgressPanelProps) {
           </div>
           <div className="p-3 border rounded-lg bg-green-50/50 dark:bg-green-900/10 border-green-100 dark:border-green-900/50">
             <p className="text-xs text-green-600 dark:text-green-400 mb-1">{t("runs:progress.failed")}</p>
-            <p className="text-xl font-semibold text-green-700 dark:text-green-500">{data.totalCases - data.failedCases - data.errorCases - data.uncertainCases}</p>
+            <p className="text-xl font-semibold text-green-700 dark:text-green-500">{data.totalCases - data.failedCases - data.errorCases - data.uncertainCases - data.skippedCases}</p>
           </div>
           <div className="p-3 border rounded-lg bg-red-50/50 dark:bg-red-900/10 border-red-100 dark:border-red-900/50">
             <p className="text-xs text-red-600 dark:text-red-400 mb-1">{t("runs:progress.failed")}</p>
@@ -155,11 +147,11 @@ export function RunProgressPanel({ runId }: RunProgressPanelProps) {
           </div>
         </div>
 
-        <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-2.5 overflow-hidden border dark:border-zinc-700">
+        <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-2.5 overflow-hidden border dark:border-zinc-700 relative">
           <motion.div 
-            className="bg-indigo-600 h-2.5 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
+            className="absolute inset-y-0 left-0 bg-indigo-600 h-2.5 rounded-full w-full origin-left"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: progressPercent / 100 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           />
         </div>
@@ -179,8 +171,7 @@ export function RunProgressPanel({ runId }: RunProgressPanelProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <AnimatePresence>
-                    {data.cases.map(c => (
+                                      {data.cases.map(c => (
                       <TableRow key={c.testCasePublicId}>
                         <TableCell className="text-center">{renderStatusIcon(c.status)}</TableCell>
                         <TableCell className="font-mono text-xs text-muted-foreground">{c.externalId || "-"}</TableCell>
@@ -200,8 +191,7 @@ export function RunProgressPanel({ runId }: RunProgressPanelProps) {
                         </TableCell>
                       </TableRow>
                     ))}
-                  </AnimatePresence>
-                </TableBody>
+                                  </TableBody>
               </Table>
             </div>
           </div>

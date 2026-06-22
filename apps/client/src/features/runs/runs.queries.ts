@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { runKeys, fetchRuns, fetchRun, triggerRun } from "./runs.api";
 import type { TriggerRunRequest, RunFilterParams } from "./runs.types";
-import type { RunStatus } from "@/lib/api/types";
 
 export const useRuns = (datasetId: string, params?: RunFilterParams) => {
   return useQuery({
@@ -19,13 +18,17 @@ export const useRun = (runId: string) => {
   });
 };
 
-export const useRunPolling = (runId: string, status?: RunStatus) => {
-  const isTerminal = status === "COMPLETED" || status === "FAILED" || status === "CANCELLED";
+export const useRunPolling = (runId: string) => {
   return useQuery({
     queryKey: runKeys.detail(runId),
     queryFn: () => fetchRun(runId),
-    enabled: !!runId && !isTerminal,
-    refetchInterval: isTerminal ? false : 3000,
+    enabled: !!runId,
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      const isTerminal = status === "COMPLETED" || status === "FAILED" || status === "CANCELLED";
+      if (isTerminal) return false;
+      return 3000;
+    },
   });
 };
 
