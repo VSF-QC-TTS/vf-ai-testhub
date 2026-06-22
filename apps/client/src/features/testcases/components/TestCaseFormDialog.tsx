@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
@@ -8,6 +8,13 @@ import { AssertionList } from "../../assertions/components/AssertionList";
 import { ToolExpectationList } from "../../toolexpectations/components/ToolExpectationList";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { getTestCaseSchema, type TestCaseFormData } from "../testcases.schemas";
@@ -39,7 +46,7 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
   const [isValidatingJson, setIsValidatingJson] = useState(false);
 
   const form = useForm<TestCaseFormData>({
-    resolver: zodResolver(getTestCaseSchema(t)) as any,
+    resolver: zodResolver(getTestCaseSchema(t)) as Resolver<TestCaseFormData>,
     defaultValues: {
       externalId: "",
       sectionName: "",
@@ -310,18 +317,19 @@ export function TestCaseFormDialog({ open, onOpenChange, testCase }: TestCaseFor
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>{t("testcases:form.priority")}</FormLabel>
-                      <FormControl>
-                        <select
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          disabled={isPending}
-                          {...field}
-                        >
-                          <option value="P0">P0</option>
-                          <option value="P1">P1</option>
-                          <option value="P2">P2</option>
-                          <option value="P3">P3</option>
-                        </select>
-                      </FormControl>
+                      <Select value={field.value || "P3"} onValueChange={field.onChange} disabled={isPending}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="P0">P0</SelectItem>
+                          <SelectItem value="P1">P1</SelectItem>
+                          <SelectItem value="P2">P2</SelectItem>
+                          <SelectItem value="P3">P3</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

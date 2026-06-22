@@ -34,7 +34,7 @@ export function ProjectOverviewPage() {
     if (targetCount === 0) {
       return (
         <div className="relative overflow-hidden flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 dark:border-zinc-800 p-12 text-center bg-zinc-50/50 dark:bg-zinc-900/30">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-50 dark:opacity-20" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-50 dark:opacity-20" />
           <div className="relative mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-zinc-950/50 dark:border dark:border-zinc-800 shadow-sm">
             <Target className="h-8 w-8 text-primary" />
           </div>
@@ -55,7 +55,7 @@ export function ProjectOverviewPage() {
     if (datasetCount === 0) {
       return (
         <div className="relative overflow-hidden flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 dark:border-zinc-800 p-12 text-center bg-zinc-50/50 dark:bg-zinc-900/30">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-50 dark:opacity-20" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-50 dark:opacity-20" />
           <div className="relative mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-zinc-950/50 dark:border dark:border-zinc-800 shadow-sm">
             <Database className="h-8 w-8 text-primary" />
           </div>
@@ -76,7 +76,7 @@ export function ProjectOverviewPage() {
     if (runCount === 0) {
       return (
         <div className="relative overflow-hidden flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 dark:border-zinc-800 p-12 text-center bg-zinc-50/50 dark:bg-zinc-900/30">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-50 dark:opacity-20" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-50 dark:opacity-20" />
           <div className="relative mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-zinc-950/50 dark:border dark:border-zinc-800 shadow-sm">
             <PlayCircle className="h-8 w-8 text-primary" />
           </div>
@@ -173,7 +173,7 @@ function SetupCard({ icon, title, value, to }: SetupCardProps) {
       to={to}
       className="group relative overflow-hidden rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-1 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700 dark:hover:bg-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
       <div className="relative mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-950/50 dark:border dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 group-hover:scale-110 group-hover:text-primary transition-all">
         {icon}
       </div>

@@ -24,6 +24,7 @@ interface ProjectSwitcherProps extends ComponentProps<"div"> {
   onProjectSelect?: (project: Project) => void;
   isCollapsed?: boolean;
   compact?: boolean;
+  tone?: "default" | "sidebar";
 }
 
 export function ProjectSwitcher({
@@ -32,10 +33,12 @@ export function ProjectSwitcher({
   onProjectSelect,
   isCollapsed,
   compact,
+  tone = "default",
   className,
   ...props
 }: ProjectSwitcherProps) {
   const { t } = useTranslation();
+  const isSidebarTone = tone === "sidebar";
 
   return (
     <div className={cn(compact ? "min-w-0" : "px-2 lg:px-4 mb-2 mt-2", className)} {...props}>
@@ -45,16 +48,31 @@ export function ProjectSwitcher({
             variant="outline"
             className={cn(
               "h-12 w-full justify-start overflow-hidden py-2",
-              isCollapsed ? "px-2 justify-center" : "px-3"
+              isCollapsed ? "px-2 justify-center" : "px-3",
+              isSidebarTone &&
+                "border-border bg-muted/50 text-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring dark:border-white/10 dark:bg-white/[0.06] dark:text-zinc-100 dark:hover:bg-white/[0.10] dark:hover:text-white dark:focus-visible:ring-white/30 dark:focus-visible:ring-offset-[#15181d]"
             )}
             aria-label={t("projects:switcher.select")}
             title={currentProject?.name ?? t("projects:switcher.select")}
           >
-            <Folder className={cn("h-4 w-4 shrink-0", !isCollapsed && "mr-2")} />
+            <span
+              className={cn(
+                "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+                isSidebarTone ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
+                !isCollapsed && "mr-2"
+              )}
+            >
+              <Folder className="h-4 w-4" />
+            </span>
             {!isCollapsed && (
               <>
                 <span className="min-w-0 flex-1 text-left">
-                  <span className="block truncate text-[11px] font-medium uppercase text-muted-foreground">
+                  <span
+                    className={cn(
+                      "block truncate text-[11px] font-medium uppercase",
+                      isSidebarTone ? "text-muted-foreground dark:text-zinc-400" : "text-muted-foreground"
+                    )}
+                  >
                     {t("projects:switcher.current")}
                   </span>
                   <span className="block truncate">{currentProject?.name || t("projects:switcher.select")}</span>

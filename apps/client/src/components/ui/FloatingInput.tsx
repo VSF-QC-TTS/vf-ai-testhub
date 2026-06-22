@@ -17,6 +17,7 @@ function FloatingInput({ className, type, id, label, ref, ...props }: FloatingIn
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
   const inputType = isPassword ? (showPassword ? "text" : "password") : type;
+  const isInvalid = props["aria-invalid"] === true || props["aria-invalid"] === "true";
 
   return (
     <div className="relative w-full">
@@ -35,7 +36,12 @@ function FloatingInput({ className, type, id, label, ref, ...props }: FloatingIn
       />
       <label
         htmlFor={inputId}
-        className="absolute left-4 top-4 z-10 origin-[0] -translate-y-2.5 scale-[0.85] transform text-muted-foreground duration-200 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-2.5 peer-focus:scale-[0.85] peer-focus:text-foreground pointer-events-none"
+        className={cn(
+          "pointer-events-none absolute left-3 top-4 z-10 origin-[0] -translate-y-2.5 scale-[0.85] transform text-muted-foreground duration-200",
+          "peer-placeholder-shown:left-4 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100",
+          "peer-focus:left-3 peer-focus:-translate-y-2.5 peer-focus:scale-[0.85] peer-focus:text-primary",
+          isInvalid && "text-destructive peer-focus:text-destructive"
+        )}
       >
         {label}
       </label>

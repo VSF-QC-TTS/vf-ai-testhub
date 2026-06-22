@@ -12,6 +12,13 @@ import {
 import { Button } from "../../../components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
 import { getTargetSchema, type TargetFormData } from "../targets.schemas";
 import { useTarget, useCreateTarget, useUpdateTarget, useParseCurl } from "../targets.queries";
@@ -19,8 +26,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui
 import { projectTargetsPath } from "../../projects/project.routes";
 import { ApiError } from "@/lib/api/errors";
 import { toast } from "sonner";
-
-const SELECT_CLASS = "flex h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 dark:border-zinc-800 dark:bg-zinc-950 dark:ring-offset-zinc-950 disabled:cursor-not-allowed disabled:opacity-50 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-500 dark:placeholder:text-zinc-400 dark:focus-visible:ring-zinc-300 transition-colors hover:border-zinc-400 dark:hover:border-zinc-600";
 
 function SectionHeader({ icon: Icon, title, className = "mb-4" }: { icon: React.ElementType; title: string; className?: string }) {
   return (
@@ -79,9 +84,15 @@ export function TargetConfigurationWorkbench() {
         timeoutMs: target.timeoutMs,
         responseMapping: target.responseMapping,
       });
-      setHeadersJson(target.headersTemplate ? JSON.stringify(target.headersTemplate, null, 2) : "");
-      setBodyJson(target.bodyTemplate ? JSON.stringify(target.bodyTemplate, null, 2) : "");
+      const timeoutId = window.setTimeout(() => {
+        setHeadersJson(target.headersTemplate ? JSON.stringify(target.headersTemplate, null, 2) : "");
+        setBodyJson(target.bodyTemplate ? JSON.stringify(target.bodyTemplate, null, 2) : "");
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     }
+
+    return undefined;
   }, [target, isNew, form]);
 
   useEffect(() => {
@@ -113,14 +124,14 @@ export function TargetConfigurationWorkbench() {
 
     try {
       if (headersJson.trim()) parsedHeaders = JSON.parse(headersJson);
-    } catch (e) {
+    } catch {
       setJsonError("Invalid JSON in Headers");
       return;
     }
 
     try {
       if (bodyJson.trim()) parsedBody = JSON.parse(bodyJson);
-    } catch (e) {
+    } catch {
       setJsonError("Invalid JSON in Body");
       return;
     }
@@ -216,19 +227,20 @@ export function TargetConfigurationWorkbench() {
                   render={({ field }) => (
                     <FormItem className="md:col-span-1">
                       <FormLabel>{t("targets:workbench.httpConfig.method")}</FormLabel>
-                      <FormControl>
-                        <select
-                          className={SELECT_CLASS}
-                          {...field}
-                          value={field.value || "POST"}
-                        >
-                          <option value="GET">GET</option>
-                          <option value="POST">POST</option>
-                          <option value="PUT">PUT</option>
-                          <option value="PATCH">PATCH</option>
-                          <option value="DELETE">DELETE</option>
-                        </select>
-                      </FormControl>
+                      <Select value={field.value || "POST"} onValueChange={field.onChange} disabled={isPending}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="GET">GET</SelectItem>
+                          <SelectItem value="POST">POST</SelectItem>
+                          <SelectItem value="PUT">PUT</SelectItem>
+                          <SelectItem value="PATCH">PATCH</SelectItem>
+                          <SelectItem value="DELETE">DELETE</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -341,17 +353,18 @@ export function TargetConfigurationWorkbench() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("targets:workbench.responseMapping.missingFieldBehavior")}</FormLabel>
-                      <FormControl>
-                        <select
-                          className={SELECT_CLASS}
-                          {...field}
-                          value={field.value || "FAIL"}
-                        >
-                          <option value="FAIL">{t("targets:workbench.responseMapping.fail")}</option>
-                          <option value="SKIP">{t("targets:workbench.responseMapping.skip")}</option>
-                          <option value="WARNING">{t("targets:workbench.responseMapping.warning")}</option>
-                        </select>
-                      </FormControl>
+                      <Select value={field.value || "FAIL"} onValueChange={field.onChange} disabled={isPending}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="FAIL">{t("targets:workbench.responseMapping.fail")}</SelectItem>
+                          <SelectItem value="SKIP">{t("targets:workbench.responseMapping.skip")}</SelectItem>
+                          <SelectItem value="WARNING">{t("targets:workbench.responseMapping.warning")}</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -385,17 +398,18 @@ export function TargetConfigurationWorkbench() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("targets:workbench.settings.environment")}</FormLabel>
-                    <FormControl>
-                      <select
-                        className={SELECT_CLASS}
-                        {...field}
-                        value={field.value || "dev"}
-                      >
-                        <option value="dev">{t("targets:workbench.settings.envDev")}</option>
-                        <option value="staging">{t("targets:workbench.settings.envStaging")}</option>
-                        <option value="prod">{t("targets:workbench.settings.envProd")}</option>
-                      </select>
-                    </FormControl>
+                    <Select value={field.value || "dev"} onValueChange={field.onChange} disabled={isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="dev">{t("targets:workbench.settings.envDev")}</SelectItem>
+                        <SelectItem value="staging">{t("targets:workbench.settings.envStaging")}</SelectItem>
+                        <SelectItem value="prod">{t("targets:workbench.settings.envProd")}</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -454,4 +468,3 @@ export function TargetConfigurationWorkbench() {
     </div>
   );
 }
-

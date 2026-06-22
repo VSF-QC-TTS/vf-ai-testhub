@@ -23,19 +23,23 @@ export function PageBreadcrumbs() {
         const routeTo = `/${paths.slice(0, index + 1).join("/")}`;
         const isLast = index === paths.length - 1;
 
-        let name = path;
         const translationKey = `nav.${path}`;
         const translated = t(translationKey);
+        const name = (() => {
+          if (translated !== translationKey && translated !== path && translated !== `nav.${path}`) {
+            return translated;
+          }
 
-        if (translated !== translationKey && translated !== path && translated !== `nav.${path}`) {
-          name = translated;
-        } else if (currentProject && path === currentProject.id) {
-          name = currentProject.name;
-        } else if (path.length > 20 && path.includes("-")) {
-          name = `${path.substring(0, 8)}...`;
-        } else {
-          name = path.charAt(0).toUpperCase() + path.slice(1);
-        }
+          if (currentProject && path === currentProject.id) {
+            return currentProject.name;
+          }
+
+          if (path.length > 20 && path.includes("-")) {
+            return `${path.substring(0, 8)}...`;
+          }
+
+          return path.charAt(0).toUpperCase() + path.slice(1);
+        })();
 
         return (
           <div key={path} className="flex items-center">

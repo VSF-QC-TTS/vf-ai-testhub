@@ -17,6 +17,13 @@ import {
 import { Button } from "../../../components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { TestCaseFormDialog } from "../components/TestCaseFormDialog";
 import { TestCaseImportDialog } from "../components/TestCaseImportDialog";
 import { TriggerRunDialog } from "../../runs/components/TriggerRunDialog";
@@ -26,6 +33,8 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import type { TestCaseResponse, TestCaseSource, TestPriority } from "../testcases.types";
 import { useDataset } from "../../datasets/datasets.queries";
+
+const ALL_FILTER_VALUE = "__all__";
 
 export function TestCaseListPage() {
   const { t } = useTranslation();
@@ -147,27 +156,35 @@ export function TestCaseListPage() {
               />
             </div>
 
-            <select
-              className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              value={priorityFilter || ""}
-              onChange={(e) => handleFilterChange("priority", e.target.value)}
+            <Select
+              value={priorityFilter || ALL_FILTER_VALUE}
+              onValueChange={(value) => handleFilterChange("priority", value === ALL_FILTER_VALUE ? "" : value)}
             >
-              <option value="">{t("testcases:allPriorities")}</option>
-              <option value="P0">P0</option>
-              <option value="P1">P1</option>
-              <option value="P2">P2</option>
-              <option value="P3">P3</option>
-            </select>
+              <SelectTrigger className="w-full sm:w-[150px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_FILTER_VALUE}>{t("testcases:allPriorities")}</SelectItem>
+                <SelectItem value="P0">P0</SelectItem>
+                <SelectItem value="P1">P1</SelectItem>
+                <SelectItem value="P2">P2</SelectItem>
+                <SelectItem value="P3">P3</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <select
-              className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              value={enabledFilter || ""}
-              onChange={(e) => handleFilterChange("enabled", e.target.value)}
+            <Select
+              value={enabledFilter || ALL_FILTER_VALUE}
+              onValueChange={(value) => handleFilterChange("enabled", value === ALL_FILTER_VALUE ? "" : value)}
             >
-              <option value="">{t("testcases:allStates")}</option>
-              <option value="true">{t("testcases:enabled")}</option>
-              <option value="false">{t("testcases:disabled")}</option>
-            </select>
+              <SelectTrigger className="w-full sm:w-[150px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_FILTER_VALUE}>{t("testcases:allStates")}</SelectItem>
+                <SelectItem value="true">{t("testcases:enabled")}</SelectItem>
+                <SelectItem value="false">{t("testcases:disabled")}</SelectItem>
+              </SelectContent>
+            </Select>
 
             <Input
               placeholder={t("testcases:sectionPlaceholder")}

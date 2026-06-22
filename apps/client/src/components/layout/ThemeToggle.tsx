@@ -1,41 +1,31 @@
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+import { useThemePreference } from "./useThemePreference";
 
-export function ThemeToggle() {
+interface ThemeToggleProps {
+  className?: string;
+  iconClassName?: string;
+}
+
+export function ThemeToggle({ className, iconClassName }: ThemeToggleProps) {
   const { t } = useTranslation();
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    // Check initial theme from localStorage or system preference
-    const storedTheme = localStorage.getItem("vf_theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    
-    if (storedTheme === "dark" || (!storedTheme && prefersDark)) {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      setIsDark(false);
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newIsDark = !isDark;
-    setIsDark(newIsDark);
-    if (newIsDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("vf_theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("vf_theme", "light");
-    }
-  };
+  const { isDark, toggleTheme } = useThemePreference();
 
   return (
-    <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full flex shrink-0 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors" onClick={toggleTheme} title={t("common:navigation.toggleTheme", "Toggle theme")}>
-      {isDark ? <Moon className="h-4 w-4 text-zinc-600 dark:text-zinc-400 shrink-0" /> : <Sun className="h-4 w-4 text-zinc-600 dark:text-zinc-400 shrink-0" />}
+    <Button
+      variant="ghost"
+      size="icon"
+      className={cn("w-10 h-10 rounded-full flex shrink-0 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors", className)}
+      onClick={toggleTheme}
+      title={t("common:navigation.toggleTheme", "Toggle theme")}
+    >
+      {isDark ? (
+        <Moon className={cn("h-4 w-4 text-zinc-600 dark:text-zinc-400 shrink-0", iconClassName)} />
+      ) : (
+        <Sun className={cn("h-4 w-4 text-zinc-600 dark:text-zinc-400 shrink-0", iconClassName)} />
+      )}
       <span className="sr-only">Toggle theme</span>
     </Button>
   );

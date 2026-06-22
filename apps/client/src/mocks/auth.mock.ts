@@ -1,6 +1,12 @@
 import { http, HttpResponse, delay } from 'msw';
 import { initialAuthData } from './auth.data';
-import type { LoginRequest } from '../features/auth/auth.types';
+import type {
+  ForgotPasswordRequest,
+  LoginRequest,
+  RegisterRequest,
+  ResetPasswordRequest,
+  VerifyEmailRequest,
+} from '../features/auth/auth.types';
 
 const API_BASE_URL = 'http://localhost:8080/api/v1';
 
@@ -17,6 +23,51 @@ export const authHandlers = [
     }
 
     return HttpResponse.json({ error: "Invalid credentials" }, { status: 401 });
+  }),
+
+  http.post(`${API_BASE_URL}/auth/register`, async ({ request }) => {
+    const body = await request.json() as RegisterRequest;
+    await delay(600);
+
+    return HttpResponse.json({
+      ...initialAuthData.user,
+      publicId: `u-${crypto.randomUUID()}`,
+      email: body.email,
+      displayName: body.displayName || body.email.split("@")[0],
+      status: "PENDING_EMAIL_VERIFICATION",
+      lastLoginAt: null,
+    }, { status: 201 });
+  }),
+
+  http.post(`${API_BASE_URL}/auth/verify-email`, async ({ request }) => {
+    const body = await request.json() as VerifyEmailRequest;
+    await delay(600);
+
+    if (!body.token) {
+      return HttpResponse.json({ error: "Invalid token" }, { status: 400 });
+    }
+
+    return HttpResponse.json({
+      ...initialAuthData.user,
+      status: "ACTIVE",
+    });
+  }),
+
+  http.post(`${API_BASE_URL}/auth/forgot-password`, async ({ request }) => {
+    await request.json() as ForgotPasswordRequest;
+    await delay(600);
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post(`${API_BASE_URL}/auth/reset-password`, async ({ request }) => {
+    const body = await request.json() as ResetPasswordRequest;
+    await delay(600);
+
+    if (!body.token) {
+      return HttpResponse.json({ error: "Invalid token" }, { status: 400 });
+    }
+
+    return new HttpResponse(null, { status: 204 });
   }),
 
   // Mock POST /auth/refresh-token

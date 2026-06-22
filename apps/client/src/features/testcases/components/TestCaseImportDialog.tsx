@@ -4,6 +4,13 @@ import { useParams } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { CheckCircle2, AlertCircle, FileSpreadsheet, X } from "lucide-react";
 import { usePreviewImport, useConfirmImport } from "../import.queries";
 import type { ImportPreviewResponse, ImportConfirmResponse } from "../import.types";
@@ -36,6 +43,7 @@ const SUPPORTED_FIELDS = [
   { value: "tags", label: "Tags (comma-separated)" },
   { value: "priority", label: "Priority (P0-P3)" }
 ];
+const IGNORE_FIELD_VALUE = "__ignore__";
 
 export function TestCaseImportDialog({ open, onOpenChange }: TestCaseImportDialogProps) {
   const { t } = useTranslation();
@@ -229,15 +237,26 @@ export function TestCaseImportDialog({ open, onOpenChange }: TestCaseImportDialo
                           <TableRow key={col}>
                             <TableCell className="font-mono text-sm">{col}</TableCell>
                             <TableCell>
-                              <select
-                                className="w-full h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                                value={columnMapping[col] || ""}
-                                onChange={(e) => setColumnMapping(prev => ({ ...prev, [col]: e.target.value }))}
+                              <Select
+                                value={columnMapping[col] || IGNORE_FIELD_VALUE}
+                                onValueChange={(value) =>
+                                  setColumnMapping(prev => ({
+                                    ...prev,
+                                    [col]: value === IGNORE_FIELD_VALUE ? "" : value,
+                                  }))
+                                }
                               >
-                                {SUPPORTED_FIELDS.map(f => (
-                                  <option key={f.value} value={f.value}>{f.label}</option>
-                                ))}
-                              </select>
+                                <SelectTrigger className="h-8">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {SUPPORTED_FIELDS.map(f => (
+                                    <SelectItem key={f.value || IGNORE_FIELD_VALUE} value={f.value || IGNORE_FIELD_VALUE}>
+                                      {f.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </TableCell>
                           </TableRow>
                         ))}

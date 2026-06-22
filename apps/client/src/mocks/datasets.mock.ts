@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 import { datasets } from "./datasets.data";
 import { v4 as uuidv4 } from "uuid";
+import type { DatasetCreateRequest, DatasetUpdateRequest } from "../features/datasets/datasets.types";
 
 const BASE_URL = "/api/v1/projects/:projectId/datasets";
 
@@ -30,14 +31,14 @@ export const datasetHandlers = [
 
   http.post(BASE_URL, async ({ request, params }) => {
     const { projectId } = params;
-    const body = await request.json() as any;
+    const body = await request.json() as DatasetCreateRequest;
 
     const newDataset = {
       publicId: uuidv4(),
       projectId: projectId as string,
       name: body.name,
-      description: body.description,
-      category: body.category,
+      description: body.description ?? "",
+      category: body.category ?? "",
       tags: body.tags || [],
       testCaseCount: 0,
       creator: "Test User",
@@ -52,7 +53,7 @@ export const datasetHandlers = [
 
   http.put(`${BASE_URL}/:id`, async ({ request, params }) => {
     const { id, projectId } = params;
-    const body = await request.json() as any;
+    const body = await request.json() as DatasetUpdateRequest;
 
     const index = datasets.findIndex(d => d.publicId === id && d.projectId === projectId);
     if (index === -1) {

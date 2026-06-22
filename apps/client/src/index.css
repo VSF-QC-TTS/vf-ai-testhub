@@ -8,10 +8,16 @@
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-elevated: var(--elevated);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
 
   --color-border: var(--border);
+  --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -42,10 +48,16 @@
 
     --surface: #ffffff;
     --popover: #ffffff;
+    --popover-foreground: #18181b;
     --elevated: #f4f4f5; /* zinc-100 */
+    --card: #ffffff;
+    --card-foreground: #18181b;
 
     --border: #e4e4e7; /* zinc-200 */
+    --input: #d4d4d8; /* zinc-300 */
     --ring: #a1a1aa; /* zinc-400 */
+    --accent: #eef2ff; /* indigo-50 */
+    --accent-foreground: #1f2937; /* gray-800 */
 
     --primary: #2563eb; /* blue-600 */
     --primary-foreground: #ffffff;
@@ -74,10 +86,16 @@
 
     --surface: #18181b; /* zinc-900 */
     --popover: #18181b; /* zinc-900 */
+    --popover-foreground: #fafafa;
     --elevated: #27272a; /* zinc-800 */
+    --card: #18181b;
+    --card-foreground: #fafafa;
 
     --border: #27272a; /* zinc-800 */
+    --input: #3f3f46; /* zinc-700 */
     --ring: #52525b; /* zinc-600 */
+    --accent: #27272a; /* zinc-800 */
+    --accent-foreground: #fafafa;
 
     --primary: #2563eb; /* blue-600 */
     --primary-foreground: #ffffff;
@@ -109,5 +127,14 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     line-height: 1.5; /* Prevent Vietnamese text clipping */
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  summary {
+    cursor: pointer;
   }
 }

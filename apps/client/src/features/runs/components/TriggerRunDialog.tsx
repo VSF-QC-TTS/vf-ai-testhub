@@ -1,10 +1,17 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo } from "react";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { Button } from "../../../components/ui/button";
 import { getTriggerRunSchema, type TriggerRunFormData } from "../runs.schemas";
 import { useTriggerRun } from "../runs.queries";
@@ -27,7 +34,7 @@ export function TriggerRunDialog({ open, onOpenChange, datasetId, onRunStarted }
   const { projectId = "" } = useParams();
 
   const { data: targetsData, isLoading: isLoadingTargets } = useTargets(projectId);
-  const targets = targetsData?.content || [];
+  const targets = useMemo(() => targetsData?.content ?? [], [targetsData?.content]);
 
   const triggerMutation = useTriggerRun(datasetId);
   const isPending = triggerMutation.isPending;
@@ -35,7 +42,7 @@ export function TriggerRunDialog({ open, onOpenChange, datasetId, onRunStarted }
   const errorCode = mutationError instanceof ApiError ? mutationError.code : undefined;
 
   const form = useForm<TriggerRunFormData>({
-    resolver: zodResolver(getTriggerRunSchema(t)) as any,
+    resolver: zodResolver(getTriggerRunSchema(t)) as Resolver<TriggerRunFormData>,
     defaultValues: {
       targetId: "",
       runMode: "FULL_DATASET",
@@ -49,7 +56,7 @@ export function TriggerRunDialog({ open, onOpenChange, datasetId, onRunStarted }
     },
   });
 
-  const watchRunMode = form.watch("runMode");
+  const watchRunMode = useWatch({ control: form.control, name: "runMode" });
 
   useEffect(() => {
     if (open) {
@@ -96,16 +103,18 @@ export function TriggerRunDialog({ open, onOpenChange, datasetId, onRunStarted }
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("runs:form.target")}</FormLabel>
-                    <FormControl>
-                      <select
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={isPending || isLoadingTargets}
-                        {...field}
-                      >
-                        <option value="" disabled>{t("runs:form.targetPlaceholder")}</option>
-                        {targets.map(opt => <option key={opt.publicId} value={opt.publicId}>{opt.name}</option>)}
-                      </select>
-                    </FormControl>
+                    <Select value={field.value} onValueChange={field.onChange} disabled={isPending || isLoadingTargets}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("runs:form.targetPlaceholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {targets.map(opt => (
+                          <SelectItem key={opt.publicId} value={opt.publicId}>{opt.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -117,17 +126,18 @@ export function TriggerRunDialog({ open, onOpenChange, datasetId, onRunStarted }
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("runs:form.runMode")}</FormLabel>
-                    <FormControl>
-                      <select
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={isPending}
-                        {...field}
-                      >
-                        <option value="FULL_DATASET">{t("runs:form.modes.full")}</option>
-                        <option value="SELECTED_SECTION">{t("runs:form.modes.section")}</option>
-                        <option value="SELECTED_CASES">{t("runs:form.modes.cases")}</option>
-                      </select>
-                    </FormControl>
+                    <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="FULL_DATASET">{t("runs:form.modes.full")}</SelectItem>
+                        <SelectItem value="SELECTED_SECTION">{t("runs:form.modes.section")}</SelectItem>
+                        <SelectItem value="SELECTED_CASES">{t("runs:form.modes.cases")}</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

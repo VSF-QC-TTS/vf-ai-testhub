@@ -161,18 +161,12 @@ export function DatasetFormDialog({ open, onOpenChange, dataset }: DatasetFormDi
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
                 {t("common:actions.cancel")}
               </Button>
-              <Button type="submit" disabled={isPending} className="min-w-[100px] relative overflow-hidden">
-                <motion.div
-                  initial={false}
-                  animate={{ y: isPending ? -30 : 0 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="flex flex-col items-center"
-                >
-                  <span className="flex h-[20px] items-center">{isEditing ? t("common:actions.saveChanges") : t("common:actions.save")}</span>
-                  <span className="flex h-[20px] items-center absolute top-[30px]">
-                    {isEditing ? t("common:actions.save") : t("common:actions.save")}
-                  </span>
-                </motion.div>
+              <Button type="submit" disabled={isPending} className="min-w-[120px]">
+                {isPending
+                  ? t("common:loading")
+                  : isEditing
+                    ? t("common:actions.saveChanges")
+                    : t("common:actions.save")}
               </Button>
             </div>
           </form>

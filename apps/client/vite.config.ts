@@ -9,6 +9,35 @@ export default defineConfig({
     tailwindcss(),
     react()
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return undefined
+          }
+
+          if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/react-router-dom/')) {
+            return 'react-vendor'
+          }
+
+          if (id.includes('/@radix-ui/')) {
+            return 'radix-ui'
+          }
+
+          if (id.includes('/@tanstack/')) {
+            return 'query-vendor'
+          }
+
+          if (id.includes('/framer-motion/')) {
+            return 'motion-vendor'
+          }
+
+          return 'vendor'
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

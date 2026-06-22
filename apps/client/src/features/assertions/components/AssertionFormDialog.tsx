@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/Input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
 import { getAssertionSchema, type AssertionFormData } from "../assertions.schemas";
@@ -60,7 +67,7 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
   const [isValidatingJson, setIsValidatingJson] = useState(false);
 
   const form = useForm<AssertionFormData>({
-    resolver: zodResolver(getAssertionSchema(t)) as any,
+    resolver: zodResolver(getAssertionSchema(t)) as Resolver<AssertionFormData>,
     defaultValues: {
       scope: "WHOLE_RESPONSE",
       type: "contains",
@@ -78,8 +85,8 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
     },
   });
 
-  const watchScope = form.watch("scope");
-  const watchType = form.watch("type");
+  const watchScope = useWatch({ control: form.control, name: "scope" });
+  const watchType = useWatch({ control: form.control, name: "type" });
 
   useEffect(() => {
     if (open) {
@@ -214,15 +221,18 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("assertions:form.scope")}</FormLabel>
-                    <FormControl>
-                      <select
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={isPending}
-                        {...field}
-                      >
-                        {SCOPE_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                      </select>
-                    </FormControl>
+                    <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {SCOPE_OPTIONS.map(opt => (
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -234,15 +244,18 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("assertions:form.type")}</FormLabel>
-                    <FormControl>
-                      <select
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={isPending}
-                        {...field}
-                      >
-                        {TYPE_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                      </select>
-                    </FormControl>
+                    <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {TYPE_OPTIONS.map(opt => (
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -369,18 +382,19 @@ export function AssertionFormDialog({ open, onOpenChange, assertion, testCaseId 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("assertions:form.severity")}</FormLabel>
-                    <FormControl>
-                      <select
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-                        disabled={isPending}
-                        {...field}
-                      >
-                        <option value="CRITICAL">CRITICAL</option>
-                        <option value="MAJOR">MAJOR</option>
-                        <option value="MINOR">MINOR</option>
-                        <option value="INFO">INFO</option>
-                      </select>
-                    </FormControl>
+                    <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="CRITICAL">CRITICAL</SelectItem>
+                        <SelectItem value="MAJOR">MAJOR</SelectItem>
+                        <SelectItem value="MINOR">MINOR</SelectItem>
+                        <SelectItem value="INFO">INFO</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
