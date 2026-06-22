@@ -48,25 +48,27 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
       )} 
       {...props}
     >
-      <div className="flex h-14 lg:h-16 items-center border-b px-4 lg:px-6">
+      <div className="flex h-14 lg:h-16 items-center px-4 lg:px-6">
         <Link to="/" className="flex items-center">
           <BrandLogo hideTextOnMobile textClassName="text-sm" />
         </Link>
       </div>
-      
-      <ProjectSwitcher 
-        projects={projects} 
-        currentProject={currentProject}
-        onProjectSelect={handleProjectSelect}
-        className="hidden lg:block"
-      />
-      <ProjectSwitcher 
-        projects={projects} 
-        currentProject={currentProject}
-        onProjectSelect={handleProjectSelect}
-        className="md:block lg:hidden"
-        isCollapsed
-      />
+
+      <div className="border-b border-zinc-200 dark:border-zinc-800 pb-2 mb-2">
+        <ProjectSwitcher
+          projects={projects}
+          currentProject={currentProject}
+          onProjectSelect={handleProjectSelect}
+          className="hidden lg:block"
+        />
+        <ProjectSwitcher
+          projects={projects}
+          currentProject={currentProject}
+          onProjectSelect={handleProjectSelect}
+          className="md:block lg:hidden"
+          isCollapsed
+        />
+      </div>
 
       <nav className="flex-1 overflow-y-auto py-2">
         <ul className="grid gap-1 px-2 lg:px-4">
@@ -78,7 +80,7 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
                 : location.pathname === to
               : false;
             const label = t(item.i18nKey);
-            
+
             return (
               <li key={item.module ?? "overview"}>
                 {to ? (
@@ -117,17 +119,17 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
         </ul>
       </nav>
 
-      <div className="flex flex-col gap-2 border-t p-2">
+      <div className="flex md:flex-col lg:flex-row items-center justify-between gap-2 border-t border-zinc-200 dark:border-zinc-800 p-3 lg:p-4 bg-zinc-50/50 dark:bg-zinc-900/50 mt-auto">
         <ThemeToggle />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="w-full flex justify-center h-10 rounded-md">
-              <Languages className="h-5 w-5 shrink-0" />
+            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full flex shrink-0 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">
+              <Languages className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
               <span className="sr-only">{t("common:navigation.toggleLanguage", "Toggle language")}</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="right">
+          <DropdownMenuContent align="end" side="right" sideOffset={12}>
             <DropdownMenuItem onClick={() => i18n.changeLanguage("en")}>English</DropdownMenuItem>
             <DropdownMenuItem onClick={() => i18n.changeLanguage("vi")}>Tiếng Việt</DropdownMenuItem>
           </DropdownMenuContent>
@@ -135,12 +137,12 @@ export function Sidebar({ className, ...props }: ComponentProps<"aside">) {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="w-full flex justify-center h-10 rounded-md">
-              <User className="h-5 w-5 shrink-0" />
+            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full flex shrink-0 bg-primary/10 hover:bg-primary/20 text-primary transition-colors">
+              <User className="h-4 w-4" />
               <span className="sr-only">{t("common:navigation.toggleUserMenu", "Toggle user menu")}</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="right">
+          <DropdownMenuContent align="end" side="right" sideOffset={12}>
             <DropdownMenuLabel>{t("common:navigation.myAccount", "My Account")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>{t("common:navigation.profile", "Profile")}</DropdownMenuItem>

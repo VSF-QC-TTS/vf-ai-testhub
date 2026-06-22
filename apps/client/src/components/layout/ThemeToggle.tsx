@@ -34,8 +34,8 @@ export function ThemeToggle() {
   };
 
   return (
-    <Button variant="ghost" size="icon" className="w-full flex justify-center h-10 rounded-md" onClick={toggleTheme} title={t("common:navigation.toggleTheme", "Toggle theme")}>
-      {isDark ? <Moon className="h-5 w-5 shrink-0" /> : <Sun className="h-5 w-5 shrink-0" />}
+    <Button variant="ghost" size="icon" className="w-10 h-10 rounded-full flex shrink-0 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors" onClick={toggleTheme} title={t("common:navigation.toggleTheme", "Toggle theme")}>
+      {isDark ? <Moon className="h-4 w-4 text-zinc-600 dark:text-zinc-400 shrink-0" /> : <Sun className="h-4 w-4 text-zinc-600 dark:text-zinc-400 shrink-0" />}
       <span className="sr-only">Toggle theme</span>
     </Button>
   );
