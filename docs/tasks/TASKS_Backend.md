@@ -11,13 +11,13 @@ These choices are already implemented. Do not rebuild them unless the task expli
 | Area | Current state |
 |---|---|
 | Framework | Spring Boot 4.0.7, Java 21, Maven |
-| Persistence | PostgreSQL + Flyway. Current migrations: `V1__init_schema.sql`, `V2__project_schema.sql`, `V3__target_schema.sql`, `V4__dataset_schema.sql`, `V5__test_case_schema.sql`, `V6__test_case_import_preview_schema.sql`, `V7__rubric_schema.sql`, `V8__assertion_schema.sql`, `V9__tool_expectation_schema.sql`, `V10__run_schema.sql`, `V11__result_schema.sql`, `V12__manual_review_schema.sql` |
+| Persistence | PostgreSQL + Flyway. Current migrations: `V1__init_schema.sql`, `V2__project_schema.sql`, `V3__target_schema.sql`, `V4__dataset_schema.sql`, `V5__test_case_schema.sql`, `V6__test_case_import_preview_schema.sql`, `V7__rubric_schema.sql`, `V8__assertion_schema.sql`, `V9__tool_expectation_schema.sql`, `V10__run_schema.sql`, `V11__result_schema.sql`, `V12__manual_review_schema.sql`, `V13__experiment_schema.sql` |
 | Identity model | Internal `BIGINT id`; public APIs expose UUID `publicId` |
 | Auth | Local email/password auth, Google/GitHub OAuth2 login, custom JWT issuing |
 | JWT validation | Spring Security OAuth2 Resource Server with `JwtDecoder`; no separate handwritten JWT request filter is needed |
 | Refresh flow | HttpOnly `refresh_token` cookie, rotated by `POST /api/v1/auth/refresh-token` |
-| Implemented APIs | Auth, OAuth2, `GET /api/v1/users/me`, Project CRUD/archive, Target CRUD/parse-curl, ResponseMapping get/save, Dataset CRUD/archive, TestCase CRUD/list/filter/import, Assertion CRUD/list, ToolExpectation CRUD/list, Rubric CRUD/archive/list, Run trigger/status/history, Result ingestion/report/listing/comparison, ManualReview batch submission |
-| Not yet implemented | Dashboard aggregate endpoint, A/B experiment/variant/versioning contracts |
+| Implemented APIs | Auth, OAuth2, `GET /api/v1/users/me`, Project CRUD/archive, Target CRUD/parse-curl, ResponseMapping get/save, Dataset CRUD/archive, TestCase CRUD/list/filter/import, Assertion CRUD/list, ToolExpectation CRUD/list, Rubric CRUD/archive/list, Run trigger/status/history, Result ingestion/report/listing/comparison, ManualReview batch submission, Experiment create/list/detail/start/comparison |
+| Not yet implemented | Dashboard aggregate endpoint, prompt/config versioning and promotion contracts |
 
 ## Status Legend
 
@@ -131,10 +131,9 @@ Comparison/A-B clarification:
 
 - Current backend supports independent runs and reports.
 - Current backend exposes `GET /api/v1/runs/compare?baseRunId=&candidateRunId=` for completed compatible runs.
-- Current backend does not have experiment/variant entities.
-- `A/B Experiment` should be planned as E11 work, not inferred from the UI prototype.
-- Frontend may show "Compare runs" for compatible completed runs, but must not label it as A/B Experiment until
-  experiment/variant contracts exist.
+- Current backend exposes draft A/B experiment entities and APIs that start one run per variant.
+- Prompt/config versioning and winner promotion are still not implemented; variants currently reference targets and
+  runtime options.
 
 ## Resolved Decisions
 

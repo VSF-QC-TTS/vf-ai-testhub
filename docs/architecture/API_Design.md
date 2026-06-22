@@ -3762,6 +3762,60 @@ cùng dataset, cùng `runMode`, cùng `selectedSection`, và cùng tập `select
 
 ---
 
+### 11.6 Experiments — A/B workflow
+
+Current implementation supports target-variant experiments. Prompt/config version snapshots and winner promotion are not
+implemented yet.
+
+| Method | Path | Mô tả |
+|---|---|---|
+| `POST` | `/api/v1/projects/{projectId}/experiments` | Tạo experiment draft với 2-8 variants |
+| `GET` | `/api/v1/projects/{projectId}/experiments` | List experiments theo project |
+| `GET` | `/api/v1/experiments/{experimentId}` | Chi tiết experiment và variant run links |
+| `POST` | `/api/v1/experiments/{experimentId}/start` | Start experiment, trigger một run cho mỗi variant |
+| `GET` | `/api/v1/experiments/{experimentId}/comparison` | Compare 2 variant runs đầu tiên qua run comparison service |
+
+**Create Request:**
+
+```json
+{
+  "datasetId": "11111111-1111-1111-1111-111111111111",
+  "name": "Prompt v3.1 vs v3.2",
+  "description": "Compare baseline and candidate target behavior",
+  "runMode": "FULL_DATASET",
+  "selectedCaseIds": [],
+  "selectedSection": null,
+  "includeLlmJudge": true,
+  "includeToolExpectations": true,
+  "maxConcurrency": 3,
+  "timeoutMs": 30000,
+  "retryCount": 0,
+  "variants": [
+    {
+      "variantKey": "A",
+      "name": "Baseline",
+      "targetId": "22222222-2222-2222-2222-222222222222",
+      "runtimeOptions": {}
+    },
+    {
+      "variantKey": "B",
+      "name": "Candidate",
+      "targetId": "33333333-3333-3333-3333-333333333333",
+      "runtimeOptions": {}
+    }
+  ]
+}
+```
+
+**Experiment Response fields:**
+
+- `publicId`, `projectPublicId`, `datasetPublicId`
+- `name`, `description`, `runMode`, selected scope/options
+- `status`: `DRAFT`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`
+- `variants[]`: `variantKey`, `name`, `targetPublicId`, `targetName`, optional `runPublicId`, optional `runStatus`
+
+---
+
 ## 12. Phụ lục — Enum Values & Domain Types
 
 ### 12.1 Assertion Scopes

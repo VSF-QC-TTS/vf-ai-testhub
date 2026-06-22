@@ -179,6 +179,14 @@ public enum ErrorCode {
       422,
       "RUN_COMPARISON_NOT_COMPARABLE",
       "Evaluation runs must belong to the same dataset and scope before comparison."),
+  EXPERIMENT_NOT_FOUND(
+      HttpStatus.NOT_FOUND.value(),
+      "EXPERIMENT_NOT_FOUND",
+      "No experiment found with the provided ID."),
+  EXPERIMENT_START_INVALID(
+      422,
+      "EXPERIMENT_START_INVALID",
+      "Experiment cannot be started in its current state."),
   JOB_NOT_FOUND(
       HttpStatus.NOT_FOUND.value(), "JOB_NOT_FOUND", "No job found with the provided ID."),
   EVALUATION_RESULT_NOT_FOUND(

@@ -170,6 +170,11 @@ class RunControllerTest {
     }
 
     @Override
+    public RunResponse triggerExperimentRun(UUID datasetPublicId, RunRequest request, String username) {
+      return response();
+    }
+
+    @Override
     public RunResponse getRun(UUID publicId) {
       if (throwNotFound) {
         throw new ResourceException(ErrorCode.EVALUATION_RUN_NOT_FOUND);

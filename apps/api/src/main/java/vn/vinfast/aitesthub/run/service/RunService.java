@@ -26,6 +26,16 @@ public interface RunService {
   RunResponse triggerRun(UUID datasetPublicId, @Valid RunRequest request, String username);
 
   /**
+   * Triggers an asynchronous dataset run as part of an experiment variant.
+   *
+   * @param datasetPublicId the public ID of the dataset to run
+   * @param request the validated {@link RunRequest}
+   * @param username the username of the authenticated user starting the experiment
+   * @return the created {@link RunResponse}
+   */
+  RunResponse triggerExperimentRun(UUID datasetPublicId, @Valid RunRequest request, String username);
+
+  /**
    * Retrieves a run by public ID.
    *
    * @param publicId the public ID of the {@link vn.vinfast.aitesthub.run.entity.Run}

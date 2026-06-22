@@ -6,11 +6,12 @@ Goal: support contract-backed run comparison first, then optional A/B experiment
 
 ## Current Backend Facts
 
-- `RunRequest` accepts one `targetId`; it does not accept variants.
-- `RunController` supports trigger/status/history only.
+- `RunRequest` accepts one `targetId`; experiment start creates one run per variant.
+- `RunController` supports trigger/status/history only; experiment orchestration lives in `ExperimentController`.
 - `ResultController` supports `GET /api/v1/runs/{runId}/report`, `GET /api/v1/runs/{runId}/results`, and
   `GET /api/v1/runs/compare`.
-- There are no experiment, variant, prompt/config version, or promotion entities.
+- `ExperimentController` supports draft creation, list/detail, start, and comparison.
+- Prompt/config version and promotion entities do not exist yet.
 
 ## Definitions
 
@@ -53,14 +54,16 @@ Checklist:
 
 | # | Task | Status |
 |---|---|---|
-| 1 | Decide whether comparisons are computed on demand or persisted as saved comparison reports | TODO |
-| 2 | If persisted, add Flyway migration for comparison report metadata and cached diff payload references | TODO |
-| 3 | If on-demand, document performance limits and pagination strategy for large runs | TODO |
+| 1 | Decide whether comparisons are computed on demand or persisted as saved comparison reports | DONE |
+| 2 | If persisted, add Flyway migration for comparison report metadata and cached diff payload references | WARNING |
+| 3 | If on-demand, document performance limits and pagination strategy for large runs | WARNING |
 
 Guidance:
 
 - Start on-demand unless large runs make response time unacceptable.
 - Persist only if users need saved comparison history, audit trails, or shareable snapshots independent of current result data.
+- Current implementation computes comparisons on demand and returns all diffs. Add pagination or persisted snapshots if
+  runs grow beyond practical response size.
 
 ## E11.3: Experiment Domain Model
 
@@ -70,11 +73,11 @@ Checklist:
 
 | # | Task | Status |
 |---|---|---|
-| 1 | Add Flyway migration for `experiments` and `experiment_variants` | TODO |
-| 2 | Store public UUIDs, project, dataset, run scope, status, created by, started/completed timestamps | TODO |
-| 3 | Store variant name/key, target ID, optional rubric/config references, runtime options, and produced run ID | TODO |
-| 4 | Define statuses: `DRAFT`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED` | TODO |
-| 5 | Add repositories, entities, DTOs, mappers | TODO |
+| 1 | Add Flyway migration for `experiments` and `experiment_variants` | DONE |
+| 2 | Store public UUIDs, project, dataset, run scope, status, created by, started/completed timestamps | DONE |
+| 3 | Store variant name/key, target ID, optional rubric/config references, runtime options, and produced run ID | DONE |
+| 4 | Define statuses: `DRAFT`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED` | DONE |
+| 5 | Add repositories, entities, DTOs, mappers | DONE |
 
 Rules:
 
@@ -90,11 +93,11 @@ Checklist:
 
 | # | Task | Status |
 |---|---|---|
-| 1 | Add `ExperimentService` interface with Javadoc for create/start/get/list behavior | TODO |
-| 2 | Implement create/update draft experiment | TODO |
-| 3 | Implement start experiment by triggering one run per variant through existing run service/work queue | TODO |
-| 4 | Aggregate variant run statuses into experiment status | TODO |
-| 5 | Prevent starting experiments with fewer than two variants or invalid dataset/scope | TODO |
+| 1 | Add `ExperimentService` interface with Javadoc for create/start/get/list behavior | DONE |
+| 2 | Implement create/update draft experiment | DONE |
+| 3 | Implement start experiment by triggering one run per variant through existing run service/work queue | DONE |
+| 4 | Aggregate variant run statuses into experiment status | DONE |
+| 5 | Prevent starting experiments with fewer than two variants or invalid dataset/scope | DONE |
 | 6 | Add cancellation only if existing runner cancellation exists; otherwise document as unsupported | TODO |
 
 Acceptance:
@@ -111,11 +114,15 @@ Checklist:
 
 | # | Endpoint | Status |
 |---|---|---|
-| 1 | `POST /api/v1/projects/{projectId}/experiments` create draft | TODO |
-| 2 | `GET /api/v1/projects/{projectId}/experiments` list | TODO |
-| 3 | `GET /api/v1/experiments/{experimentId}` detail | TODO |
-| 4 | `POST /api/v1/experiments/{experimentId}/start` start | TODO |
-| 5 | `GET /api/v1/experiments/{experimentId}/comparison` aggregate variant comparison | TODO |
+| 1 | `POST /api/v1/projects/{projectId}/experiments` create draft | DONE |
+| 2 | `GET /api/v1/projects/{projectId}/experiments` list | DONE |
+| 3 | `GET /api/v1/experiments/{experimentId}` detail | DONE |
+| 4 | `POST /api/v1/experiments/{experimentId}/start` start | DONE |
+| 5 | `GET /api/v1/experiments/{experimentId}/comparison` aggregate variant comparison | DONE |
+
+- Commit: `feat(experiment): add variant experiment backend`
+- Scope: `L`
+- Review: `DONE`
 
 Response requirements:
 

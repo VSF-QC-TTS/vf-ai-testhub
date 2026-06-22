@@ -121,6 +121,7 @@ Persistence now vs target:
   - `V10__run_schema.sql`: async evaluation runs and run enum types.
   - `V11__result_schema.sql`: test/assertion/tool expectation results and `review_status`.
   - `V12__manual_review_schema.sql`: manual QC review overrides for test results.
+  - `V13__experiment_schema.sql`: experiments, experiment variants, and `experiment_status`.
 - Email verification and password reset tokens are opaque raw values; only SHA-256 hashes are stored.
 - `OpaqueTokenService` owns raw token generation and hashing for one-time email tokens.
 - Main tables use internal `BIGINT id` plus public UUID `public_id`; APIs should expose `publicId`, not internal `id`.
@@ -185,6 +186,12 @@ Implemented API slices after auth:
   return base/candidate run summaries, regressions, fixes, unchanged/status-changed counts, new/missing cases, pass-rate
   delta, average latency delta, testcase diffs, assertion diffs, and tool expectation diffs.
 - `POST /api/v1/runs/{runId}/review`: submit batch manual review decisions for test results in a completed run.
+- `POST /api/v1/projects/{projectId}/experiments`: create a draft A/B experiment with two to eight target variants.
+- `GET /api/v1/projects/{projectId}/experiments`: list experiments for a project.
+- `GET /api/v1/experiments/{experimentId}`: get experiment detail and variant run links.
+- `POST /api/v1/experiments/{experimentId}/start`: start a draft experiment by triggering one run per variant.
+- `GET /api/v1/experiments/{experimentId}/comparison`: compare the first two variant runs through the run comparison
+  service.
 
 Manual review service state:
 
@@ -196,8 +203,11 @@ Manual review service state:
   expectation breakdowns, and manual review state. Summary counts use `finalStatus`, so manual overrides affect pass
   rate.
 - `RunComparisonService.compareRuns(...)` is read-only and on-demand. It requires both runs to be `COMPLETED`, from the
-  same dataset, and using the same run mode/selected section/selected case IDs. It compares persisted auto result rows;
-  full A/B experiment/variant orchestration is not implemented yet.
+  same dataset, and using the same run mode/selected section/selected case IDs. It compares persisted auto result rows.
+- `ExperimentService` owns draft A/B experiment creation and start. Starting an experiment uses
+  `RunService.triggerExperimentRun(...)`, an internal run trigger path that bypasses the normal "one active run per
+  dataset" guard so variants can execute concurrently. Normal user-triggered dataset runs still keep the active-run
+  guard. Prompt/config versioning and promotion are not implemented yet.
 
 AI generation service state:
 
@@ -320,6 +330,9 @@ Focused tests:
   -> 7 tests, 0 failures/errors.
 - Run comparison focused verification on 2026-06-22:
   `rtk bash mvnw -Dtest=RunComparisonServiceImplTest,ResultControllerTest test` -> 9 tests, 0 failures/errors.
+- Experiment focused verification on 2026-06-22:
+  `rtk bash mvnw -Dtest=ExperimentServiceImplTest,ExperimentControllerTest,RunControllerTest test`
+  -> 10 tests, 0 failures/errors.
 - AI testcase generator compile verification on 2026-06-22:
   `rtk bash mvnw compile` -> success.
 - AI assertion suggestion compile verification on 2026-06-22:

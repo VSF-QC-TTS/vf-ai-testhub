@@ -53,6 +53,17 @@ public class RunServiceImpl implements RunService {
   @Override
   @Transactional
   public RunResponse triggerRun(UUID datasetPublicId, RunRequest request, String username) {
+    return triggerRun(datasetPublicId, request, username, false);
+  }
+
+  @Override
+  @Transactional
+  public RunResponse triggerExperimentRun(UUID datasetPublicId, RunRequest request, String username) {
+    return triggerRun(datasetPublicId, request, username, true);
+  }
+
+  private RunResponse triggerRun(
+      UUID datasetPublicId, RunRequest request, String username, boolean allowConcurrentDatasetRun) {
     Dataset dataset = datasetRepository.findByPublicId(datasetPublicId)
         .orElseThrow(() -> new ResourceException(ErrorCode.DATASET_NOT_FOUND));
     if (dataset.isArchived()) {
@@ -66,7 +77,8 @@ public class RunServiceImpl implements RunService {
           ErrorCode.VALIDATION_ERROR.getStatus(),
           "RUN_TARGET_PROJECT_MISMATCH");
     }
-    if (runRepository.existsByDatasetAndStatusIn(dataset, List.of(RunStatus.PENDING, RunStatus.RUNNING))) {
+    if (!allowConcurrentDatasetRun
+        && runRepository.existsByDatasetAndStatusIn(dataset, List.of(RunStatus.PENDING, RunStatus.RUNNING))) {
       throw new ResourceException(
           "Dataset already has a pending or running run",
           ErrorCode.VALIDATION_ERROR.getStatus(),
