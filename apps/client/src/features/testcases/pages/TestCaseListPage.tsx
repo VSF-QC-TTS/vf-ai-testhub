@@ -18,6 +18,8 @@ import { Button } from "../../../components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../../components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
 import { TestCaseFormDialog } from "../components/TestCaseFormDialog";
+import { TestCaseImportDialog } from "../components/TestCaseImportDialog";
+import { UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import type { TestCaseResponse, TestCaseSource, TestPriority } from "../testcases.types";
 import { useDataset } from "../../datasets/datasets.queries";
@@ -35,6 +37,7 @@ export function TestCaseListPage() {
   const sectionFilter = searchParams.get("sectionName") || "";
 
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
   const [editingTestCase, setEditingTestCase] = useState<TestCaseResponse | null>(null);
   const [testCasePendingDelete, setTestCasePendingDelete] = useState<TestCaseResponse | null>(null);
   
@@ -77,10 +80,16 @@ export function TestCaseListPage() {
           <h1 className="text-3xl font-semibold tracking-tight">{datasetData?.name || t("testcases:title")}</h1>
           <p className="text-muted-foreground mt-1">{t("testcases:description")}</p>
         </div>
-        <Button onClick={() => { setEditingTestCase(null); setIsFormOpen(true); }} className="gap-2 shrink-0">
-          <Plus className="h-4 w-4" />
-          {t("testcases:addTestCase")}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setIsImportOpen(true)} variant="outline" className="gap-2 shrink-0">
+            <UploadCloud className="h-4 w-4" />
+            {t("testcases:import.title")}
+          </Button>
+          <Button onClick={() => { setEditingTestCase(null); setIsFormOpen(true); }} className="gap-2 shrink-0">
+            <Plus className="h-4 w-4" />
+            {t("testcases:addTestCase")}
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -271,6 +280,11 @@ export function TestCaseListPage() {
           )}
         </div>
       )}
+
+      <TestCaseImportDialog
+        open={isImportOpen}
+        onOpenChange={setIsImportOpen}
+      />
 
       <TestCaseFormDialog
         open={isFormOpen}
