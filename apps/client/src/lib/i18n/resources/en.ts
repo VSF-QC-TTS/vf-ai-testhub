@@ -42,7 +42,20 @@ export const en = {
     },
     actions: {
       cancel: "Cancel",
+      save: "Save",
+      saveChanges: "Save Changes",
+      edit: "Edit",
       deleteConfirm: "Are you sure you want to delete this item? This action cannot be undone."
+    },
+    optional: "Optional",
+    description: "Description"
+  },
+  home: {
+    title: "AI TestHub",
+    totalProjects: "Total Projects",
+    noProjects: {
+      title: "No projects created",
+      description: "You don't have any projects yet. Create one to get started."
     }
   },
   auth: {
@@ -177,12 +190,70 @@ export const en = {
     title: "Targets",
     missingProject: "Select a project before managing targets.",
     notFound: "The requested target could not be found.",
+    description: "Configure APIs and environments to be evaluated.",
+    create: "Create Target",
+    edit: "Edit Target",
+    empty: {
+      title: "No Targets Yet",
+      description: "Set up your first API target to begin evaluating prompts and testing endpoints."
+    },
+    searchPlaceholder: "Search targets...",
+    noUrl: "No URL",
+    primary: "Primary",
     delete: {
       title: "Delete target",
       desc: "This target will be removed from the current project. Existing run history is not changed.",
       confirm: "Delete",
       deleting: "Deleting...",
     },
+    workbench: {
+      createTitle: "Create Target",
+      editTitle: "Edit Target",
+      createDesc: "Set up a new API target.",
+      quickImport: {
+        title: "Quick Import (cURL)",
+        placeholder: "Paste your cURL command here to auto-fill the configuration below...",
+        parse: "Parse",
+        parsing: "Parsing..."
+      },
+      httpConfig: {
+        title: "HTTP Configuration",
+        method: "Method",
+        url: "URL",
+        urlPlaceholder: "https://api.example.com/v1/chat",
+        headers: "Headers",
+        body: "Body (JSON)",
+        auth: "Authentication",
+        headersDesc: "Define custom HTTP headers. Use {{variable}} syntax for dynamic values.",
+        bodyDesc: "Define the request body payload template.",
+        authDesc: "Authentication forms will be rendered here based on auth type."
+      },
+      responseMapping: {
+        title: "Response Mapping",
+        desc: "Map fields from your API's JSON response to standard Evaluation metrics using JSONPath expressions.",
+        answerPath: "Answer Path",
+        answerPathPlaceholder: "e.g. data.choices[0].message.content",
+        sourcesPath: "Sources/Citations Path",
+        sourcesPathPlaceholder: "e.g. data.metadata.citations",
+        latencyPath: "Latency Path",
+        latencyPathPlaceholder: "e.g. metrics.total_time_ms",
+        missingFieldBehavior: "Missing Field Behavior",
+        fail: "FAIL (Mark test as error)",
+        skip: "SKIP (Ignore missing fields)",
+        warning: "WARNING (Log warning)"
+      },
+      settings: {
+        title: "General settings",
+        name: "Target Name *",
+        namePlaceholder: "e.g. Production RAG API",
+        environment: "Environment",
+        envDev: "Development (dev)",
+        envStaging: "Staging (staging)",
+        envProd: "Production (prod)",
+        timeout: "Timeout (ms)",
+        testConnection: "Test Connection"
+      }
+    }
   },
   datasets: {
     title: "Datasets",

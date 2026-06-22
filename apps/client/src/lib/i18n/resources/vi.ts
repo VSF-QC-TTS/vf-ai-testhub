@@ -42,7 +42,20 @@ export const vi = {
     },
     actions: {
       cancel: "Hủy",
+      save: "Lưu",
+      saveChanges: "Lưu thay đổi",
+      edit: "Sửa",
       deleteConfirm: "Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác."
+    },
+    optional: "Tùy chọn",
+    description: "Mô tả"
+  },
+  home: {
+    title: "AI TestHub",
+    totalProjects: "Tổng số dự án",
+    noProjects: {
+      title: "Chưa có dự án nào",
+      description: "Bạn chưa có dự án nào. Hãy tạo dự án để bắt đầu."
     }
   },
   auth: {
@@ -177,12 +190,70 @@ export const vi = {
     title: "Mục tiêu",
     missingProject: "Vui lòng chọn dự án trước khi quản lý mục tiêu.",
     notFound: "Không tìm thấy mục tiêu yêu cầu.",
+    description: "Cấu hình API và môi trường để kiểm thử.",
+    create: "Tạo mục tiêu",
+    edit: "Sửa mục tiêu",
+    empty: {
+      title: "Chưa có mục tiêu",
+      description: "Thiết lập mục tiêu API đầu tiên để bắt đầu đánh giá prompt và kiểm thử endpoint."
+    },
+    searchPlaceholder: "Tìm kiếm mục tiêu...",
+    noUrl: "Không có URL",
+    primary: "Chính",
     delete: {
       title: "Xóa mục tiêu",
       desc: "Mục tiêu này sẽ bị xóa khỏi dự án hiện tại. Lịch sử các lượt chạy không thay đổi.",
       confirm: "Xóa",
       deleting: "Đang xóa...",
     },
+    workbench: {
+      createTitle: "Tạo mục tiêu",
+      editTitle: "Sửa mục tiêu",
+      createDesc: "Thiết lập mục tiêu API mới.",
+      quickImport: {
+        title: "Nhập nhanh (cURL)",
+        placeholder: "Dán lệnh cURL của bạn vào đây để tự động điền cấu hình bên dưới...",
+        parse: "Phân tích",
+        parsing: "Đang phân tích..."
+      },
+      httpConfig: {
+        title: "Cấu hình HTTP",
+        method: "Phương thức",
+        url: "URL",
+        urlPlaceholder: "https://api.example.com/v1/chat",
+        headers: "Headers",
+        body: "Body (JSON)",
+        auth: "Xác thực",
+        headersDesc: "Định nghĩa HTTP headers tùy chỉnh. Sử dụng cú pháp {{variable}} cho các giá trị động.",
+        bodyDesc: "Định nghĩa template cho payload của request body.",
+        authDesc: "Form xác thực sẽ được hiển thị ở đây dựa trên loại xác thực."
+      },
+      responseMapping: {
+        title: "Ánh xạ phản hồi",
+        desc: "Ánh xạ các trường từ phản hồi JSON của API sang các số liệu Đánh giá chuẩn bằng biểu thức JSONPath.",
+        answerPath: "Đường dẫn câu trả lời",
+        answerPathPlaceholder: "VD: data.choices[0].message.content",
+        sourcesPath: "Đường dẫn nguồn/trích dẫn",
+        sourcesPathPlaceholder: "VD: data.metadata.citations",
+        latencyPath: "Đường dẫn độ trễ",
+        latencyPathPlaceholder: "VD: metrics.total_time_ms",
+        missingFieldBehavior: "Xử lý khi thiếu trường",
+        fail: "FAIL (Đánh dấu test là lỗi)",
+        skip: "SKIP (Bỏ qua trường bị thiếu)",
+        warning: "WARNING (Ghi log cảnh báo)"
+      },
+      settings: {
+        title: "Cài đặt chung",
+        name: "Tên mục tiêu *",
+        namePlaceholder: "VD: Production RAG API",
+        environment: "Môi trường",
+        envDev: "Phát triển (dev)",
+        envStaging: "Kiểm thử (staging)",
+        envProd: "Sản phẩm (prod)",
+        timeout: "Thời gian chờ (ms)",
+        testConnection: "Kiểm tra kết nối"
+      }
+    }
   },
   datasets: {
     title: "Tập dữ liệu",
