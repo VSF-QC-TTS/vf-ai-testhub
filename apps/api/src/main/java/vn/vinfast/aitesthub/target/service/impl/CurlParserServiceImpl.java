@@ -109,26 +109,22 @@ public class CurlParserServiceImpl implements CurlParserService {
 
     if (dataMatcher.find()) {
       String rawBody = dataMatcher.group(1);
-      // Clean up escaped quotes inside the body string
-      rawBody = rawBody.replace("\\\"", "\"");
+      
+      // Try to parse as-is first
       try {
-        Map<String, Object> bodyMap = objectMapper.readValue(rawBody, new TypeReference<>() {});
-        // Find first string value and replace it with {{input}} if needed.
-        boolean replaced = false;
-        for (Map.Entry<String, Object> entry : bodyMap.entrySet()) {
-            if (entry.getValue() instanceof String) {
-               if (!replaced) {
-                   bodyMap.put(entry.getKey(), "{{input}}");
-                   replaced = true;
-               }
-            }
-        }
-        parsed.bodyTemplate = bodyMap;
+        parsed.bodyTemplate = objectMapper.readValue(rawBody, new TypeReference<Map<String, Object>>() {});
       } catch (JsonProcessingException e) {
-        log.warn("cURL body is not valid JSON, creating a raw wrapper", e);
-        Map<String, Object> rawMap = new HashMap<>();
-        rawMap.put("raw", "{{input}}");
-        parsed.bodyTemplate = rawMap;
+        // If it fails, it might be because the entire string was inside double quotes and escaped.
+        // Let's try unescaping.
+        String unescapedBody = rawBody.replace("\\\"", "\"");
+        try {
+          parsed.bodyTemplate = objectMapper.readValue(unescapedBody, new TypeReference<Map<String, Object>>() {});
+        } catch (JsonProcessingException ex) {
+          log.warn("cURL body is not valid JSON, creating a raw wrapper. Original: {}", rawBody);
+          Map<String, Object> rawMap = new HashMap<>();
+          rawMap.put("raw", rawBody);
+          parsed.bodyTemplate = rawMap;
+        }
       }
     }
 
