@@ -15,6 +15,7 @@ public interface CurlParserService {
     public Map<String, Object> queryParamsTemplate;
     public Map<String, Object> headersTemplate;
     public Map<String, Object> bodyTemplate;
+    public Map<String, String> extractedSecrets;
   }
 
   /**

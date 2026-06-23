@@ -49,6 +49,11 @@ public class TargetController {
 
     CurlParserService.ParsedCurl parsedCurl = curlParserService.parseCurl(curlCommand);
 
+    Map<String, Object> authConfig = null;
+    if (parsedCurl.extractedSecrets != null && !parsedCurl.extractedSecrets.isEmpty()) {
+      authConfig = new java.util.HashMap<>(parsedCurl.extractedSecrets);
+    }
+
     TargetResponse response = new TargetResponse(
         null,
         projectId,
@@ -60,7 +65,7 @@ public class TargetController {
         parsedCurl.queryParamsTemplate,
         parsedCurl.headersTemplate,
         parsedCurl.bodyTemplate,
-        null, // authConfig
+        authConfig, // mapped from extracted secrets
         null, // llmProvider
         null, // llmModel
         null, // llmBaseUrl

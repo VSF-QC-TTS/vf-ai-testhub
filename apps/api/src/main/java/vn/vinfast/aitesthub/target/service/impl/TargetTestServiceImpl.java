@@ -56,7 +56,8 @@ public class TargetTestServiceImpl implements TargetTestService {
     boolean hasContentType = false;
     if (request.headersTemplate() != null) {
       for (Map.Entry<String, Object> entry : request.headersTemplate().entrySet()) {
-        requestBuilder.header(entry.getKey(), String.valueOf(entry.getValue()));
+        String resolvedValue = resolveSecrets(String.valueOf(entry.getValue()), request.authConfig());
+        requestBuilder.header(entry.getKey(), resolvedValue);
         if (entry.getKey().equalsIgnoreCase("Content-Type")) {
           hasContentType = true;
         }
@@ -71,6 +72,7 @@ public class TargetTestServiceImpl implements TargetTestService {
     if (request.bodyTemplate() != null && !request.bodyTemplate().isEmpty()) {
       try {
         bodyStr = objectMapper.writeValueAsString(request.bodyTemplate());
+        bodyStr = resolveSecrets(bodyStr, request.authConfig());
       } catch (JsonProcessingException e) {
         log.warn("Failed to serialize body template", e);
         return new TargetTestResponse(0, 0, null, "Invalid body template JSON structure");
@@ -99,5 +101,19 @@ public class TargetTestServiceImpl implements TargetTestService {
           "Unexpected error: " + e.getMessage()
       );
     }
+  }
+
+  private String resolveSecrets(String input, Map<String, Object> authConfig) {
+    if (input == null || authConfig == null || authConfig.isEmpty()) {
+      return input;
+    }
+    String result = input;
+    for (Map.Entry<String, Object> entry : authConfig.entrySet()) {
+      if (entry.getValue() != null) {
+        String placeholder = "{{secret:" + entry.getKey() + "}}";
+        result = result.replace(placeholder, entry.getValue().toString());
+      }
+    }
+    return result;
   }
 }

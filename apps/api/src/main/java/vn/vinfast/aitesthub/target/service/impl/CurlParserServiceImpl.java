@@ -1,14 +1,13 @@
 package vn.vinfast.aitesthub.target.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import vn.vinfast.aitesthub.exception.ErrorCode;
 import vn.vinfast.aitesthub.exception.ResourceException;
 import vn.vinfast.aitesthub.target.enums.HttpMethod;
 import vn.vinfast.aitesthub.target.service.CurlParserService;
+import vn.vinfast.aitesthub.target.service.TargetSecretDetector;
 
 /**
  * @author nghlong3004
@@ -26,14 +26,9 @@ import vn.vinfast.aitesthub.target.service.CurlParserService;
 @RequiredArgsConstructor
 public class CurlParserServiceImpl implements CurlParserService {
 
+  private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<>() {};
   private final ObjectMapper objectMapper;
-
-  private static final Pattern CURL_PATTERN = Pattern.compile("^curl\\s+");
-  private static final Pattern URL_PATTERN = Pattern.compile("['\"]?(https?://[^\\s'\"]+)['\"]?");
-  private static final Pattern METHOD_PATTERN = Pattern.compile("-X\\s+([A-Z]+)");
-  private static final Pattern HEADER_PATTERN = Pattern.compile("-H\\s+['\"]([^:]+):\\s*(.*?)['\"]");
-  private static final Pattern DATA_PATTERN = Pattern.compile("--data(?:-raw|-binary)?\\s+['\"](.*?)['\"]", Pattern.DOTALL);
-  private static final Pattern DATA_SHORT_PATTERN = Pattern.compile("-d\\s+['\"](.*?)['\"]", Pattern.DOTALL);
+  private final TargetSecretDetector secretDetector;
 
   @Override
   public ParsedCurl parseCurl(String curlCommand) {
@@ -41,93 +36,215 @@ public class CurlParserServiceImpl implements CurlParserService {
       throw new ResourceException(ErrorCode.CURL_PARSE_ERROR);
     }
 
-    String normalizedCurl = curlCommand.trim().replace("\\\n", " ").replace("\\\r\n", " ");
+    String normalized = normalize(curlCommand);
+    List<String> tokens = tokenize(normalized);
 
-    if (!CURL_PATTERN.matcher(normalizedCurl).find()) {
+    if (tokens.isEmpty() || !tokens.getFirst().equalsIgnoreCase("curl")) {
       throw new ResourceException(ErrorCode.CURL_PARSE_ERROR);
     }
 
     ParsedCurl parsed = new ParsedCurl();
+    String methodStr = null;
+    String urlStr = null;
+    Map<String, Object> headers = new HashMap<>();
+    StringBuilder bodyBuilder = new StringBuilder();
 
-    // Parse URL
-    Matcher urlMatcher = URL_PATTERN.matcher(normalizedCurl);
-    if (urlMatcher.find()) {
-      String fullUrl = urlMatcher.group(1);
-      try {
-        URI uri = new URI(fullUrl);
-        String baseUrl = uri.getScheme() + "://" + uri.getAuthority() + uri.getPath();
-        parsed.url = baseUrl;
-
-        // Parse Query Params from URL
-        if (uri.getQuery() != null) {
-          Map<String, Object> queryParams = new HashMap<>();
-          String[] pairs = uri.getQuery().split("&");
-          for (String pair : pairs) {
-            int idx = pair.indexOf("=");
-            if (idx > 0) {
-              queryParams.put(pair.substring(0, idx), pair.substring(idx + 1));
-            } else {
-              queryParams.put(pair, "");
-            }
-          }
-          parsed.queryParamsTemplate = queryParams;
+    int i = 1;
+    while (i < tokens.size()) {
+      String token = tokens.get(i);
+      switch (token) {
+        case "--request", "-X" -> {
+          methodStr = requireNext(tokens, i);
+          i += 2;
         }
-      } catch (URISyntaxException e) {
-        throw new ResourceException(ErrorCode.CURL_PARSE_ERROR);
+        case "--header", "-H" -> {
+          String headerValue = requireNext(tokens, i);
+          parseHeader(headerValue, headers);
+          i += 2;
+        }
+        case "--data", "--data-raw", "--data-binary", "-d" -> {
+          String data = requireNext(tokens, i);
+          if (!bodyBuilder.isEmpty()) {
+            bodyBuilder.append("&");
+          }
+          bodyBuilder.append(data);
+          i += 2;
+        }
+        case "--url" -> {
+          urlStr = requireNext(tokens, i);
+          i += 2;
+        }
+        case "--location", "-L", "--compressed", "--insecure", "-k", "-s", "--silent", "-S",
+            "--show-error", "-v", "--verbose", "--globoff", "-g" -> i++;
+        default -> {
+          if (token.startsWith("-")) {
+            // Unknown flag with possible value — skip flag + value
+            if (i + 1 < tokens.size() && !tokens.get(i + 1).startsWith("-")) {
+              i += 2;
+            } else {
+              i++;
+            }
+          } else if (urlStr == null) {
+            urlStr = token;
+            i++;
+          } else {
+            i++;
+          }
+        }
       }
-    } else {
+    }
+
+    if (urlStr == null || urlStr.isBlank()) {
       throw new ResourceException(ErrorCode.CURL_PARSE_ERROR);
     }
 
-    // Parse Method
-    Matcher methodMatcher = METHOD_PATTERN.matcher(normalizedCurl);
-    if (methodMatcher.find()) {
-      try {
-        parsed.method = HttpMethod.valueOf(methodMatcher.group(1).toUpperCase());
-      } catch (IllegalArgumentException e) {
-        parsed.method = HttpMethod.POST; // Default fallback
+    // Process URL & Query Params
+    try {
+      // Remove any surrounding quotes from URL if they exist
+      if ((urlStr.startsWith("'") && urlStr.endsWith("'")) || (urlStr.startsWith("\"") && urlStr.endsWith("\""))) {
+        urlStr = urlStr.substring(1, urlStr.length() - 1);
       }
-    } else {
-      parsed.method = (normalizedCurl.contains("--data") || normalizedCurl.contains("-d ")) ? HttpMethod.POST : HttpMethod.GET;
-    }
-
-    // Parse Headers
-    Map<String, Object> headers = new HashMap<>();
-    Matcher headerMatcher = HEADER_PATTERN.matcher(normalizedCurl);
-    while (headerMatcher.find()) {
-      headers.put(headerMatcher.group(1).trim(), headerMatcher.group(2).trim());
-    }
-    if (!headers.isEmpty()) {
-      parsed.headersTemplate = headers;
-    }
-
-    // Parse Body
-    Matcher dataMatcher = DATA_PATTERN.matcher(normalizedCurl);
-    if (!dataMatcher.find()) {
-      dataMatcher = DATA_SHORT_PATTERN.matcher(normalizedCurl);
-    }
-
-    if (dataMatcher.find()) {
-      String rawBody = dataMatcher.group(1);
       
-      // Try to parse as-is first
-      try {
-        parsed.bodyTemplate = objectMapper.readValue(rawBody, new TypeReference<Map<String, Object>>() {});
-      } catch (JsonProcessingException e) {
-        // If it fails, it might be because the entire string was inside double quotes and escaped.
-        // Let's try unescaping.
-        String unescapedBody = rawBody.replace("\\\"", "\"");
-        try {
-          parsed.bodyTemplate = objectMapper.readValue(unescapedBody, new TypeReference<Map<String, Object>>() {});
-        } catch (JsonProcessingException ex) {
-          log.warn("cURL body is not valid JSON, creating a raw wrapper. Original: {}", rawBody);
-          Map<String, Object> rawMap = new HashMap<>();
-          rawMap.put("raw", rawBody);
-          parsed.bodyTemplate = rawMap;
+      URI uri = new URI(urlStr);
+      String baseUrl = uri.getScheme() + "://" + uri.getAuthority() + uri.getPath();
+      parsed.url = baseUrl;
+
+      if (uri.getQuery() != null) {
+        Map<String, Object> queryParams = new HashMap<>();
+        String[] pairs = uri.getQuery().split("&");
+        for (String pair : pairs) {
+          int idx = pair.indexOf("=");
+          if (idx > 0) {
+            queryParams.put(pair.substring(0, idx), pair.substring(idx + 1));
+          } else {
+            queryParams.put(pair, "");
+          }
         }
+        parsed.queryParamsTemplate = queryParams;
+      }
+    } catch (URISyntaxException e) {
+      throw new ResourceException(ErrorCode.CURL_PARSE_ERROR);
+    }
+
+    if (!headers.isEmpty()) {
+      TargetSecretDetector.SecretDetectionResult detectionResult = secretDetector.detect(headers);
+      parsed.headersTemplate = detectionResult.sanitizedHeaders();
+      parsed.extractedSecrets = detectionResult.secretValues();
+    }
+
+    String bodyRaw = bodyBuilder.isEmpty() ? null : bodyBuilder.toString();
+    parsed.method = resolveMethod(methodStr, bodyRaw);
+    
+    if (bodyRaw != null) {
+      parsed.bodyTemplate = tryParseJson(bodyRaw);
+      if (parsed.bodyTemplate == null) {
+        log.warn("cURL body is not valid JSON, creating a raw wrapper. Original: {}", bodyRaw);
+        Map<String, Object> rawMap = new HashMap<>();
+        rawMap.put("raw", bodyRaw);
+        parsed.bodyTemplate = rawMap;
       }
     }
 
     return parsed;
+  }
+
+  private String normalize(String rawCurl) {
+    return rawCurl
+        .replace("\\\n", " ")
+        .replace("\\\r\n", " ")
+        .replace("\\\r", " ")
+        .replaceAll("\\\\\\s*\n", " ")
+        .trim();
+  }
+
+  private List<String> tokenize(String input) {
+    List<String> tokens = new ArrayList<>();
+    StringBuilder current = new StringBuilder();
+    boolean inSingleQuote = false;
+    boolean inDoubleQuote = false;
+
+    for (int i = 0; i < input.length(); i++) {
+      char c = input.charAt(i);
+
+      if (inSingleQuote) {
+        if (c == '\'') {
+          inSingleQuote = false;
+        } else {
+          current.append(c);
+        }
+      } else if (inDoubleQuote) {
+        if (c == '\\' && i + 1 < input.length()) {
+          char next = input.charAt(i + 1);
+          if (next == '"' || next == '\\') {
+            current.append(next);
+            i++;
+          } else {
+            current.append(c);
+          }
+        } else if (c == '"') {
+          inDoubleQuote = false;
+        } else {
+          current.append(c);
+        }
+      } else {
+        if (c == '\'') {
+          inSingleQuote = true;
+        } else if (c == '"') {
+          inDoubleQuote = true;
+        } else if (Character.isWhitespace(c)) {
+          if (!current.isEmpty()) {
+            tokens.add(current.toString());
+            current.setLength(0);
+          }
+        } else {
+          current.append(c);
+        }
+      }
+    }
+
+    if (!current.isEmpty()) {
+      tokens.add(current.toString());
+    }
+
+    return tokens;
+  }
+
+  private void parseHeader(String headerValue, Map<String, Object> headers) {
+    int colonIndex = headerValue.indexOf(':');
+    if (colonIndex <= 0) {
+      return;
+    }
+    String name = headerValue.substring(0, colonIndex).trim();
+    String value = headerValue.substring(colonIndex + 1).trim();
+    headers.put(name, value);
+  }
+
+  private String requireNext(List<String> tokens, int currentIndex) {
+    if (currentIndex + 1 >= tokens.size()) {
+      throw new ResourceException(ErrorCode.CURL_PARSE_ERROR);
+    }
+    return tokens.get(currentIndex + 1);
+  }
+
+  private HttpMethod resolveMethod(String explicit, String bodyRaw) {
+    if (explicit != null) {
+      try {
+        return HttpMethod.valueOf(explicit.toUpperCase());
+      } catch (IllegalArgumentException e) {
+        throw new ResourceException(ErrorCode.CURL_PARSE_ERROR);
+      }
+    }
+    return bodyRaw != null ? HttpMethod.POST : HttpMethod.GET;
+  }
+
+  private Map<String, Object> tryParseJson(String bodyRaw) {
+    if (bodyRaw == null || bodyRaw.isBlank()) {
+      return null;
+    }
+    try {
+      return objectMapper.readValue(bodyRaw.trim(), MAP_TYPE);
+    } catch (Exception e) {
+      return null;
+    }
   }
 }

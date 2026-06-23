@@ -22,6 +22,7 @@ import vn.vinfast.aitesthub.run.service.RunSnapshotService;
 import vn.vinfast.aitesthub.target.entity.ResponseMapping;
 import vn.vinfast.aitesthub.target.entity.Target;
 import vn.vinfast.aitesthub.target.repository.ResponseMappingRepository;
+import vn.vinfast.aitesthub.target.service.TargetSecretService;
 import vn.vinfast.aitesthub.testcase.entity.TestCase;
 import vn.vinfast.aitesthub.testcase.repository.TestCaseRepository;
 import vn.vinfast.aitesthub.toolexpectation.entity.ToolExpectation;
@@ -40,6 +41,7 @@ public class RunSnapshotServiceImpl implements RunSnapshotService {
   private final AssertionRepository assertionRepository;
   private final ToolExpectationRepository toolExpectationRepository;
   private final ResponseMappingRepository responseMappingRepository;
+  private final TargetSecretService targetSecretService;
 
   @Override
   public RunSnapshotDto assembleSnapshot(Run run) {
@@ -103,7 +105,7 @@ public class RunSnapshotServiceImpl implements RunSnapshotService {
         nullSafeMap(target.getQueryParamsTemplate()),
         nullSafeMap(target.getHeadersTemplate()),
         nullSafeMap(target.getBodyTemplate()),
-        nullSafeMap(target.getAuthConfig()),
+        buildSnapshotAuthConfig(target),
         target.getLlmProvider(),
         target.getLlmModel(),
         target.getLlmBaseUrl(),
@@ -111,6 +113,17 @@ public class RunSnapshotServiceImpl implements RunSnapshotService {
         nullSafeMap(target.getInputBinding()),
         nullSafeMap(target.getVariableBindings()),
         target.getTimeoutMs());
+  }
+
+  private Map<String, Object> buildSnapshotAuthConfig(Target target) {
+    Map<String, Object> authConfig = new HashMap<>();
+    if (target.getAuthConfig() != null) {
+      authConfig.putAll(target.getAuthConfig());
+    }
+    // Inject decrypted secrets into authConfig for execution
+    Map<String, String> secrets = targetSecretService.decryptSecrets(target);
+    authConfig.putAll(secrets);
+    return authConfig.isEmpty() ? Map.of() : Map.copyOf(authConfig);
   }
 
   private RunSnapshotDto.TestCaseSnapshot toTestCaseSnapshot(

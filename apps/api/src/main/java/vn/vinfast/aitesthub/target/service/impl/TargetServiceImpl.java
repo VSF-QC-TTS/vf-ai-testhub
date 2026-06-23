@@ -1,6 +1,7 @@
 package vn.vinfast.aitesthub.target.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import vn.vinfast.aitesthub.target.mapper.TargetMapper;
 import vn.vinfast.aitesthub.target.repository.TargetRepository;
 import vn.vinfast.aitesthub.target.request.TargetRequest;
 import vn.vinfast.aitesthub.target.response.TargetResponse;
+import vn.vinfast.aitesthub.target.service.TargetSecretService;
 import vn.vinfast.aitesthub.target.service.TargetService;
 
 /**
@@ -40,6 +42,7 @@ public class TargetServiceImpl implements TargetService {
   private final RunRepository runRepository;
   private final TargetMapper targetMapper;
   private final ResponseMappingMapper responseMappingMapper;
+  private final TargetSecretService targetSecretService;
 
   @Override
   @Transactional(readOnly = true)
@@ -71,8 +74,11 @@ public class TargetServiceImpl implements TargetService {
     Target target = targetMapper.toEntity(request);
     target.setProject(project);
 
-    // Handle inline ResponseMapping from request — mapper ignores it to prevent orphan
-    // entity creation without the required target back-reference.
+    // Prevent storing secrets in plaintext DB column
+    Map<String, String> secretValues = extractSecrets(request.authConfig());
+    target.setAuthConfig(null);
+
+    // Handle inline ResponseMapping from request
     if (request.responseMapping() != null) {
       ResponseMapping mapping = responseMappingMapper.toEntity(request.responseMapping());
       mapping.setTarget(target);
@@ -80,6 +86,8 @@ public class TargetServiceImpl implements TargetService {
     }
 
     Target saved = targetRepository.save(target);
+    targetSecretService.saveSecrets(saved, secretValues);
+
     return targetMapper.toResponse(saved);
   }
 
@@ -100,7 +108,14 @@ public class TargetServiceImpl implements TargetService {
     }
 
     targetMapper.updateEntityFromRequest(request, target);
+    
+    // Prevent storing secrets in plaintext DB column
+    Map<String, String> secretValues = extractSecrets(request.authConfig());
+    target.setAuthConfig(null);
+    
     Target updated = targetRepository.save(target);
+    targetSecretService.saveSecrets(updated, secretValues);
+
     return targetMapper.toResponse(updated);
   }
 
@@ -116,5 +131,18 @@ public class TargetServiceImpl implements TargetService {
     }
 
     targetRepository.delete(target);
+  }
+
+  private java.util.Map<String, String> extractSecrets(java.util.Map<String, Object> authConfig) {
+    if (authConfig == null || authConfig.isEmpty()) {
+      return java.util.Map.of();
+    }
+    java.util.Map<String, String> secrets = new java.util.HashMap<>();
+    authConfig.forEach((k, v) -> {
+      if (v != null) {
+        secrets.put(k, v.toString());
+      }
+    });
+    return secrets;
   }
 }
