@@ -13,6 +13,7 @@ export const getDatasetSchema = (t: TFunction) => z.object({
     .max(100, t("common:validation.maxLength", { max: 100 }))
     .optional(),
   tags: z.array(z.string()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type DatasetFormData = z.infer<ReturnType<typeof getDatasetSchema>>;

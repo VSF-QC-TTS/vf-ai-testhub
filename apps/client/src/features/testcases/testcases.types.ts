@@ -8,7 +8,7 @@ export interface TestCaseResponse {
   sectionName?: string;
   name?: string;
   description?: string;
-  input?: string;
+  input: string;
   expectedBehavior?: string;
   referenceAnswer?: string;
   variables?: Record<string, unknown>;
@@ -63,6 +63,6 @@ export interface TestCaseUpdateRequest {
   preconditions?: string;
   tags?: string[];
   priority?: TestPriority;
-  enabled: boolean;
+  enabled?: boolean;
   sortOrder?: number;
 }

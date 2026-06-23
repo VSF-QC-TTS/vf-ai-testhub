@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api/client";
 import type { PageResponse } from "@/lib/api/types";
-import type { RunSnapshotDto, TriggerRunRequest, RunFilterParams, RunComparisonResponse } from "./runs.types";
+import type { RunResponse, TriggerRunRequest, RunFilterParams, RunComparisonResponse } from "./runs.types";
 
 const BASE_PATH = "/api/v1";
 
@@ -13,18 +13,18 @@ export const runKeys = {
   compare: (baseId: string, candidateId: string) => [...runKeys.all, "compare", baseId, candidateId] as const,
 };
 
-export const fetchRuns = async (datasetId: string, params?: RunFilterParams): Promise<PageResponse<RunSnapshotDto>> => {
-  const { data } = await apiClient.get<PageResponse<RunSnapshotDto>>(`${BASE_PATH}/datasets/${datasetId}/runs`, { params });
+export const fetchRuns = async (datasetId: string, params?: RunFilterParams): Promise<PageResponse<RunResponse>> => {
+  const { data } = await apiClient.get<PageResponse<RunResponse>>(`${BASE_PATH}/datasets/${datasetId}/runs`, { params });
   return data;
 };
 
-export const fetchRun = async (runId: string): Promise<RunSnapshotDto> => {
-  const { data } = await apiClient.get<RunSnapshotDto>(`${BASE_PATH}/runs/${runId}`);
+export const fetchRun = async (runId: string): Promise<RunResponse> => {
+  const { data } = await apiClient.get<RunResponse>(`${BASE_PATH}/runs/${runId}`);
   return data;
 };
 
-export const triggerRun = async (datasetId: string, request: TriggerRunRequest): Promise<RunSnapshotDto> => {
-  const { data } = await apiClient.post<RunSnapshotDto>(`${BASE_PATH}/datasets/${datasetId}/runs`, request);
+export const triggerRun = async (datasetId: string, request: TriggerRunRequest): Promise<RunResponse> => {
+  const { data } = await apiClient.post<RunResponse>(`${BASE_PATH}/datasets/${datasetId}/runs`, request);
   return data;
 };
 

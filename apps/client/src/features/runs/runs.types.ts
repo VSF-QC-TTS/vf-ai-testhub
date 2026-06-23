@@ -1,46 +1,50 @@
 import type { ReviewStatus, RunStatus } from "@/lib/api/types";
 
-export type RunMode = "FULL_DATASET" | "SELECTED_SECTION" | "SELECTED_CASES";
+export type RunMode = "FULL_DATASET" | "SELECTED_SECTION" | "SELECTED_CASES" | "SAMPLE" | "FAILED_CASES";
 
 export interface TriggerRunRequest {
   targetId: string;
   runMode: RunMode;
-  sectionName?: string;
-  testCaseIds?: string[];
+  selectedSection?: string;
+  selectedCaseIds?: string[];
   includeLlmJudge: boolean;
   includeToolExpectations: boolean;
   maxConcurrency: number;
   timeoutMs: number;
   retryCount: number;
-  configVersionId?: string;
-  promptVersionId?: string;
+  previousRunId?: string;
 }
 
-export interface RunSnapshotCaseDto {
-  testCasePublicId: string;
-  externalId?: string;
-  input: string;
-  status: ReviewStatus;
-  latencyMs?: number;
-  failureReason?: string;
-  runResultId?: string;
-}
-
-export interface RunSnapshotDto {
+export interface RunResponse {
   publicId: string;
+  projectPublicId: string;
   datasetPublicId: string;
   targetPublicId: string;
   status: RunStatus;
   runMode: RunMode;
-  totalCases: number;
-  completedCases: number;
-  failedCases: number;
-  uncertainCases: number;
-  errorCases: number;
-  skippedCases: number;
-  elapsedMs?: number;
-  currentPhase?: string;
-  cases: RunSnapshotCaseDto[];
+  includeLlmJudge: boolean;
+  includeToolExpectations: boolean;
+  maxConcurrency?: number;
+  timeoutMs?: number;
+  retryCount?: number;
+  triggeredByPublicId?: string;
+  previousRunPublicId?: string;
+  selectedCaseIds?: string[];
+  selectedSection?: string;
+  startedAt?: string;
+  finishedAt?: string;
+  totalTestCases?: number;
+  completedTestCases?: number;
+  passedCount?: number;
+  failedCount?: number;
+  errorCount?: number;
+  skippedCount?: number;
+  llmRubricCount?: number;
+  estimatedLlmCalls?: number;
+  failureReason?: string;
+  summary?: Record<string, unknown>;
+  configSnapshot?: Record<string, unknown>;
+  artifactPath?: string;
   createdAt: string;
   updatedAt: string;
 }

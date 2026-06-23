@@ -1,10 +1,12 @@
 export interface DatasetResponse {
   publicId: string;
-  projectId: string;
+  projectPublicId: string;
+  archived: boolean;
   name: string;
   description?: string;
   category?: string;
   tags?: string[];
+  metadata?: Record<string, unknown>;
   testCaseCount?: number;
   creator?: string;
   createdAt: string;
@@ -17,6 +19,7 @@ export interface DatasetCreateRequest {
   description?: string;
   category?: string;
   tags?: string[];
+  metadata?: Record<string, unknown>;
 }
 
 export interface DatasetUpdateRequest {
@@ -24,4 +27,5 @@ export interface DatasetUpdateRequest {
   description?: string;
   category?: string;
   tags?: string[];
+  metadata?: Record<string, unknown>;
 }

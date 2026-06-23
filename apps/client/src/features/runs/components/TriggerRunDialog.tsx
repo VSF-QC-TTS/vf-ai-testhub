@@ -46,8 +46,8 @@ export function TriggerRunDialog({ open, onOpenChange, datasetId, onRunStarted }
     defaultValues: {
       targetId: "",
       runMode: "FULL_DATASET",
-      sectionName: "",
-      testCaseIds: [],
+      selectedSection: "",
+      selectedCaseIds: [],
       includeLlmJudge: true,
       includeToolExpectations: true,
       maxConcurrency: 3,
@@ -146,7 +146,7 @@ export function TriggerRunDialog({ open, onOpenChange, datasetId, onRunStarted }
               {watchRunMode === "SELECTED_SECTION" && (
                 <FormField
                   control={form.control}
-                  name="sectionName"
+                  name="selectedSection"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("runs:form.section")}</FormLabel>

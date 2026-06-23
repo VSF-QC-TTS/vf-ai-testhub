@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useRuns } from "../runs.queries";
 import { Clock } from "lucide-react";
@@ -19,7 +20,8 @@ export function RunHistoryPage() {
   const { t } = useTranslation();
   const { projectId = "", datasetId = "" } = useParams();
 
-  const { data, isLoading } = useRuns(datasetId || "all");
+  const [page, setPage] = useState(0);
+  const { data, isLoading } = useRuns(datasetId || "all", { page, size: 20 });
 
   const runs = data?.content || [];
   const isEmpty = !isLoading && runs.length === 0;
@@ -73,6 +75,7 @@ export function RunHistoryPage() {
           <p className="text-zinc-500 max-w-sm mb-8">{t("runs:history.noRunsDesc")}</p>
         </motion.div>
       ) : (
+        <div className="flex flex-col gap-4">
         <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
           <Table>
             <TableHeader className="bg-zinc-50/50 sticky top-0">
@@ -100,13 +103,13 @@ export function RunHistoryPage() {
                     {t(`runs:modes.${run.runMode}`, { defaultValue: run.runMode })}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {run.totalCases}
+                    {(run.totalTestCases || 0)}
                   </TableCell>
                   <TableCell className="text-sm text-green-600 font-medium">
-                    {(run.totalCases || 0) - (run.failedCases || 0) - (run.errorCases || 0) - (run.uncertainCases || 0) - (run.skippedCases || 0)}
+                    {((run.totalTestCases || 0) || 0) - ((run.failedCount || 0) || 0) - ((run.errorCount || 0) || 0) - (0 || 0) - ((run.skippedCount || 0) || 0)}
                   </TableCell>
                   <TableCell className="text-sm text-red-600 font-medium">
-                    {run.failedCases + run.errorCases}
+                    {(run.failedCount || 0) + (run.errorCount || 0)}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {new Date(run.createdAt).toLocaleString()}
@@ -122,6 +125,16 @@ export function RunHistoryPage() {
               ))}
             </TableBody>
           </Table>
+        </div>
+        <div className="flex justify-between items-center">
+          <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0 || isLoading}>
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground">Page {page + 1}</span>
+          <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={!data || data.last || isLoading}>
+            Next
+          </Button>
+        </div>
         </div>
       )}
     </div>
