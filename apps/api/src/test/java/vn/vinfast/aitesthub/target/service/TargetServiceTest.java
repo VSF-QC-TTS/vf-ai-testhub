@@ -45,6 +45,9 @@ class TargetServiceTest {
   @Mock
   private TargetMapper targetMapper;
 
+  @Mock
+  private vn.vinfast.aitesthub.run.repository.RunRepository runRepository;
+
   @InjectMocks
   private TargetServiceImpl targetService;
 
@@ -199,6 +202,7 @@ class TargetServiceTest {
   @Test
   void deleteTarget_targetExists_shouldDelete() {
     when(targetRepository.findByPublicId(targetId)).thenReturn(Optional.of(target));
+    when(runRepository.existsByTargetAndStatusIn(eq(target), any())).thenReturn(false);
 
     targetService.deleteTarget(targetId);
 

@@ -81,7 +81,7 @@ class GlobalTargetControllerTest {
     UUID projectId = UUID.randomUUID();
 
     TargetRequest request = new TargetRequest(
-        projectId, "Updated Target", "prod", TargetType.HTTP, null, null, null, null, null, null, null, null, null, null, null, null, 30000, false, null
+        projectId, "Updated Target", "prod", TargetType.HTTP, vn.vinfast.aitesthub.target.enums.HttpMethod.POST, "http://test.local", null, null, null, null, null, null, null, null, null, null, 30000, false, null
     );
 
     TargetResponse response = new TargetResponse(
