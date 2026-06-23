@@ -19,9 +19,9 @@ export function ProjectDashboardPage() {
   const { data: datasetsData, isLoading: isDatasetsLoading } = useDatasets(projectId, { size: 100 });
   const { data: rubricsData, isLoading: isRubricsLoading } = useProjectRubrics(projectId, { size: 100 });
 
-  const targetCount = targetsData?.content.length ?? 0;
-  const datasetCount = datasetsData?.content.length ?? 0;
-  const rubricCount = rubricsData?.content.length ?? 0;
+  const targetCount = targetsData?.totalElements ?? 0;
+  const datasetCount = datasetsData?.totalElements ?? 0;
+  const rubricCount = rubricsData?.totalElements ?? 0;
   const testCaseCount = datasetsData?.content.reduce((acc, dataset) => acc + (dataset.testCaseCount || 0), 0) ?? 0;
 
   const isLoading = isProjectLoading || isTargetsLoading || isDatasetsLoading || isRubricsLoading;
