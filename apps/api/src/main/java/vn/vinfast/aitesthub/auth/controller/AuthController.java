@@ -7,16 +7,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,11 +26,8 @@ import vn.vinfast.aitesthub.auth.request.RegisterRequest;
 import vn.vinfast.aitesthub.auth.request.ResetPasswordRequest;
 import vn.vinfast.aitesthub.auth.request.VerifyEmailRequest;
 import vn.vinfast.aitesthub.auth.response.LoginResponse;
-import vn.vinfast.aitesthub.auth.response.LoginResult;
 import vn.vinfast.aitesthub.auth.service.AuthService;
-import vn.vinfast.aitesthub.exception.ErrorCode;
 import vn.vinfast.aitesthub.exception.ErrorResponse;
-import vn.vinfast.aitesthub.exception.ResourceException;
 import vn.vinfast.aitesthub.user.response.UserResponse;
 import vn.vinfast.aitesthub.user.service.UserService;
 
@@ -46,7 +40,6 @@ import vn.vinfast.aitesthub.user.service.UserService;
 @RequiredArgsConstructor
 @Tag(name = "Auth", description = "Authentication and local account registration APIs")
 public class AuthController {
-  private static final String REFRESH_TOKEN_COOKIE = "refresh_token";
 
   private final AuthService authService;
   private final UserService userService;
@@ -185,59 +178,15 @@ public class AuthController {
                 schema = @Schema(implementation = ErrorResponse.class)))
   })
   @PostMapping(value = "/refresh-token", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<LoginResponse> refreshToken(HttpServletRequest request) {
-    var result = refreshWithAvailableCookie(request);
+  public ResponseEntity<LoginResponse> refreshToken(
+      @CookieValue(name = "refresh_token", required = false) String refreshToken) {
+    var result = authService.refreshToken(refreshToken);
     var refreshCookie =
         authCookieFactory.refreshTokenCookie(
             result.refreshToken(), result.refreshTokenMaxAgeSeconds());
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         .body(result.response());
-  }
-
-  private LoginResult refreshWithAvailableCookie(HttpServletRequest request) {
-    List<String> refreshTokens = refreshTokenCandidates(request);
-    if (refreshTokens.isEmpty()) {
-      return authService.refreshToken(null);
-    }
-
-    ResourceException lastRefreshTokenFailure = null;
-    for (String refreshToken : refreshTokens) {
-      try {
-        return authService.refreshToken(refreshToken);
-      } catch (ResourceException ex) {
-        if (!isRefreshTokenFailure(ex)) {
-          throw ex;
-        }
-        lastRefreshTokenFailure = ex;
-      }
-    }
-
-    if (lastRefreshTokenFailure != null) {
-      throw lastRefreshTokenFailure;
-    }
-    throw new ResourceException(ErrorCode.INVALID_REFRESH_TOKEN);
-  }
-
-  private List<String> refreshTokenCandidates(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies == null || cookies.length == 0) {
-      return List.of();
-    }
-
-    List<String> refreshTokens = new ArrayList<>();
-    for (Cookie cookie : cookies) {
-      if (REFRESH_TOKEN_COOKIE.equals(cookie.getName())) {
-        refreshTokens.add(cookie.getValue());
-      }
-    }
-    return refreshTokens;
-  }
-
-  private boolean isRefreshTokenFailure(ResourceException ex) {
-    String code = ex.getResponse().code();
-    return ErrorCode.INVALID_REFRESH_TOKEN.getCode().equals(code)
-        || ErrorCode.REFRESH_TOKEN_EXPIRED.getCode().equals(code);
   }
 
   @Operation(
