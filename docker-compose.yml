@@ -49,7 +49,7 @@ services:
     restart: unless-stopped
     init: true
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:${API_PORT:-8080}:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -68,8 +68,8 @@ services:
       REDIS_PORT: 6379
 
       RUNNER_TOKEN: ${RUNNER_TOKEN:-local-runner-token}
-      WEB_BASE_URL: ${CLIENT_PUBLIC_URL:-http://localhost:3000}
-      SERVER_BASE_URL: ${API_PUBLIC_URL:-http://localhost:8080}
+      WEB_BASE_URL: ${WEB_BASE_URL:-http://localhost:3000}
+      SERVER_BASE_URL: ${SERVER_BASE_URL:-http://localhost:8080}
     volumes:
       - app-logs:/app/logs
       - app-exports:/app/exports

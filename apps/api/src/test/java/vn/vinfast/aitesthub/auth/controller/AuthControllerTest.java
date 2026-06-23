@@ -35,7 +35,9 @@ import vn.vinfast.aitesthub.auth.request.VerifyEmailRequest;
 import vn.vinfast.aitesthub.auth.response.LoginResponse;
 import vn.vinfast.aitesthub.auth.response.LoginResult;
 import vn.vinfast.aitesthub.auth.service.AuthService;
+import vn.vinfast.aitesthub.exception.ErrorCode;
 import vn.vinfast.aitesthub.exception.GlobalException;
+import vn.vinfast.aitesthub.exception.ResourceException;
 import vn.vinfast.aitesthub.user.enums.Role;
 import vn.vinfast.aitesthub.user.enums.UserStatus;
 import vn.vinfast.aitesthub.user.response.UserResponse;
@@ -136,6 +138,34 @@ class AuthControllerTest {
     assertThat(RecordingAuthService.refreshToken).isEqualTo("old-refresh-token");
     assertThat(RecordingAuthCookieFactory.refreshToken).isEqualTo("new-refresh-token");
     assertThat(RecordingAuthCookieFactory.maxAgeSeconds).isEqualTo(604800);
+  }
+
+  @Test
+  void refreshTokenTriesLaterCookieWhenFirstDuplicateCookieIsInvalid() throws Exception {
+    var user = activeUser();
+    var response = new LoginResponse("new-access-token", "Bearer", 900, user);
+    RecordingAuthService.refreshTokenResult =
+        new LoginResult(response, "new-refresh-token", 604800);
+    RecordingAuthCookieFactory.cookie =
+        ResponseCookie.from("refresh_token", "new-refresh-token")
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Strict")
+            .path("/")
+            .maxAge(604800)
+            .build();
+
+    mockMvc
+        .perform(
+            post(AUTH_PATH + "/refresh-token")
+                .cookie(
+                    new Cookie("refresh_token", "invalid-refresh-token"),
+                    new Cookie("refresh_token", "valid-refresh-token")))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.accessToken").value("new-access-token"));
+
+    assertThat(RecordingAuthService.refreshTokens)
+        .containsExactly("invalid-refresh-token", "valid-refresh-token");
   }
 
   @Test
@@ -317,6 +347,7 @@ class AuthControllerTest {
     private static LoginRequest loginRequest;
     private static LoginResult loginResult;
     private static String refreshToken;
+    private static java.util.List<String> refreshTokens;
     private static LoginResult refreshTokenResult;
     private static VerifyEmailRequest verifyEmailRequest;
     private static UserResponse verifyEmailResponse;
@@ -332,6 +363,10 @@ class AuthControllerTest {
     @Override
     public LoginResult refreshToken(String refreshToken) {
       this.refreshToken = refreshToken;
+      refreshTokens.add(refreshToken);
+      if ("invalid-refresh-token".equals(refreshToken)) {
+        throw new ResourceException(ErrorCode.INVALID_REFRESH_TOKEN);
+      }
       return refreshTokenResult;
     }
 
@@ -355,6 +390,7 @@ class AuthControllerTest {
       loginRequest = null;
       loginResult = null;
       refreshToken = null;
+      refreshTokens = new java.util.ArrayList<>();
       refreshTokenResult = null;
       verifyEmailRequest = null;
       verifyEmailResponse = null;
