@@ -42,14 +42,6 @@ public class JwtConfig {
     return decoder;
   }
 
-  @Bean("refreshTokenJwtDecoder")
-  public JwtDecoder refreshTokenJwtDecoder(SecretKey secretKey) {
-    NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey).build();
-    decoder.setJwtValidator(
-        tokenTypeValidator("refresh", "Only refresh tokens can renew sessions."));
-    return decoder;
-  }
-
   private OAuth2TokenValidator<Jwt> tokenTypeValidator(
       String expectedType, String errorDescription) {
     OAuth2TokenValidator<Jwt> validator =

@@ -1,13 +1,15 @@
 package vn.vinfast.aitesthub.auth.token.impl;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.BadJwtException;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class JwtTokenService implements TokenService {
 
   private static final String ISSUER = "vat-api";
   private static final String ACCESS_TOKEN_TYPE = "access";
-  private static final String REFRESH_TOKEN_TYPE = "refresh";
+  private static final String REFRESH_TOKEN_KEY_PREFIX = "vat:auth:refresh:";
 
   @Value("${vat.security.access-expiration}")
   private long accessExpirationMinutes;
@@ -33,7 +35,7 @@ public class JwtTokenService implements TokenService {
   private long refreshExpirationMinutes;
 
   private final JwtEncoder jwtEncoder;
-  private final JwtDecoder refreshTokenJwtDecoder;
+  private final StringRedisTemplate stringRedisTemplate;
 
   @Override
   public String createAccessToken(User user) {
@@ -42,16 +44,48 @@ public class JwtTokenService implements TokenService {
 
   @Override
   public String createRefreshToken(User user) {
-    return createToken(user, REFRESH_TOKEN_TYPE, refreshTokenExpiresInSeconds());
+    String refreshToken = UUID.randomUUID().toString();
+    stringRedisTemplate
+        .opsForValue()
+        .set(
+            refreshTokenKey(refreshToken),
+            user.getUsername(),
+            Duration.ofSeconds(refreshTokenExpiresInSeconds()));
+    return refreshToken;
   }
 
   @Override
   public String readRefreshTokenSubject(String refreshToken) {
-    String subject = refreshTokenJwtDecoder.decode(refreshToken).getSubject();
+    if (refreshToken == null || refreshToken.isBlank()) {
+      throw new BadJwtException("Refresh token is missing");
+    }
+
+    try {
+      UUID.fromString(refreshToken);
+    } catch (IllegalArgumentException ex) {
+      throw new BadJwtException("Refresh token format is invalid", ex);
+    }
+
+    String subject = stringRedisTemplate.opsForValue().get(refreshTokenKey(refreshToken));
     if (subject == null || subject.isBlank()) {
-      throw new BadJwtException("Refresh token subject is missing");
+      throw new BadJwtException("Refresh token is missing or expired");
     }
     return subject;
+  }
+
+  @Override
+  public void revokeRefreshToken(String refreshToken) {
+    if (refreshToken == null || refreshToken.isBlank()) {
+      return;
+    }
+
+    try {
+      UUID.fromString(refreshToken);
+    } catch (IllegalArgumentException ex) {
+      return;
+    }
+
+    stringRedisTemplate.delete(refreshTokenKey(refreshToken));
   }
 
   @Override
@@ -78,5 +112,9 @@ public class JwtTokenService implements TokenService {
             .build();
     JwsHeader headers = JwsHeader.with(MacAlgorithm.HS256).build();
     return jwtEncoder.encode(JwtEncoderParameters.from(headers, claims)).getTokenValue();
+  }
+
+  private String refreshTokenKey(String refreshToken) {
+    return REFRESH_TOKEN_KEY_PREFIX + refreshToken;
   }
 }

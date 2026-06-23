@@ -103,6 +103,7 @@ class AuthServiceImplTest {
     user.setStatus(UserStatus.ACTIVE);
     AtomicReference<String> authenticatedEmail = new AtomicReference<>();
     AtomicReference<User> savedUser = new AtomicReference<>();
+    AtomicReference<String> revokedRefreshToken = new AtomicReference<>();
     UserResponse userResponse =
         new UserResponse(
             null, "qc.demo@example.com", "QC Demo", null, Role.QC_MEMBER, UserStatus.ACTIVE, null);
@@ -111,7 +112,7 @@ class AuthServiceImplTest {
             authenticationManager(authenticatedEmail),
             repository(user, savedUser),
             mapper(userResponse),
-            tokenService(" QC.Demo@Example.COM "),
+            tokenService(" QC.Demo@Example.COM ", revokedRefreshToken),
             ignoredEmailVerificationService(),
             ignoredPasswordResetService(),
             ignoredMailService());
@@ -123,6 +124,7 @@ class AuthServiceImplTest {
     assertThat(result.response().tokenType()).isEqualTo("Bearer");
     assertThat(result.response().expiresInSeconds()).isEqualTo(900);
     assertThat(result.response().user()).isSameAs(userResponse);
+    assertThat(revokedRefreshToken).hasValue("old-refresh-token");
     assertThat(result.refreshToken()).isEqualTo("refresh-token");
     assertThat(result.refreshTokenMaxAgeSeconds()).isEqualTo(604800);
   }
@@ -145,6 +147,24 @@ class AuthServiceImplTest {
             exception ->
                 assertThat(exception.getResponse().code())
                     .isEqualTo(ErrorCode.REFRESH_TOKEN_EXPIRED.getCode()));
+  }
+
+  @Test
+  void logoutRevokesRefreshToken() {
+    AtomicReference<String> revokedRefreshToken = new AtomicReference<>();
+    AuthServiceImpl authService =
+        new AuthServiceImpl(
+            authenticationManager(new AtomicReference<>()),
+            repository(new User(), new AtomicReference<>()),
+            mapper(null),
+            tokenService("qc.demo@example.com", revokedRefreshToken),
+            ignoredEmailVerificationService(),
+            ignoredPasswordResetService(),
+            ignoredMailService());
+
+    authService.logout("refresh-token");
+
+    assertThat(revokedRefreshToken).hasValue("refresh-token");
   }
 
   private AuthenticationManager authenticationManager(AtomicReference<String> authenticatedEmail) {
@@ -181,6 +201,11 @@ class AuthServiceImplTest {
   }
 
   private TokenService tokenService(String refreshTokenSubject) {
+    return tokenService(refreshTokenSubject, new AtomicReference<>());
+  }
+
+  private TokenService tokenService(
+      String refreshTokenSubject, AtomicReference<String> revokedRefreshToken) {
     return new TokenService() {
       @Override
       public String createAccessToken(User user) {
@@ -195,6 +220,11 @@ class AuthServiceImplTest {
       @Override
       public String readRefreshTokenSubject(String refreshToken) {
         return refreshTokenSubject;
+      }
+
+      @Override
+      public void revokeRefreshToken(String refreshToken) {
+        revokedRefreshToken.set(refreshToken);
       }
 
       @Override
@@ -224,6 +254,11 @@ class AuthServiceImplTest {
       @Override
       public String readRefreshTokenSubject(String refreshToken) {
         throw new BadJwtException("Jwt expired at 2026-06-10T00:00:00Z");
+      }
+
+      @Override
+      public void revokeRefreshToken(String refreshToken) {
+        throw new AssertionError("Refresh token should not be revoked");
       }
 
       @Override

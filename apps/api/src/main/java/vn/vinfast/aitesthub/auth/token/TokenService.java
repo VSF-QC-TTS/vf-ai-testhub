@@ -17,20 +17,27 @@ public interface TokenService {
   String createAccessToken(User user);
 
   /**
-   * Creates a refresh JWT for session renewal by a {@link User}.
+   * Creates an opaque refresh token for session renewal by a {@link User}.
    *
    * @param user authenticated {@link User}
-   * @return signed refresh token
+   * @return opaque refresh token
    */
   String createRefreshToken(User user);
 
   /**
-   * Validates a refresh JWT and returns its subject.
+   * Validates an opaque refresh token and returns its subject.
    *
-   * @param refreshToken refresh JWT from the HttpOnly cookie
+   * @param refreshToken refresh token from the HttpOnly cookie
    * @return normalized email stored as the token subject
    */
   String readRefreshTokenSubject(String refreshToken);
+
+  /**
+   * Revokes an opaque refresh token.
+   *
+   * @param refreshToken refresh token from the HttpOnly cookie
+   */
+  void revokeRefreshToken(String refreshToken);
 
   /**
    * Returns access token TTL.

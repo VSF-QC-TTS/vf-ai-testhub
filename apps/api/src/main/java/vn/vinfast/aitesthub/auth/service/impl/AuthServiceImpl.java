@@ -105,12 +105,18 @@ public class AuthServiceImpl implements AuthService {
       throw new ResourceException(ErrorCode.ACCOUNT_LOCKED);
     }
 
+    jwtTokenService.revokeRefreshToken(refreshToken);
     String newAccessToken = jwtTokenService.createAccessToken(user);
     String newRefreshToken = jwtTokenService.createRefreshToken(user);
     return new LoginResult(
         buildLoginResponse(user, newAccessToken),
         newRefreshToken,
         jwtTokenService.refreshTokenExpiresInSeconds());
+  }
+
+  @Override
+  public void logout(String refreshToken) {
+    jwtTokenService.revokeRefreshToken(refreshToken);
   }
 
   @Override

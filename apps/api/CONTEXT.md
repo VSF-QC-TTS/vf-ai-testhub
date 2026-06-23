@@ -44,20 +44,19 @@ Current implemented auth state:
 
 - Local auth endpoints live under `/api/v1/auth`: `register`, `login`, `refresh-token`, `logout`, `verify-email`,
   `forgot-password`, `reset-password`.
-- Login returns the access token in the JSON body and stores the refresh token only as the HttpOnly `refresh_token`
-  cookie.
-- `POST /api/v1/auth/refresh-token` reads the `refresh_token` cookie, validates a refresh JWT with
-  `token_type=refresh`, returns a new access token, and rotates the refresh cookie.
-- `POST /api/v1/auth/logout` clears `refresh_token` with `Max-Age=0`; no token store/revocation exists yet.
+- Login returns the access JWT in the JSON body and stores an opaque Redis-backed refresh token only as the HttpOnly
+  `refresh_token` cookie.
+- `POST /api/v1/auth/refresh-token` reads the `refresh_token` cookie, resolves it through Redis, returns a new access
+  token, revokes the old refresh token, and rotates the refresh cookie.
+- `POST /api/v1/auth/logout` revokes the Redis refresh token when present and clears `refresh_token` with
+  `Max-Age=0`.
 - Protected APIs use `Authorization: Bearer ...`; CSRF is disabled.
 - Internal runner callbacks under `/api/v1/internal/**` bypass user JWT but must pass `X-Runner-Token` matching
   `vat.worker.runner-token` (`RUNNER_TOKEN` env; dev default is `local-runner-token`).
 - Spring Security validates protected APIs through OAuth2 Resource Server `JwtDecoder`; do not add a duplicate
   handwritten JWT request filter.
-- Main `JwtDecoder` accepts only JWTs with `token_type=access`; named `refreshTokenJwtDecoder` accepts only
-  `token_type=refresh`.
-- The access `JwtDecoder` is `@Primary`; keep the refresh decoder named/qualified so Spring Security uses access tokens
-  for protected APIs while refresh-token flow uses refresh tokens.
+- Main `JwtDecoder` accepts only JWTs with `token_type=access`; refresh tokens are opaque UUIDs stored in Redis with
+  `vat:auth:refresh:{token}` keys.
 - Register creates `PENDING_EMAIL_VERIFICATION` users and emails `${WEB_BASE_URL}/verify-email?token=...`.
 - Forgot password emails `${WEB_BASE_URL}/reset-password?token=...`; the request must not reveal account existence.
 

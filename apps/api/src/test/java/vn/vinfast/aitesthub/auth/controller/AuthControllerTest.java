@@ -150,11 +150,12 @@ class AuthControllerTest {
             .build();
 
     mockMvc
-        .perform(post(AUTH_PATH + "/logout"))
+        .perform(post(AUTH_PATH + "/logout").cookie(new Cookie("refresh_token", "refresh-token")))
         .andExpect(status().isNoContent())
         .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("refresh_token=")))
         .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("Max-Age=0")));
 
+    assertThat(RecordingAuthService.logoutRefreshToken).isEqualTo("refresh-token");
     assertThat(RecordingAuthCookieFactory.clearCookieCalled).isTrue();
   }
 
@@ -318,6 +319,7 @@ class AuthControllerTest {
     private static LoginResult loginResult;
     private static String refreshToken;
     private static LoginResult refreshTokenResult;
+    private static String logoutRefreshToken;
     private static VerifyEmailRequest verifyEmailRequest;
     private static UserResponse verifyEmailResponse;
     private static ForgotPasswordRequest forgotPasswordRequest;
@@ -333,6 +335,11 @@ class AuthControllerTest {
     public LoginResult refreshToken(String refreshToken) {
       this.refreshToken = refreshToken;
       return refreshTokenResult;
+    }
+
+    @Override
+    public void logout(String refreshToken) {
+      logoutRefreshToken = refreshToken;
     }
 
     @Override
@@ -356,6 +363,7 @@ class AuthControllerTest {
       loginResult = null;
       refreshToken = null;
       refreshTokenResult = null;
+      logoutRefreshToken = null;
       verifyEmailRequest = null;
       verifyEmailResponse = null;
       forgotPasswordRequest = null;
