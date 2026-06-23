@@ -169,7 +169,7 @@ export function TargetConfigurationWorkbench() {
   if (!isNew && !target) return <div className="p-8 text-center text-muted-foreground">{t("targets:notFound")}</div>;
 
   return (
-    <div className="flex flex-col h-full w-full max-w-7xl mx-auto px-4 md:px-0 pb-12">
+    <div className="flex flex-col h-full w-full max-w-5xl mx-auto px-4 md:px-0 pb-12">
       {/* Header */}
       <div className="flex items-center justify-between mt-8 mb-6">
         <div className="flex items-center gap-4">
@@ -191,120 +191,192 @@ export function TargetConfigurationWorkbench() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           
-          {/* Main Configuration */}
-          <div className="lg:col-span-2 space-y-8">
-            {currentTargetType === "HTTP" && (
-              <>
-                {/* Quick cURL Import */}
-                <div className="relative overflow-hidden bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 dark:opacity-20 pointer-events-none" />
-              <SectionHeader icon={Code} title={t("targets:workbench.quickImport.title")} />
-              <div className="flex gap-3">
-                <Textarea
-                  placeholder={t("targets:workbench.quickImport.placeholder")}
-                  value={curlInput}
-                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setCurlInput(e.target.value)}
-                  className="font-mono text-sm min-h-[100px]"
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="h-auto px-6 whitespace-nowrap"
-                  onClick={handleParseCurl}
-                  disabled={parseCurlMutation.isPending || !/\S/.test(curlInput)}
-                >
-                  {parseCurlMutation.isPending ? t("targets:workbench.quickImport.parsing") : t("targets:workbench.quickImport.parse")}
-                </Button>
-              </div>
-            </div>
+          {/* General Information Card */}
+          <div className="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-zinc-200 dark:border-zinc-800/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300">
+            <SectionHeader icon={Settings2} title={t("targets:workbench.generalInfo.title", "General Information")} className="mb-6" />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>{t("targets:workbench.settings.name")}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("targets:workbench.settings.namePlaceholder")} className="text-lg bg-zinc-50/50 dark:bg-zinc-950/50" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* HTTP Configuration */}
-            <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm space-y-6 hover:shadow-md transition-shadow">
-              <SectionHeader icon={Link2} title={t("targets:workbench.httpConfig.title")} className="mb-2" />
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <FormField
-                  control={form.control}
-                  name="method"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-1">
-                      <FormLabel>{t("targets:workbench.httpConfig.method")}</FormLabel>
-                      <Select value={field.value || "POST"} onValueChange={field.onChange} disabled={isPending}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="GET">GET</SelectItem>
-                          <SelectItem value="POST">POST</SelectItem>
-                          <SelectItem value="PUT">PUT</SelectItem>
-                          <SelectItem value="PATCH">PATCH</SelectItem>
-                          <SelectItem value="DELETE">DELETE</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="url"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-3">
-                      <FormLabel>{t("targets:workbench.httpConfig.url")}</FormLabel>
+              <FormField
+                control={form.control}
+                name="targetType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("targets:workbench.settings.targetType", "Target Type")}</FormLabel>
+                    <Select value={field.value || "HTTP"} onValueChange={field.onChange} disabled={isPending}>
                       <FormControl>
-                        <Input placeholder={t("targets:workbench.httpConfig.urlPlaceholder")} className="font-mono text-sm" {...field} value={field.value || ""} />
+                        <SelectTrigger className="bg-zinc-50/50 dark:bg-zinc-950/50">
+                          <SelectValue />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <SelectContent>
+                        <SelectItem value="HTTP">HTTP API</SelectItem>
+                        <SelectItem value="LLM">Native LLM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="environment"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("targets:workbench.settings.environment")}</FormLabel>
+                    <Select value={field.value || "dev"} onValueChange={field.onChange} disabled={isPending}>
+                      <FormControl>
+                        <SelectTrigger className="bg-zinc-50/50 dark:bg-zinc-950/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="dev">{t("targets:workbench.settings.envDev")}</SelectItem>
+                        <SelectItem value="staging">{t("targets:workbench.settings.envStaging")}</SelectItem>
+                        <SelectItem value="prod">{t("targets:workbench.settings.envProd")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* HTTP Configuration Card */}
+          {currentTargetType === "HTTP" && (
+            <div className="space-y-8">
+              {/* Quick cURL Import */}
+              <div className="relative overflow-hidden bg-zinc-50 dark:bg-zinc-900/30 border border-dashed border-zinc-300 dark:border-zinc-700 p-6 rounded-[2rem] hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-colors">
+                <div className="flex gap-4 flex-col md:flex-row">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Code className="h-4 w-4 text-zinc-500" />
+                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{t("targets:workbench.quickImport.title")}</span>
+                    </div>
+                    <Textarea
+                      placeholder={t("targets:workbench.quickImport.placeholder")}
+                      value={curlInput}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setCurlInput(e.target.value)}
+                      className="font-mono text-sm min-h-[80px] bg-white dark:bg-zinc-950"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-end">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="h-10 px-6 whitespace-nowrap"
+                      onClick={handleParseCurl}
+                      disabled={parseCurlMutation.isPending || !/\S/.test(curlInput)}
+                    >
+                      {parseCurlMutation.isPending ? t("targets:workbench.quickImport.parsing") : t("targets:workbench.quickImport.parse")}
+                    </Button>
+                  </div>
+                </div>
               </div>
 
-              <Tabs defaultValue="headers" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-4">
-                  <TabsTrigger value="headers">{t("targets:workbench.httpConfig.headers")}</TabsTrigger>
-                  <TabsTrigger value="body">{t("targets:workbench.httpConfig.body")}</TabsTrigger>
-                  <TabsTrigger value="auth">{t("targets:workbench.httpConfig.auth")}</TabsTrigger>
-                </TabsList>
-                <TabsContent value="headers" className="p-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800">
-                  <p className="text-sm text-muted-foreground mb-4">{t("targets:workbench.httpConfig.headersDesc")}</p>
-                  <Textarea
-                    placeholder='{\n  "Content-Type": "application/json",\n  "X-Custom-Header": "{{my_var}}"\n}'
-                    className="font-mono text-sm min-h-[150px]"
-                    value={headersJson}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setHeadersJson(e.target.value)}
+              {/* Endpoint Configuration */}
+              <div className="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-zinc-200 dark:border-zinc-800/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300">
+                <SectionHeader icon={Link2} title={t("targets:workbench.httpConfig.title")} className="mb-6" />
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                  <FormField
+                    control={form.control}
+                    name="method"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-1">
+                        <FormLabel>{t("targets:workbench.httpConfig.method")}</FormLabel>
+                        <Select value={field.value || "POST"} onValueChange={field.onChange} disabled={isPending}>
+                          <FormControl>
+                            <SelectTrigger className="bg-zinc-50/50 dark:bg-zinc-950/50">
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="GET">GET</SelectItem>
+                            <SelectItem value="POST">POST</SelectItem>
+                            <SelectItem value="PUT">PUT</SelectItem>
+                            <SelectItem value="PATCH">PATCH</SelectItem>
+                            <SelectItem value="DELETE">DELETE</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </TabsContent>
-                <TabsContent value="body" className="p-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800">
-                  <p className="text-sm text-muted-foreground mb-4">{t("targets:workbench.httpConfig.bodyDesc")}</p>
-                  <Textarea
-                    placeholder='{\n  "query": "{{input}}",\n  "session_id": "{{session_id}}"\n}'
-                    className="font-mono text-sm min-h-[200px]"
-                    value={bodyJson}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setBodyJson(e.target.value)}
+
+                  <FormField
+                    control={form.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-3">
+                        <FormLabel>{t("targets:workbench.httpConfig.url")}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t("targets:workbench.httpConfig.urlPlaceholder")} className="font-mono text-sm bg-zinc-50/50 dark:bg-zinc-950/50" {...field} value={field.value || ""} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </TabsContent>
-                <TabsContent value="auth" className="p-4 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800 flex items-center justify-center min-h-[200px] text-zinc-500">
-                  <div className="text-center">
-                    <KeyRound className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>{t("targets:workbench.httpConfig.authDesc")}</p>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                </div>
+
+                <Tabs defaultValue="headers" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 mb-4 bg-zinc-100/50 dark:bg-zinc-800/50 rounded-xl p-1">
+                    <TabsTrigger value="headers" className="rounded-lg">{t("targets:workbench.httpConfig.headers")}</TabsTrigger>
+                    <TabsTrigger value="body" className="rounded-lg">{t("targets:workbench.httpConfig.body")}</TabsTrigger>
+                    <TabsTrigger value="auth" className="rounded-lg">{t("targets:workbench.httpConfig.auth")}</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="headers" className="p-4 bg-zinc-50/50 dark:bg-zinc-950/30 rounded-xl border border-zinc-100 dark:border-zinc-800/50">
+                    <p className="text-sm text-muted-foreground mb-4">{t("targets:workbench.httpConfig.headersDesc")}</p>
+                    <Textarea
+                      placeholder='{\n  "Content-Type": "application/json",\n  "X-Custom-Header": "{{my_var}}"\n}'
+                      className="font-mono text-sm min-h-[150px] bg-white dark:bg-zinc-900"
+                      value={headersJson}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setHeadersJson(e.target.value)}
+                    />
+                  </TabsContent>
+                  <TabsContent value="body" className="p-4 bg-zinc-50/50 dark:bg-zinc-950/30 rounded-xl border border-zinc-100 dark:border-zinc-800/50">
+                    <p className="text-sm text-muted-foreground mb-4">{t("targets:workbench.httpConfig.bodyDesc")}</p>
+                    <Textarea
+                      placeholder='{\n  "query": "{{input}}",\n  "session_id": "{{session_id}}"\n}'
+                      className="font-mono text-sm min-h-[200px] bg-white dark:bg-zinc-900"
+                      value={bodyJson}
+                      onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setBodyJson(e.target.value)}
+                    />
+                  </TabsContent>
+                  <TabsContent value="auth" className="p-4 bg-zinc-50/50 dark:bg-zinc-950/30 rounded-xl border border-zinc-100 dark:border-zinc-800/50 flex items-center justify-center min-h-[200px] text-zinc-500">
+                    <div className="text-center">
+                      <KeyRound className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                      <p>{t("targets:workbench.httpConfig.authDesc")}</p>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
             </div>
-            </>
           )}
 
+          {/* LLM Configuration Card */}
           {currentTargetType === "LLM" && (
-            <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm space-y-6 hover:shadow-md transition-shadow">
-              <SectionHeader icon={Cpu} title={t("targets:workbench.llmConfig.title", "LLM Configuration")} className="mb-2" />
+            <div className="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-zinc-200 dark:border-zinc-800/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300">
+              <SectionHeader icon={Cpu} title={t("targets:workbench.llmConfig.title", "LLM Configuration")} className="mb-6" />
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="llmProvider"
@@ -313,7 +385,7 @@ export function TargetConfigurationWorkbench() {
                       <FormLabel>{t("targets:workbench.llmConfig.provider", "Provider")}</FormLabel>
                       <Select value={field.value || ""} onValueChange={field.onChange} disabled={isPending}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-zinc-50/50 dark:bg-zinc-950/50">
                             <SelectValue placeholder="Select a provider" />
                           </SelectTrigger>
                         </FormControl>
@@ -337,7 +409,7 @@ export function TargetConfigurationWorkbench() {
                     <FormItem>
                       <FormLabel>{t("targets:workbench.llmConfig.model", "Model Name")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="gpt-4o, claude-3-5-sonnet..." {...field} value={field.value || ""} />
+                        <Input placeholder="gpt-4o, claude-3-5-sonnet..." className="bg-zinc-50/50 dark:bg-zinc-950/50" {...field} value={field.value || ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -351,7 +423,7 @@ export function TargetConfigurationWorkbench() {
                     <FormItem className="md:col-span-2">
                       <FormLabel>{t("targets:workbench.llmConfig.baseUrl", "Base URL (Optional)")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://api.openai.com/v1" className="font-mono text-sm" {...field} value={field.value || ""} />
+                        <Input placeholder="https://api.openai.com/v1" className="font-mono text-sm bg-zinc-50/50 dark:bg-zinc-950/50" {...field} value={field.value || ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -365,7 +437,7 @@ export function TargetConfigurationWorkbench() {
                     <FormItem className="md:col-span-2">
                       <FormLabel>{t("targets:workbench.llmConfig.keyRef", "API Key Reference (Optional)")}</FormLabel>
                       <FormControl>
-                        <Input placeholder="OPENAI_API_KEY" className="font-mono text-sm" {...field} value={field.value || ""} />
+                        <Input placeholder="OPENAI_API_KEY" className="font-mono text-sm bg-zinc-50/50 dark:bg-zinc-950/50" {...field} value={field.value || ""} />
                       </FormControl>
                       <p className="text-xs text-muted-foreground mt-1">Environment variable name containing the API key.</p>
                       <FormMessage />
@@ -376,98 +448,25 @@ export function TargetConfigurationWorkbench() {
             </div>
           )}
 
-            {/* Response Mapping */}
-            <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm space-y-6 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-2">
-                <SectionHeader icon={Braces} title={t("targets:workbench.responseMapping.title")} className="mb-0" />
-                <div className="text-sm bg-zinc-100 dark:bg-zinc-900 px-3 py-1 rounded-full text-zinc-500 font-mono">
-                  JSONPath
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground">{t("targets:workbench.responseMapping.desc")}</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-zinc-50 dark:bg-zinc-900/30 p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800">
-                <FormField
-                  control={form.control}
-                  name="responseMapping.answerPath"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("targets:workbench.responseMapping.answerPath")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t("targets:workbench.responseMapping.answerPathPlaceholder")} className="font-mono text-sm" {...field} value={field.value || ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="responseMapping.sourcesPath"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("targets:workbench.responseMapping.sourcesPath")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t("targets:workbench.responseMapping.sourcesPathPlaceholder")} className="font-mono text-sm" {...field} value={field.value || ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="responseMapping.latencyPath"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("targets:workbench.responseMapping.latencyPath")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t("targets:workbench.responseMapping.latencyPathPlaceholder")} className="font-mono text-sm" {...field} value={field.value || ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="responseMapping.missingFieldBehavior"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("targets:workbench.responseMapping.missingFieldBehavior")}</FormLabel>
-                      <Select value={field.value || "FAIL"} onValueChange={field.onChange} disabled={isPending}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="FAIL">{t("targets:workbench.responseMapping.fail")}</SelectItem>
-                          <SelectItem value="SKIP">{t("targets:workbench.responseMapping.skip")}</SelectItem>
-                          <SelectItem value="WARNING">{t("targets:workbench.responseMapping.warning")}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          {/* Response Mapping Card */}
+          <div className="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-zinc-200 dark:border-zinc-800/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center justify-between mb-2">
+              <SectionHeader icon={Braces} title={t("targets:workbench.responseMapping.title")} className="mb-0" />
+              <div className="text-sm bg-zinc-100 dark:bg-zinc-900 px-3 py-1 rounded-full text-zinc-500 font-mono border border-zinc-200 dark:border-zinc-800">
+                JSONPath
               </div>
             </div>
-          </div>
+            <p className="text-sm text-muted-foreground mb-6">{t("targets:workbench.responseMapping.desc")}</p>
 
-          {/* Sidebar / Metadata */}
-          <div className="space-y-6">
-            <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm space-y-6 hover:shadow-md transition-shadow">
-              <SectionHeader icon={Settings2} title={t("targets:workbench.settings.title")} className="mb-2" />
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-50/50 dark:bg-zinc-950/30 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800/50">
               <FormField
                 control={form.control}
-                name="name"
+                name="responseMapping.answerPath"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("targets:workbench.settings.name")}</FormLabel>
+                    <FormLabel>{t("targets:workbench.responseMapping.answerPath")}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("targets:workbench.settings.namePlaceholder")} {...field} />
+                      <Input placeholder={t("targets:workbench.responseMapping.answerPathPlaceholder")} className="font-mono text-sm bg-white dark:bg-zinc-900" {...field} value={field.value || ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -476,21 +475,13 @@ export function TargetConfigurationWorkbench() {
 
               <FormField
                 control={form.control}
-                name="targetType"
+                name="responseMapping.sourcesPath"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("targets:workbench.settings.targetType", "Target Type")}</FormLabel>
-                    <Select value={field.value || "HTTP"} onValueChange={field.onChange} disabled={isPending}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="HTTP">HTTP API</SelectItem>
-                        <SelectItem value="LLM">Native LLM</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>{t("targets:workbench.responseMapping.sourcesPath")}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("targets:workbench.responseMapping.sourcesPathPlaceholder")} className="font-mono text-sm bg-white dark:bg-zinc-900" {...field} value={field.value || ""} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -498,27 +489,48 @@ export function TargetConfigurationWorkbench() {
 
               <FormField
                 control={form.control}
-                name="environment"
+                name="responseMapping.latencyPath"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("targets:workbench.settings.environment")}</FormLabel>
-                    <Select value={field.value || "dev"} onValueChange={field.onChange} disabled={isPending}>
+                    <FormLabel>{t("targets:workbench.responseMapping.latencyPath")}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("targets:workbench.responseMapping.latencyPathPlaceholder")} className="font-mono text-sm bg-white dark:bg-zinc-900" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="responseMapping.missingFieldBehavior"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("targets:workbench.responseMapping.missingFieldBehavior")}</FormLabel>
+                    <Select value={field.value || "FAIL"} onValueChange={field.onChange} disabled={isPending}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-white dark:bg-zinc-900">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="dev">{t("targets:workbench.settings.envDev")}</SelectItem>
-                        <SelectItem value="staging">{t("targets:workbench.settings.envStaging")}</SelectItem>
-                        <SelectItem value="prod">{t("targets:workbench.settings.envProd")}</SelectItem>
+                        <SelectItem value="FAIL">{t("targets:workbench.responseMapping.fail")}</SelectItem>
+                        <SelectItem value="SKIP">{t("targets:workbench.responseMapping.skip")}</SelectItem>
+                        <SelectItem value="WARNING">{t("targets:workbench.responseMapping.warning")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
+          </div>
 
+          {/* Advanced Settings / Actions */}
+          <div className="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md border border-zinc-200 dark:border-zinc-800/80 p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-all duration-300">
+            <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-6 uppercase tracking-wider">Advanced Settings</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
               <FormField
                 control={form.control}
                 name="timeoutMs"
@@ -529,6 +541,7 @@ export function TargetConfigurationWorkbench() {
                       <Input
                         type="number"
                         placeholder="30000"
+                        className="bg-zinc-50/50 dark:bg-zinc-950/50"
                         {...field}
                         value={field.value || ""}
                         onChange={e => field.onChange(parseInt(e.target.value) || undefined)}
@@ -539,33 +552,31 @@ export function TargetConfigurationWorkbench() {
                 )}
               />
 
-              <div className="pt-4 border-t border-zinc-100 dark:border-zinc-900">
-                <Button type="button" variant="outline" className="w-full gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700">
-                  <Play className="h-4 w-4" />
-                  {t("targets:workbench.settings.testConnection")}
-                </Button>
-              </div>
-
-              {mutationError && !jsonError && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20 mt-4"
-                >
-                  {errorCode ? t(`api:${errorCode}`, { defaultValue: t("errors:unknown") }) : t("errors:unknown")}
-                </motion.div>
-              )}
-
-              {jsonError && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20 mt-4"
-                >
-                  {jsonError}
-                </motion.div>
-              )}
+              <Button type="button" variant="outline" className="w-full gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 h-10">
+                <Play className="h-4 w-4" />
+                {t("targets:workbench.settings.testConnection")}
+              </Button>
             </div>
+
+            {mutationError && !jsonError && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="rounded-xl bg-destructive/10 p-4 text-sm text-destructive border border-destructive/20 mt-6"
+              >
+                {errorCode ? t(`api:${errorCode}`, { defaultValue: t("errors:unknown") }) : t("errors:unknown")}
+              </motion.div>
+            )}
+
+            {jsonError && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="rounded-xl bg-destructive/10 p-4 text-sm text-destructive border border-destructive/20 mt-6"
+              >
+                {jsonError}
+              </motion.div>
+            )}
           </div>
         </form>
       </Form>
