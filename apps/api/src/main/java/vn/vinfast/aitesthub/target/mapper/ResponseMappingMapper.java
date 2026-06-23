@@ -20,11 +20,13 @@ public interface ResponseMappingMapper {
   @Mapping(target = "target", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
+  @Mapping(target = "missingFieldBehavior", source = "missingFieldBehavior", defaultValue = "FAIL")
   ResponseMapping toEntity(ResponseMappingRequest request);
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "target", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
+  @Mapping(target = "missingFieldBehavior", source = "missingFieldBehavior", defaultValue = "FAIL")
   void updateEntityFromRequest(ResponseMappingRequest request, @MappingTarget ResponseMapping responseMapping);
 }
