@@ -24,11 +24,11 @@ export function projectOverviewPath(projectId: string): string {
 }
 
 export function projectTargetsPath(projectId: string): string {
-  return `${projectOverviewPath(projectId)}/targets`;
+  return `${PROJECT_ROUTE_PREFIX}/${projectId}/targets`;
 }
 
 export function projectModulePath(projectId: string, module?: ProjectModule): string {
-  return module ? `${projectOverviewPath(projectId)}/${module}` : projectOverviewPath(projectId);
+  return module && module !== "dashboard" ? `${PROJECT_ROUTE_PREFIX}/${projectId}/${module}` : projectOverviewPath(projectId);
 }
 
 export function getProjectNavPath(projectId: string | null, module?: ProjectModule): string | null {
