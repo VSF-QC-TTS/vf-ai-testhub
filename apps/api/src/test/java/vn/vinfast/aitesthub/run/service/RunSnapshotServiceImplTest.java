@@ -32,6 +32,7 @@ import vn.vinfast.aitesthub.target.entity.Target;
 import vn.vinfast.aitesthub.target.enums.HttpMethod;
 import vn.vinfast.aitesthub.target.enums.TargetType;
 import vn.vinfast.aitesthub.target.repository.ResponseMappingRepository;
+import vn.vinfast.aitesthub.target.service.TargetSecretService;
 import vn.vinfast.aitesthub.testcase.entity.TestCase;
 import vn.vinfast.aitesthub.testcase.repository.TestCaseRepository;
 import vn.vinfast.aitesthub.toolexpectation.entity.ToolExpectation;
@@ -50,6 +51,7 @@ class RunSnapshotServiceImplTest {
   @Mock private AssertionRepository assertionRepository;
   @Mock private ToolExpectationRepository toolExpectationRepository;
   @Mock private ResponseMappingRepository responseMappingRepository;
+  @Mock private TargetSecretService targetSecretService;
 
   private RunSnapshotServiceImpl runSnapshotService;
   private Project project;
@@ -66,7 +68,8 @@ class RunSnapshotServiceImplTest {
             testCaseRepository,
             assertionRepository,
             toolExpectationRepository,
-            responseMappingRepository);
+            responseMappingRepository,
+            targetSecretService);
     project = Project.builder().id(1L).publicId(UUID.randomUUID()).name("Bot").build();
     dataset = Dataset.builder().id(2L).publicId(UUID.randomUUID()).project(project).name("Regression").build();
     target =

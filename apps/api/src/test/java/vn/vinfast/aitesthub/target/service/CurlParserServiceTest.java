@@ -13,11 +13,13 @@ import vn.vinfast.aitesthub.target.service.impl.CurlParserServiceImpl;
 
 class CurlParserServiceTest {
 
-  private CurlParserService curlParserService;
+  private CurlParserServiceImpl curlParserService;
 
   @BeforeEach
   void setUp() {
-    curlParserService = new CurlParserServiceImpl(new ObjectMapper());
+    ObjectMapper objectMapper = new ObjectMapper();
+    TargetSecretDetector secretDetector = new TargetSecretDetector();
+    curlParserService = new CurlParserServiceImpl(objectMapper, secretDetector);
   }
 
   @Test
