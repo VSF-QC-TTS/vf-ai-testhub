@@ -11,6 +11,13 @@ import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/errors";
 import { Loader2 } from "lucide-react";
 
+type OAuthProvider = "google" | "github";
+
+export function buildOAuthAuthorizationUrl(provider: OAuthProvider, redirectTo: string): string {
+  const params = new URLSearchParams({ redirectTo });
+  return `/api/v1/oauth2/authorization/${provider}?${params.toString()}`;
+}
+
 export function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -31,8 +38,8 @@ export function LoginPage() {
     });
   };
 
-  const handleOAuthLogin = (provider: 'google' | 'github') => {
-    window.location.href = `/api/v1/oauth2/authorization/${provider}`;
+  const handleOAuthLogin = (provider: OAuthProvider) => {
+    window.location.href = buildOAuthAuthorizationUrl(provider, redirectTo);
   };
 
   return (

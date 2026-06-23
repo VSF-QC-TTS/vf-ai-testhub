@@ -2,6 +2,7 @@ package vn.vinfast.aitesthub.oauth.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -16,7 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import vn.vinfast.aitesthub.auth.cookie.AuthCookieFactory;
 import vn.vinfast.aitesthub.auth.token.TokenService;
+import vn.vinfast.aitesthub.oauth.filter.OAuth2RedirectToFilter;
 import vn.vinfast.aitesthub.oauth.profile.OAuth2UserProfile;
 import vn.vinfast.aitesthub.oauth.profile.OAuth2UserProfileService;
 import vn.vinfast.aitesthub.user.entity.User;
@@ -37,12 +40,12 @@ import vn.vinfast.aitesthub.user.repository.UserRepository;
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private static final int MAX_DISPLAY_NAME_LENGTH = 255;
+  private static final String REFRESH_TOKEN_COOKIE = "refresh_token";
+  private static final String LEGACY_OAUTH_REFRESH_COOKIE_PATH = "/api/v1/auth/refresh-token";
+  private static final int MAX_REDIRECT_TO_LENGTH = 2048;
 
   @Value("${vat.client.base-url}")
   private String webBaseUrl;
-
-  @Value("${vat.security.refresh-expiration}")
-  private int refreshExpirationMinutes;
 
   @Value("${vat.security.cookie.secure}")
   private boolean cookieSecure;
@@ -54,6 +57,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
   private final UserRepository userRepository;
   private final TokenService jwtTokenService;
   private final PasswordEncoder passwordEncoder;
+  private final AuthCookieFactory authCookieFactory;
 
   @Override
   @Transactional
@@ -77,15 +81,21 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     String accessToken = jwtTokenService.createAccessToken(user);
     String refreshToken = jwtTokenService.createRefreshToken(user);
 
-    response.addHeader(HttpHeaders.SET_COOKIE, buildRefreshCookie(refreshToken).toString());
+    response.addHeader(
+        HttpHeaders.SET_COOKIE,
+        authCookieFactory
+            .refreshTokenCookie(refreshToken, jwtTokenService.refreshTokenExpiresInSeconds())
+            .toString());
+    response.addHeader(HttpHeaders.SET_COOKIE, clearLegacyOAuthRefreshCookie().toString());
 
     var session = request.getSession(false);
+    String redirectTo = resolveRedirectTo(session);
     if (session != null) {
       session.invalidate();
     }
 
     log.info("OAuth2 login success for user: {} (provider: {})", email, profile.provider());
-    response.sendRedirect(webBaseUrl + "/dashboard");
+    response.sendRedirect(webBaseUrl + redirectTo);
   }
 
   // ---------------------------------------------------------------------------
@@ -144,13 +154,32 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         : fullName;
   }
 
-  private ResponseCookie buildRefreshCookie(String refreshToken) {
-    return ResponseCookie.from("refresh_token", refreshToken)
+  private ResponseCookie clearLegacyOAuthRefreshCookie() {
+    return ResponseCookie.from(REFRESH_TOKEN_COOKIE, "")
         .httpOnly(true)
         .secure(cookieSecure)
-        .path("/api/v1/auth/refresh-token")
-        .maxAge(refreshExpirationMinutes * 60L)
+        .path(LEGACY_OAUTH_REFRESH_COOKIE_PATH)
+        .maxAge(0)
         .sameSite(sameSite)
         .build();
+  }
+
+  private String resolveRedirectTo(HttpSession session) {
+    if (session == null) {
+      return "/";
+    }
+
+    Object redirectTo = session.getAttribute(OAuth2RedirectToFilter.REDIRECT_TO_SESSION_ATTRIBUTE);
+    session.removeAttribute(OAuth2RedirectToFilter.REDIRECT_TO_SESSION_ATTRIBUTE);
+    return redirectTo instanceof String path && isSafeClientPath(path) ? path : "/";
+  }
+
+  private boolean isSafeClientPath(String redirectTo) {
+    return !redirectTo.isBlank()
+        && redirectTo.length() <= MAX_REDIRECT_TO_LENGTH
+        && redirectTo.startsWith("/")
+        && !redirectTo.startsWith("//")
+        && !redirectTo.contains("\r")
+        && !redirectTo.contains("\n");
   }
 }

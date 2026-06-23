@@ -71,6 +71,12 @@ OAuth state:
   with email-prefix fallback, and `avatarUrl` from the provider. On re-login, `avatarUrl` and `lastLoginAt` are synced.
 - JWT tokens (access + refresh) are issued via `JwtTokenService`, same as local login. Refresh token is set as an
   HttpOnly cookie.
+- OAuth refresh cookies use the shared `AuthCookieFactory` so login, refresh, logout, and OAuth all use the same
+  `refresh_token` path and attributes. OAuth success also expires the legacy `/api/v1/auth/refresh-token` cookie path
+  that older builds used.
+- OAuth authorization requests can include a relative `redirectTo` query parameter. `OAuth2RedirectToFilter` stores
+  only safe same-origin client paths in the OAuth session, and `OAuth2LoginSuccessHandler` redirects there after
+  successful login, defaulting to `/`.
 - There is no `authProvider` field on `User`; OAuth users are regular users with an unguessable password hash.
 - Profile extraction: `GoogleOAuth2UserProfileExtractor` reads email, `given_name`, `family_name`, and `picture`;
   `GithubOAuth2UserProfileExtractor` reads email, name/login, and `avatar_url`.

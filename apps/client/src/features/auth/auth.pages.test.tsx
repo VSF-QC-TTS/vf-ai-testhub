@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { LoginPage } from "./pages/LoginPage";
+import { buildOAuthAuthorizationUrl, LoginPage } from "./pages/LoginPage";
 import { authApi } from "./auth.api";
 import { useAuthStore } from "./auth.store";
 import { I18nextProvider } from "react-i18next";
@@ -93,5 +93,10 @@ describe("Auth Pages", () => {
       expect(useAuthStore.getState().isAuthenticated).toBe(true);
       expect(useAuthStore.getState().accessToken).toBe("mock-token");
     });
+  });
+
+  it("builds OAuth authorization URL with encoded redirect target", () => {
+    expect(buildOAuthAuthorizationUrl("google", "/projects/prj_123/runs?status=completed"))
+      .toBe("/api/v1/oauth2/authorization/google?redirectTo=%2Fprojects%2Fprj_123%2Fruns%3Fstatus%3Dcompleted");
   });
 });

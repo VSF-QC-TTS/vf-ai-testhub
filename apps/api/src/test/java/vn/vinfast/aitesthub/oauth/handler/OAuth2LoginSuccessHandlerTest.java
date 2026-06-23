@@ -16,7 +16,9 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
+import vn.vinfast.aitesthub.auth.cookie.RefreshTokenCookieFactory;
 import vn.vinfast.aitesthub.auth.token.TokenService;
+import vn.vinfast.aitesthub.oauth.filter.OAuth2RedirectToFilter;
 import vn.vinfast.aitesthub.oauth.AuthProvider;
 import vn.vinfast.aitesthub.oauth.profile.OAuth2UserProfile;
 import vn.vinfast.aitesthub.oauth.profile.OAuth2UserProfileService;
@@ -92,7 +94,7 @@ class OAuth2LoginSuccessHandlerTest {
     assertThat(savedUser.getLastLoginAt()).isNotNull();
 
     // Verify redirect + cookie + session
-    assertThat(response.getRedirectedUrl()).isEqualTo(WEB_BASE_URL + "/dashboard");
+    assertThat(response.getRedirectedUrl()).isEqualTo(WEB_BASE_URL + "/");
     assertThat(session.isInvalid()).isTrue();
     assertThat(response.getHeader(HttpHeaders.SET_COOKIE))
         .contains("refresh_token=" + REFRESH_TOKEN);
@@ -160,7 +162,28 @@ class OAuth2LoginSuccessHandlerTest {
 
     assertThat(updatedUser.getAvatarUrl()).isEqualTo("https://cdn.example.com/new-avatar.png");
     assertThat(updatedUser.getLastLoginAt()).isNotNull();
-    assertThat(response.getRedirectedUrl()).isEqualTo(WEB_BASE_URL + "/dashboard");
+    assertThat(response.getRedirectedUrl()).isEqualTo(WEB_BASE_URL + "/");
+  }
+
+  @Test
+  void redirectsToStoredRedirectToAfterOAuthLogin() throws Exception {
+    var profile =
+        new OAuth2UserProfile(AuthProvider.GOOGLE, "qc.demo@example.com", "Long", "Nguyen", null);
+
+    var handler = buildHandler(profile, Optional.empty());
+    var request = new MockHttpServletRequest();
+    var session = new MockHttpSession();
+    session.setAttribute(
+        OAuth2RedirectToFilter.REDIRECT_TO_SESSION_ATTRIBUTE,
+        "/projects/prj_123/runs?status=completed");
+    request.setSession(session);
+    var response = new MockHttpServletResponse();
+
+    handler.onAuthenticationSuccess(request, response, authToken());
+
+    assertThat(response.getRedirectedUrl())
+        .isEqualTo(WEB_BASE_URL + "/projects/prj_123/runs?status=completed");
+    assertThat(session.isInvalid()).isTrue();
   }
 
   // ---------------------------------------------------------------------------
@@ -180,13 +203,24 @@ class OAuth2LoginSuccessHandlerTest {
 
     handler.onAuthenticationSuccess(request, response, authToken());
 
-    assertThat(response.getHeader(HttpHeaders.SET_COOKIE))
-        .contains("refresh_token=" + REFRESH_TOKEN)
-        .contains("HttpOnly")
-        .contains("Secure")
-        .contains("Path=/api/v1/auth/refresh-token")
-        .contains("Max-Age=1800")
-        .contains("SameSite=Strict");
+    assertThat(response.getHeaders(HttpHeaders.SET_COOKIE))
+        .anySatisfy(
+            cookie ->
+                assertThat(cookie)
+                    .contains("refresh_token=" + REFRESH_TOKEN)
+                    .contains("HttpOnly")
+                    .contains("Secure")
+                    .contains("Path=/api/v1/auth;")
+                    .doesNotContain("Path=/api/v1/auth/refresh-token")
+                    .contains("Max-Age=1800")
+                    .contains("SameSite=Strict"))
+        .anySatisfy(
+            cookie ->
+                assertThat(cookie)
+                    .contains("refresh_token=")
+                    .contains("Path=/api/v1/auth/refresh-token")
+                    .contains("Max-Age=0")
+                    .contains("SameSite=Strict"));
     assertThat(session.isInvalid()).isTrue();
   }
 
@@ -209,16 +243,24 @@ class OAuth2LoginSuccessHandlerTest {
     var jwtTokenService = mock(TokenService.class);
     when(jwtTokenService.createAccessToken(any())).thenReturn(ACCESS_TOKEN);
     when(jwtTokenService.createRefreshToken(any())).thenReturn(REFRESH_TOKEN);
+    when(jwtTokenService.refreshTokenExpiresInSeconds()).thenReturn(1800L);
 
     var passwordEncoder = mock(PasswordEncoder.class);
     when(passwordEncoder.encode(any())).thenReturn(HASHED_PASSWORD);
 
+    var authCookieFactory = new RefreshTokenCookieFactory();
+    ReflectionTestUtils.setField(authCookieFactory, "cookieSecure", true);
+    ReflectionTestUtils.setField(authCookieFactory, "sameSite", "Strict");
+
     var handler =
         new OAuth2LoginSuccessHandler(
-            new StubProfileService(profile), userRepo, jwtTokenService, passwordEncoder);
+            new StubProfileService(profile),
+            userRepo,
+            jwtTokenService,
+            passwordEncoder,
+            authCookieFactory);
 
     ReflectionTestUtils.setField(handler, "webBaseUrl", WEB_BASE_URL);
-    ReflectionTestUtils.setField(handler, "refreshExpirationMinutes", 30);
     ReflectionTestUtils.setField(handler, "cookieSecure", true);
     ReflectionTestUtils.setField(handler, "sameSite", "Strict");
     return handler;

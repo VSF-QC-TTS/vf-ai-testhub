@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
@@ -24,6 +25,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import vn.vinfast.aitesthub.oauth.filter.OAuth2RedirectToFilter;
 import vn.vinfast.aitesthub.oauth.handler.OAuth2LoginSuccessHandler;
 import vn.vinfast.aitesthub.oauth.userinfo.ProviderAwareOAuth2UserService;
 
@@ -67,6 +69,7 @@ public class SecurityConfig {
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
   private final ProviderAwareOAuth2UserService providerAwareOAuth2UserService;
+  private final OAuth2RedirectToFilter oAuth2RedirectToFilter;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) {
@@ -108,6 +111,8 @@ public class SecurityConfig {
                     .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                     .bearerTokenResolver(bearerTokenResolver())
                     .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+        .addFilterBefore(
+            oAuth2RedirectToFilter, OAuth2AuthorizationRequestRedirectFilter.class)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
     return http.build();
