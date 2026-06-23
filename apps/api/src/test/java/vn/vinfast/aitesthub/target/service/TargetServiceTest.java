@@ -31,6 +31,7 @@ import vn.vinfast.aitesthub.target.mapper.TargetMapper;
 import vn.vinfast.aitesthub.target.repository.TargetRepository;
 import vn.vinfast.aitesthub.target.request.TargetRequest;
 import vn.vinfast.aitesthub.target.response.TargetResponse;
+import vn.vinfast.aitesthub.target.service.TargetSecretService;
 import vn.vinfast.aitesthub.target.service.impl.TargetServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,6 +48,9 @@ class TargetServiceTest {
 
   @Mock
   private vn.vinfast.aitesthub.run.repository.RunRepository runRepository;
+
+  @Mock
+  private TargetSecretService targetSecretService;
 
   @InjectMocks
   private TargetServiceImpl targetService;
