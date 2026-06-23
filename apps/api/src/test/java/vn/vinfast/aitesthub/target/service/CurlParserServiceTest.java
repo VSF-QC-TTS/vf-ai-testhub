@@ -36,13 +36,11 @@ class CurlParserServiceTest {
 
     assertThat(result.headersTemplate).isNotNull();
     assertThat(result.headersTemplate.get("Content-Type")).isEqualTo("application/json");
-    assertThat(result.headersTemplate.get("Authorization")).isEqualTo("Bearer token");
+    assertThat(result.headersTemplate.get("Authorization")).isEqualTo("Bearer {{secret:AUTH_TOKEN}}");
 
     assertThat(result.bodyTemplate).isNotNull();
-    // Test the specific behavior of falling back to raw {{input}}
-    // due to string-in-string json parsing issue or matching
-    // As log shows: "cURL body is not valid JSON, creating a raw wrapper"
-    assertThat(result.bodyTemplate.get("raw")).isEqualTo("{{input}}");
+    assertThat(result.bodyTemplate.get("message")).isEqualTo("hello");
+    assertThat(result.bodyTemplate.get("model")).isEqualTo("gpt-4");
   }
 
   @Test
