@@ -24,7 +24,7 @@ export const getTestCaseSchema = (t: TFunction) => z.object({
   tags: z.string().optional(), // Will be split by comma later
   priority: z.enum(["P0", "P1", "P2", "P3"]).optional(),
   enabled: z.boolean(),
-  sortOrder: z.number().min(0).max(1000000).optional(),
+  sortOrder: z.number().min(0, t("testcases:form.validation.minOrder")).max(1000000, t("testcases:form.validation.maxOrder")).optional(),
 });
 
 export type TestCaseFormData = z.infer<ReturnType<typeof getTestCaseSchema>>;

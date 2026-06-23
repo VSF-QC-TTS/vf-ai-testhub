@@ -33,7 +33,7 @@ export const getToolExpectationSchema = (t: TFunction) => z.object({
   required: z.boolean().optional().default(true),
   severity: z.enum(["CRITICAL", "MAJOR", "MINOR", "INFO"]).optional(),
   enabled: z.boolean().optional().default(true),
-  sortOrder: z.number().min(0).max(1000000).optional(),
+  sortOrder: z.number().min(0, t("toolexpectations:form.validation.minOrder")).max(1000000, t("toolexpectations:form.validation.maxOrder")).optional(),
 });
 
 export type ToolExpectationFormData = z.infer<ReturnType<typeof getToolExpectationSchema>>;
