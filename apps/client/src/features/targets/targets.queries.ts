@@ -64,3 +64,9 @@ export function useParseCurl(projectId: UUID | null) {
     mutationFn: (curlCommand: string) => targetsApi.parseCurl(projectId!, curlCommand),
   });
 }
+
+export function useTestConnectionTarget(projectId: UUID | null) {
+  return useMutation({
+    mutationFn: (data: TargetRequest) => targetsApi.testConnection(projectId!, data),
+  });
+}

@@ -20,6 +20,8 @@ import vn.vinfast.aitesthub.target.request.TargetRequest;
 import vn.vinfast.aitesthub.target.response.TargetResponse;
 import vn.vinfast.aitesthub.target.service.CurlParserService;
 import vn.vinfast.aitesthub.target.service.TargetService;
+import vn.vinfast.aitesthub.target.service.TargetTestService;
+import vn.vinfast.aitesthub.target.response.TargetTestResponse;
 
 /**
  * @author nghlong3004
@@ -33,6 +35,7 @@ public class TargetController {
 
   private final TargetService targetService;
   private final CurlParserService curlParserService;
+  private final TargetTestService targetTestService;
 
   @Operation(summary = "Parse cURL command to get Target preview")
   @PostMapping("/parse-curl")
@@ -94,5 +97,13 @@ public class TargetController {
       @PathVariable UUID projectId,
       Pageable pageable) {
     return ResponseEntity.ok(targetService.getTargets(projectId, pageable));
+  }
+
+  @Operation(summary = "Test target connection")
+  @PostMapping("/test-connection")
+  public ResponseEntity<TargetTestResponse> testConnection(
+      @PathVariable UUID projectId,
+      @RequestBody TargetRequest request) {
+    return ResponseEntity.ok(targetTestService.testConnection(request));
   }
 }

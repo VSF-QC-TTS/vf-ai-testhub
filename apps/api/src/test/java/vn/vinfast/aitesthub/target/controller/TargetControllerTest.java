@@ -148,6 +148,11 @@ class TargetControllerTest {
     CurlParserService curlParserService() {
       return new MockCurlParserService();
     }
+
+    @Bean
+    vn.vinfast.aitesthub.target.service.TargetTestService targetTestService() {
+      return request -> new vn.vinfast.aitesthub.target.response.TargetTestResponse(200, 10, "{\"mock\":\"yes\"}", null);
+    }
   }
 
   static class MockTargetService implements TargetService {

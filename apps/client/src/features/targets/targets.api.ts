@@ -1,6 +1,6 @@
 import { apiClient } from "../../lib/api/client";
 import type { PageResponse, UUID } from "../../lib/api/types";
-import type { TargetRequest, TargetResponse } from "./targets.types";
+import type { TargetRequest, TargetResponse, TargetTestResponse } from "./targets.types";
 
 export const targetsApi = {
   create: async (data: TargetRequest): Promise<TargetResponse> => {
@@ -29,6 +29,11 @@ export const targetsApi = {
 
   parseCurl: async (projectId: UUID, curlCommand: string): Promise<Partial<TargetRequest>> => {
     const res = await apiClient.post<Partial<TargetRequest>>(`/api/v1/projects/${projectId}/targets/parse-curl`, { curlCommand });
+    return res.data;
+  },
+
+  testConnection: async (projectId: UUID, data: TargetRequest): Promise<TargetTestResponse> => {
+    const res = await apiClient.post<TargetTestResponse>(`/api/v1/projects/${projectId}/targets/test-connection`, data);
     return res.data;
   }
 };

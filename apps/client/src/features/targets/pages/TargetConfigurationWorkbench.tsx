@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Save, Play, Code, 
-  Settings2, Braces, Link2, KeyRound, Cpu 
+  Settings2, Braces, Link2, KeyRound, Cpu, Loader2, FileJson
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
@@ -21,7 +21,8 @@ import {
 } from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
 import { getTargetSchema, type TargetFormData } from "../targets.schemas";
-import { useTarget, useCreateTarget, useUpdateTarget, useParseCurl } from "../targets.queries";
+import { useTarget, useCreateTarget, useUpdateTarget, useParseCurl, useTestConnectionTarget } from "../targets.queries";
+import type { TargetTestResponse } from "../targets.types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { projectTargetsPath } from "../../projects/project.routes";
 import { ApiError } from "@/lib/api/errors";
@@ -49,6 +50,7 @@ export function TargetConfigurationWorkbench() {
   const createMutation = useCreateTarget();
   const updateMutation = useUpdateTarget(targetId ?? "");
   const parseCurlMutation = useParseCurl(projectId || null);
+  const testConnectionMutation = useTestConnectionTarget(projectId || null);
   const isPending = createMutation.isPending || updateMutation.isPending;
   const mutationError = createMutation.error ?? updateMutation.error;
   const errorCode = mutationError instanceof ApiError ? mutationError.code : undefined;
@@ -57,6 +59,7 @@ export function TargetConfigurationWorkbench() {
   const [headersJson, setHeadersJson] = useState("");
   const [bodyJson, setBodyJson] = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
+  const [testResponse, setTestResponse] = useState<TargetTestResponse | null>(null);
 
   const form = useForm<TargetFormData>({
     resolver: zodResolver(getTargetSchema(t)),
@@ -116,6 +119,74 @@ export function TargetConfigurationWorkbench() {
     } catch (e) {
       console.error("Failed to parse cURL", e);
       toast.error(t("common:error"));
+    }
+  };
+
+  const handleTestConnection = async () => {
+    setJsonError(null);
+    setTestResponse(null);
+    let parsedHeaders = undefined;
+    let parsedBody = undefined;
+
+    try {
+      if (headersJson.trim()) parsedHeaders = JSON.parse(headersJson);
+    } catch {
+      setJsonError("Invalid JSON in Headers");
+      return;
+    }
+
+    try {
+      if (bodyJson.trim()) parsedBody = JSON.parse(bodyJson);
+    } catch {
+      setJsonError("Invalid JSON in Body");
+      return;
+    }
+
+    const payload = {
+      ...form.getValues(),
+      projectId,
+      headersTemplate: parsedHeaders,
+      bodyTemplate: parsedBody
+    };
+
+    try {
+      const res = await testConnectionMutation.mutateAsync(payload as any);
+      setTestResponse(res);
+      
+      // Auto mapping logic
+      if (res.statusCode >= 200 && res.statusCode < 300 && res.responseBody) {
+        try {
+          const bodyJson = JSON.parse(res.responseBody);
+          // find common paths
+          const findPath = (obj: any, keys: string[], prefix = "$"): string | null => {
+            if (typeof obj !== 'object' || obj === null) return null;
+            for (const key of Object.keys(obj)) {
+              if (keys.includes(key.toLowerCase())) return `${prefix}.${key}`;
+            }
+            for (const key of Object.keys(obj)) {
+              const result = findPath(obj[key], keys, `${prefix}.${key}`);
+              if (result) return result;
+            }
+            return null;
+          };
+
+          const answerPath = findPath(bodyJson, ['answer', 'text', 'response', 'reply', 'content', 'message']);
+          const sourcesPath = findPath(bodyJson, ['sources', 'references', 'citations', 'docs']);
+          const latencyPath = findPath(bodyJson, ['latency', 'duration', 'time', 'responsetime']);
+
+          if (answerPath) form.setValue("responseMapping.answerPath", answerPath);
+          if (sourcesPath) form.setValue("responseMapping.sourcesPath", sourcesPath);
+          if (latencyPath) form.setValue("responseMapping.latencyPath", latencyPath);
+          
+          if (answerPath || sourcesPath) {
+            toast.success("Auto-mapped response fields based on Test Connection!");
+          }
+        } catch(e) {
+          // ignore parsing error for auto-mapping
+        }
+      }
+    } catch (e) {
+      toast.error("Test connection failed");
     }
   };
 
@@ -552,11 +623,49 @@ export function TargetConfigurationWorkbench() {
                 )}
               />
 
-              <Button type="button" variant="outline" className="w-full gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 h-10">
-                <Play className="h-4 w-4" />
-                {t("targets:workbench.settings.testConnection")}
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 h-10"
+                onClick={handleTestConnection}
+                disabled={testConnectionMutation.isPending}
+              >
+                {testConnectionMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                {testConnectionMutation.isPending ? "Testing..." : t("targets:workbench.settings.testConnection")}
               </Button>
             </div>
+
+            {testResponse && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="mt-6 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden"
+              >
+                <div className={`p-3 text-sm font-medium flex items-center justify-between ${testResponse.statusCode >= 200 && testResponse.statusCode < 300 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 border-b border-emerald-100 dark:border-emerald-800/30' : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border-b border-red-100 dark:border-red-800/30'}`}>
+                  <div className="flex items-center gap-2">
+                    <FileJson className="h-4 w-4" />
+                    Status: {testResponse.statusCode}
+                  </div>
+                  <span>{testResponse.responseTimeMs} ms</span>
+                </div>
+                <div className="bg-zinc-950 p-4 overflow-auto max-h-[300px]">
+                  {testResponse.errorMessage && (
+                    <div className="text-red-400 text-sm mb-2 font-mono">{testResponse.errorMessage}</div>
+                  )}
+                  {testResponse.responseBody && (
+                    <pre className="text-zinc-300 text-xs font-mono">
+                      {(() => {
+                        try {
+                          return JSON.stringify(JSON.parse(testResponse.responseBody), null, 2);
+                        } catch {
+                          return testResponse.responseBody;
+                        }
+                      })()}
+                    </pre>
+                  )}
+                </div>
+              </motion.div>
+            )}
 
             {mutationError && !jsonError && (
               <motion.div

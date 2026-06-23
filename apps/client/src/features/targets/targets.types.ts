@@ -24,6 +24,13 @@ export interface ResponseMappingRequest {
 
 export type ResponseMappingResponse = ResponseMappingRequest;
 
+export interface TargetTestResponse {
+  statusCode: number;
+  responseTimeMs: number;
+  responseBody: string | null;
+  errorMessage: string | null;
+}
+
 export interface TargetRequest {
   projectId: UUID;
   name: string;
