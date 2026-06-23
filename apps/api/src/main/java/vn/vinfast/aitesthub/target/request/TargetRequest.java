@@ -11,11 +11,13 @@ import java.util.Map;
 import java.util.UUID;
 import vn.vinfast.aitesthub.target.enums.HttpMethod;
 import vn.vinfast.aitesthub.target.enums.TargetType;
+import vn.vinfast.aitesthub.target.validation.ValidTargetRequest;
 
 /**
  * @author nghlong3004
  * @since 6/19/2026
  */
+@ValidTargetRequest
 @Schema(description = "Request DTO for creating or updating a Target")
 public record TargetRequest(
     @NotNull(message = "Project ID is required")

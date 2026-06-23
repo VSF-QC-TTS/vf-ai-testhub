@@ -22,6 +22,14 @@ export class TargetExecutor {
     testCase: TestCaseSnapshot,
     timeoutMs: number,
   ): Promise<TargetExecutionResult> {
+    if (target.targetType !== "HTTP") {
+      throw new ExternalServiceError(
+        "UNSUPPORTED_TARGET_TYPE",
+        `Target type "${target.targetType}" is not yet supported by the runner. Only HTTP targets can be executed.`,
+        undefined,
+        false,
+      );
+    }
     const url = applyQueryParams(new URL(target.url), interpolate(target.queryParamsTemplate, testCase));
     const body = interpolate(target.bodyTemplate, testCase);
     const headers = applyAuthConfig(

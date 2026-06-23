@@ -79,6 +79,11 @@ public class TargetController {
   public ResponseEntity<TargetResponse> createTarget(
       @PathVariable UUID projectId,
       @Valid @RequestBody TargetRequest request) {
+    if (!projectId.equals(request.projectId())) {
+      throw new vn.vinfast.aitesthub.exception.BusinessException(
+          vn.vinfast.aitesthub.exception.ErrorCode.VALIDATION_ERROR,
+          "Request projectId does not match the URL path projectId.");
+    }
     TargetResponse response = targetService.createTarget(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }

@@ -23,6 +23,8 @@ public interface TargetMapper {
   @Mapping(target = "project", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
+  @Mapping(target = "isDefault", source = "isDefault")
+  @Mapping(target = "responseMapping", ignore = true)
   Target toEntity(TargetRequest request);
 
   @Mapping(target = "id", ignore = true)

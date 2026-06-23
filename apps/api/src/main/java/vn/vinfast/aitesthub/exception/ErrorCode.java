@@ -85,6 +85,10 @@ public enum ErrorCode {
       HttpStatus.NOT_FOUND.value(),
       "TARGET_CONNECTOR_NOT_FOUND",
       "No target connector found with the provided ID."),
+  TARGET_HAS_ACTIVE_RUNS(
+      HttpStatus.CONFLICT.value(),
+      "TARGET_HAS_ACTIVE_RUNS",
+      "Cannot delete target with active or pending runs."),
   JUDGE_MODEL_NOT_FOUND(
       HttpStatus.NOT_FOUND.value(),
       "JUDGE_MODEL_NOT_FOUND",

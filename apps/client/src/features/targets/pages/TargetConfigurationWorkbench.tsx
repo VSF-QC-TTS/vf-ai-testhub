@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, Save, Play, Code, 
-  Settings2, Braces, Link2, KeyRound 
+  Settings2, Braces, Link2, KeyRound, Cpu 
 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../../components/ui/form";
@@ -70,6 +70,8 @@ export function TargetConfigurationWorkbench() {
       isDefault: false,
     },
   });
+
+  const currentTargetType = form.watch("targetType");
 
   useEffect(() => {
     if (target && !isNew) {
@@ -193,8 +195,10 @@ export function TargetConfigurationWorkbench() {
           
           {/* Main Configuration */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Quick cURL Import */}
-            <div className="relative overflow-hidden bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+            {currentTargetType === "HTTP" && (
+              <>
+                {/* Quick cURL Import */}
+                <div className="relative overflow-hidden bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 dark:opacity-20 pointer-events-none" />
               <SectionHeader icon={Code} title={t("targets:workbench.quickImport.title")} />
               <div className="flex gap-3">
@@ -293,6 +297,84 @@ export function TargetConfigurationWorkbench() {
                 </TabsContent>
               </Tabs>
             </div>
+            </>
+          )}
+
+          {currentTargetType === "LLM" && (
+            <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm space-y-6 hover:shadow-md transition-shadow">
+              <SectionHeader icon={Cpu} title={t("targets:workbench.llmConfig.title", "LLM Configuration")} className="mb-2" />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="llmProvider"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("targets:workbench.llmConfig.provider", "Provider")}</FormLabel>
+                      <Select value={field.value || ""} onValueChange={field.onChange} disabled={isPending}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a provider" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="openai">OpenAI</SelectItem>
+                          <SelectItem value="anthropic">Anthropic</SelectItem>
+                          <SelectItem value="google">Google Gemini</SelectItem>
+                          <SelectItem value="azure">Azure OpenAI</SelectItem>
+                          <SelectItem value="custom">Custom Provider</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="llmModel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("targets:workbench.llmConfig.model", "Model Name")}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="gpt-4o, claude-3-5-sonnet..." {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="llmBaseUrl"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>{t("targets:workbench.llmConfig.baseUrl", "Base URL (Optional)")}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://api.openai.com/v1" className="font-mono text-sm" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="llmKeyRef"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>{t("targets:workbench.llmConfig.keyRef", "API Key Reference (Optional)")}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="OPENAI_API_KEY" className="font-mono text-sm" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <p className="text-xs text-muted-foreground mt-1">Environment variable name containing the API key.</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          )}
 
             {/* Response Mapping */}
             <div className="bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-6 rounded-3xl shadow-sm space-y-6 hover:shadow-md transition-shadow">
@@ -387,6 +469,28 @@ export function TargetConfigurationWorkbench() {
                     <FormControl>
                       <Input placeholder={t("targets:workbench.settings.namePlaceholder")} {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="targetType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("targets:workbench.settings.targetType", "Target Type")}</FormLabel>
+                    <Select value={field.value || "HTTP"} onValueChange={field.onChange} disabled={isPending}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="HTTP">HTTP API</SelectItem>
+                        <SelectItem value="LLM">Native LLM</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

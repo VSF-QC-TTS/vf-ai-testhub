@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import vn.vinfast.aitesthub.dataset.entity.Dataset;
 import vn.vinfast.aitesthub.run.entity.Run;
 import vn.vinfast.aitesthub.run.enums.RunStatus;
+import vn.vinfast.aitesthub.target.entity.Target;
 
 /**
  * @author nghlong3004 (Long Nguyen Hoang)
@@ -23,4 +24,6 @@ public interface RunRepository extends JpaRepository<Run, Long> {
   Page<Run> findByDataset(Dataset dataset, Pageable pageable);
 
   boolean existsByDatasetAndStatusIn(Dataset dataset, Collection<RunStatus> statuses);
+
+  boolean existsByTargetAndStatusIn(Target target, Collection<RunStatus> statuses);
 }

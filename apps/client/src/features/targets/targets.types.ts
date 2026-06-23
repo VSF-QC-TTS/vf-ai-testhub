@@ -1,6 +1,6 @@
 import type { UUID } from "../../lib/api/types";
 
-export type TargetType = "HTTP";
+export type TargetType = "HTTP" | "LLM";
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 export type MissingFieldBehavior = "FAIL" | "SKIP" | "WARNING";
 

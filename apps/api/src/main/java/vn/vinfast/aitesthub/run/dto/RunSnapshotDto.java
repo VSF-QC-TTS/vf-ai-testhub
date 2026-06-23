@@ -47,6 +47,10 @@ public record RunSnapshotDto(
       Map<String, Object> headersTemplate,
       Map<String, Object> bodyTemplate,
       Map<String, Object> authConfig,
+      String llmProvider,
+      String llmModel,
+      String llmBaseUrl,
+      String llmKeyRef,
       Map<String, Object> inputBinding,
       Map<String, Object> variableBindings,
       Integer timeoutMs

@@ -77,6 +77,10 @@ export interface TargetSnapshot {
   readonly headersTemplate: Record<string, unknown>;
   readonly bodyTemplate: Record<string, unknown>;
   readonly authConfig: Record<string, unknown>;
+  readonly llmProvider: string | null;
+  readonly llmModel: string | null;
+  readonly llmBaseUrl: string | null;
+  readonly llmKeyRef: string | null;
   readonly inputBinding: Record<string, unknown>;
   readonly variableBindings: Record<string, unknown>;
   readonly timeoutMs: number | null;

@@ -104,6 +104,10 @@ public class RunSnapshotServiceImpl implements RunSnapshotService {
         nullSafeMap(target.getHeadersTemplate()),
         nullSafeMap(target.getBodyTemplate()),
         nullSafeMap(target.getAuthConfig()),
+        target.getLlmProvider(),
+        target.getLlmModel(),
+        target.getLlmBaseUrl(),
+        target.getLlmKeyRef(),
         nullSafeMap(target.getInputBinding()),
         nullSafeMap(target.getVariableBindings()),
         target.getTimeoutMs());
