@@ -32,7 +32,7 @@ pipeline {
             steps {
                 echo ' Build các Docker image (Client, API, Runner)...'
                 // Tách riêng bước Build để kiểm tra lỗi Compile trước khi chạy
-                sh 'docker-compose build'
+                sh 'docker compose build'
             }
         }
 
@@ -40,8 +40,8 @@ pipeline {
             steps {
                 echo 'Tắt hệ thống cũ và khởi động hệ thống mới...'
                 // Nếu Build ở trên thành công thì mới thực hiện tắt hệ thống cũ
-                sh 'docker-compose down'
-                sh 'docker-compose up -d'
+                sh 'docker compose down'
+                sh 'docker compose up -d'
             }
         }
 
