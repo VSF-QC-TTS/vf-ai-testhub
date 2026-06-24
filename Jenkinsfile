@@ -23,7 +23,7 @@ pipeline {
                 echo 'Chuẩn bị file biến môi trường (.env)...'
                 // Ghi chú: Mở comment 3 dòng dưới sau khi tạo Secret trên Jenkins
                 sh '''
-                    cp .env .env
+                    cp ~/.env .env
                     chmod 600 .env
                 '''
             }
