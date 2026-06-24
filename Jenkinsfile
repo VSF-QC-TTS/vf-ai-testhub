@@ -26,7 +26,7 @@ pipeline {
                     cp /opt/vf-ai-testhub/.env .env
                     chmod 600 .env
                 '''
- 0           }
+            }
         }
 
         stage('Build Images') {
