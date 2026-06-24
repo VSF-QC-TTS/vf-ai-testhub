@@ -1,8 +1,5 @@
 pipeline {
-    // Chỉ định đích danh Node/Agent của dự án Chatbot
-    agent { 
-        label 'chatbot-server' 
-    }
+    agent any
 
     options {
         // Giới hạn số lượng bản build log lưu lại để tránh đầy ổ cứng Jenkins
