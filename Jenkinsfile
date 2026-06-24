@@ -22,9 +22,9 @@ pipeline {
             steps {
                 echo 'Chuẩn bị file biến môi trường (.env)...'
                 // Ghi chú: Mở comment 3 dòng dưới sau khi tạo Secret trên Jenkins
-                sh '''
-                    cp ~/env .env
-                '''
+                 withCredentials([file(credentialsId: 'chatbot-env-file', variable: 'SECRET_ENV')]) {
+                     sh 'cp $SECRET_ENV .env'
+                }
             }
         }
 
