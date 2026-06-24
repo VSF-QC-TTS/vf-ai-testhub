@@ -49,7 +49,7 @@ services:
     restart: unless-stopped
     init: true
     ports:
-      - "127.0.0.1:8080:8080"
+      - "${API_PORT:-8088}:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -86,7 +86,7 @@ services:
     restart: unless-stopped
     init: true
     ports:
-      - "127.0.0.1:${CLIENT_PORT:-3000}:80"
+      - "${CLIENT_PORT:-3000}:80"
     depends_on:
       api:
         condition: service_started
