@@ -1069,7 +1069,7 @@ services:
 
   backend:
     image: chatbot-qa-backend:latest
-    ports: ["8080:8080"]
+    ports: ["8088:8080"]
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/chatbot_qa
       - REDIS_HOST=redis
