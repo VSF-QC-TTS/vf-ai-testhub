@@ -185,7 +185,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of(webBaseUrl, "http://localhost:8888"));
+    configuration.setAllowedOrigins(List.of(webBaseUrl, "http://localhost:8888", "https://vinAI-testhub-staging-v2-front-end.azurewebsites.net"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setAllowCredentials(true);
